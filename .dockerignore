@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+.git
+.gitignore
+*.log
+.DS_Store
+uploads/*
+!uploads/.gitkeep
+dev.db
+dev.db-journal
