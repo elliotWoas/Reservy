@@ -39,7 +39,7 @@ availabilityRouter.use(authenticate);
 availabilityRouter.get('/staff/:staffId/schedule', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrganizationId(req);
-    const schedules = await availabilityService.getStaffSchedules(orgId, req.params.staffId);
+    const schedules = await availabilityService.getStaffSchedule(orgId, req.params.staffId);
     res.json({ data: schedules });
   } catch (err) {
     next(err);
@@ -53,7 +53,10 @@ availabilityRouter.put(
     try {
       const orgId = getOrganizationId(req);
       const validated = SetStaffScheduleSchema.parse(req.body);
-      const result = await availabilityService.setStaffSchedules(orgId, req.params.staffId, validated);
+      const result = await availabilityService.setStaffSchedule(orgId, {
+        staffId: req.params.staffId,
+        schedules: validated.schedules,
+      });
       res.json({ data: result });
     } catch (err) {
       next(err);
