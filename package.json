@@ -1,0 +1,37 @@
+{
+  "name": "reservy",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun --filter \"*\" dev",
+    "dev:api": "bun --filter @reservy/api dev",
+    "dev:web": "bun --filter @reservy/web dev",
+    "build": "bun --filter \"*\" build",
+    "build:api": "bun --filter @reservy/api build",
+    "build:web": "bun --filter @reservy/web build",
+    "start": "bun --filter \"*\" start",
+    "start:api": "bun --filter @reservy/api start",
+    "start:web": "bun --filter @reservy/web start",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "db:generate": "bun run ./packages/database/node_modules/prisma/build/index.js generate --schema=./packages/database/prisma/schema.prisma",
+    "db:push": "bun run ./packages/database/node_modules/prisma/build/index.js db push --schema=./packages/database/prisma/schema.prisma",
+    "db:migrate": "bun run ./packages/database/node_modules/prisma/build/index.js migrate dev --schema=./packages/database/prisma/schema.prisma",
+    "db:migrate:prod": "bun run ./packages/database/node_modules/prisma/build/index.js migrate deploy --schema=./packages/database/prisma/schema.prisma",
+    "db:seed": "bun run packages/database/prisma/seed.ts",
+    "db:studio": "bun run ./packages/database/node_modules/prisma/build/index.js studio --schema=./packages/database/prisma/schema.prisma",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose -f docker-compose.prod.yml build",
+    "docker:prod": "docker compose -f docker-compose.prod.yml up -d",
+    "lint": "bun --filter \"*\" lint",
+    "typecheck": "tsc -b"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
