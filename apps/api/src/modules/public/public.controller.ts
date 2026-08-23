@@ -1,9 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '@reservy/database';
 import { DomainError, DomainErrorCode } from '@reservy/domain';
-import { PublicCreateBookingSchema, AvailabilityQuerySchema } from '@reservy/validation';
+import { PublicCreateBookingSchema, AvailabilityQuerySchema, SubmitPaymentProofSchema } from '@reservy/validation';
 import { availabilityService } from '../availability/availability.service';
 import { bookingService } from '../booking/booking.service';
+import { paymentService } from '../payment/payment.service';
 
 export const publicRouter = Router();
 
@@ -102,6 +103,17 @@ publicRouter.post('/organizations/:slug/bookings', async (req: Request, res: Res
 
     const validated = PublicCreateBookingSchema.parse(req.body);
     const result = await bookingService.createBooking(org.id, validated);
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Public Submit Payment Proof
+publicRouter.post('/payments/proof', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const validated = SubmitPaymentProofSchema.parse(req.body);
+    const result = await paymentService.submitPaymentProof(validated);
     res.status(201).json({ data: result });
   } catch (err) {
     next(err);
