@@ -25,9 +25,7 @@ export class AvailabilityService {
       include: {
         staffServices: {
           include: {
-            staff: {
-              where: { isActive: true, isBookable: true, deletedAt: null },
-            },
+            staff: true,
           },
         },
       },
@@ -40,7 +38,9 @@ export class AvailabilityService {
     // Determine target staff members
     let candidateStaffIds: string[] = [];
     if (staffId) {
-      const isAssigned = service.staffServices.some((ss) => ss.staffId === staffId && ss.staff);
+      const isAssigned = service.staffServices.some(
+        (ss) => ss.staffId === staffId && ss.staff && ss.staff.isActive && ss.staff.isBookable && !ss.staff.deletedAt
+      );
       if (!isAssigned) {
         throw new DomainError(
           DomainErrorCode.STAFF_DOES_NOT_PROVIDE_SERVICE,
@@ -51,7 +51,7 @@ export class AvailabilityService {
     } else {
       // Any staff: get all bookable staff offering this service
       candidateStaffIds = service.staffServices
-        .filter((ss) => ss.staff && ss.staff.isActive && ss.staff.isBookable)
+        .filter((ss) => ss.staff && ss.staff.isActive && ss.staff.isBookable && !ss.staff.deletedAt)
         .map((ss) => ss.staffId);
     }
 
@@ -121,13 +121,15 @@ export class AvailabilityService {
         },
       });
 
-      // Run Domain slot generator
+      // Run Domain slot generator with service duration blocks
+      const slotStep = service.durationMinutes > 0 ? service.durationMinutes : 30;
+
       const staffSlots = generateAvailableSlots({
         date,
         serviceDurationMinutes: service.durationMinutes,
         bufferBeforeMinutes: service.bufferBeforeMinutes,
         bufferAfterMinutes: service.bufferAfterMinutes,
-        slotIntervalMinutes: 30, // 30 min granularity
+        slotIntervalMinutes: slotStep,
         schedule: {
           dayOfWeek,
           shifts,
@@ -159,54 +161,70 @@ export class AvailabilityService {
     );
   }
 
-  async getStaffSchedules(orgId: string, staffId: string) {
-    return await prisma.staffSchedule.findMany({
-      where: { organizationId: orgId, staffId },
-      orderBy: { dayOfWeek: 'asc' },
-    });
-  }
+  /**
+   * Sets weekly schedule for a staff member
+   */
+  async setStaffSchedule(orgId: string, input: SetStaffScheduleInput & { staffId: string }) {
+    const { staffId, schedules } = input;
 
-  async setStaffSchedules(orgId: string, staffId: string, input: SetStaffScheduleInput) {
-    return await prisma.$transaction(async (tx) => {
-      const results = [];
-      for (const day of input.schedules) {
-        const res = await tx.staffSchedule.upsert({
+    // Verify staff belongs to org
+    const staff = await prisma.staffMember.findFirst({
+      where: { id: staffId, organizationId: orgId, deletedAt: null },
+    });
+
+    if (!staff) {
+      throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'ارائه‌دهنده یافت نشد');
+    }
+
+    // Upsert each day's schedule in a transaction
+    return await prisma.$transaction(
+      schedules.map((s) =>
+        prisma.staffSchedule.upsert({
           where: {
             staffId_dayOfWeek: {
               staffId,
-              dayOfWeek: day.dayOfWeek,
+              dayOfWeek: s.dayOfWeek,
             },
           },
           update: {
-            shiftsJson: JSON.stringify(day.shifts),
-            breaksJson: JSON.stringify(day.breaks || []),
-            isDayOff: day.isDayOff,
+            shiftsJson: JSON.stringify(s.shifts),
+            breaksJson: JSON.stringify(s.breaks || []),
+            isDayOff: s.isDayOff,
           },
           create: {
             organizationId: orgId,
             staffId,
-            dayOfWeek: day.dayOfWeek,
-            shiftsJson: JSON.stringify(day.shifts),
-            breaksJson: JSON.stringify(day.breaks || []),
-            isDayOff: day.isDayOff,
+            dayOfWeek: s.dayOfWeek,
+            shiftsJson: JSON.stringify(s.shifts),
+            breaksJson: JSON.stringify(s.breaks || []),
+            isDayOff: s.isDayOff,
           },
-        });
-        results.push(res);
-      }
-      return results;
+        })
+      )
+    );
+  }
+
+  /**
+   * Fetches weekly schedule for a staff member
+   */
+  async getStaffSchedule(orgId: string, staffId: string) {
+    const staff = await prisma.staffMember.findFirst({
+      where: { id: staffId, organizationId: orgId, deletedAt: null },
+    });
+
+    if (!staff) {
+      throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'ارائه‌دهنده یافت نشد');
+    }
+
+    return await prisma.staffSchedule.findMany({
+      where: { staffId, organizationId: orgId },
+      orderBy: { dayOfWeek: 'asc' },
     });
   }
 
-  async getBlockedPeriods(orgId: string, staffId?: string) {
-    return await prisma.blockedPeriod.findMany({
-      where: {
-        organizationId: orgId,
-        ...(staffId ? { staffId } : {}),
-      },
-      orderBy: { startAt: 'asc' },
-    });
-  }
-
+  /**
+   * Creates a blocked period (vacation, maintenance, etc.)
+   */
   async createBlockedPeriod(orgId: string, input: CreateBlockedPeriodInput) {
     return await prisma.blockedPeriod.create({
       data: {
@@ -220,9 +238,27 @@ export class AvailabilityService {
     });
   }
 
-  async deleteBlockedPeriod(orgId: string, periodId: string) {
+  /**
+   * Lists blocked periods for an organization
+   */
+  async getBlockedPeriods(orgId: string, staffId?: string) {
+    const where: any = { organizationId: orgId };
+    if (staffId) {
+      where.OR = [{ staffId }, { staffId: null }];
+    }
+    return await prisma.blockedPeriod.findMany({
+      where,
+      include: { staff: true, location: true },
+      orderBy: { startAt: 'asc' },
+    });
+  }
+
+  /**
+   * Deletes a blocked period
+   */
+  async deleteBlockedPeriod(orgId: string, id: string) {
     return await prisma.blockedPeriod.deleteMany({
-      where: { id: periodId, organizationId: orgId },
+      where: { id, organizationId: orgId },
     });
   }
 }
