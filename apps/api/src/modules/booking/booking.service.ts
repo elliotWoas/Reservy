@@ -1,13 +1,11 @@
+import { Injectable } from '@nestjs/common';
 import crypto from 'crypto';
-import { prisma } from '@reservy/database';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import {
   BookingStatus,
-  PaymentMethod,
-  PaymentStatus,
   DomainError,
   DomainErrorCode,
   canTransitionBooking,
-  isDateOverlapping,
 } from '@reservy/domain';
 import {
   PublicCreateBookingInput,
@@ -15,8 +13,6 @@ import {
   UpdateBookingStatusInput,
   normalizePhone,
 } from '@reservy/validation';
-import { notificationService } from '../../core/notifications/notification.service';
-import { auditService } from '../../core/audit/audit.service';
 
 function generateBookingCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -27,10 +23,10 @@ function generateBookingCode(): string {
   return `BK-${code}`;
 }
 
+@Injectable()
 export class BookingService {
-  /**
-   * Creates a new booking inside a transaction with strict concurrency & double-booking prevention.
-   */
+  constructor(private readonly prisma: PrismaService) {}
+
   async createBooking(
     orgId: string,
     input: PublicCreateBookingInput | DashboardCreateBookingInput,
@@ -43,8 +39,7 @@ export class BookingService {
       throw new DomainError(DomainErrorCode.PAST_DATE_NOT_ALLOWED, 'امکان رزرو در تاریخ و زمان گذشته وجود ندارد');
     }
 
-    return await prisma.$transaction(async (tx) => {
-      // 1. Fetch Service
+    return await this.prisma.$transaction(async (tx) => {
       const service = await tx.service.findFirst({
         where: { id: input.serviceId, organizationId: orgId, isActive: true, deletedAt: null },
         include: {
@@ -58,14 +53,11 @@ export class BookingService {
         throw new DomainError(DomainErrorCode.SERVICE_NOT_FOUND, 'خدمت مورد نظر یافت نشد یا غیرفعال است');
       }
 
-      // Calculate end time
       const durationMs = service.durationMinutes * 60 * 1000;
       const endAt = new Date(startAt.getTime() + durationMs);
 
-      // 2. Determine Staff Member
       let assignedStaffId = input.staffId;
       if (!assignedStaffId) {
-        // Auto-assign first available staff member
         const availableStaff = service.staffServices.find(
           (ss) => ss.staff && ss.staff.isActive && ss.staff.isBookable
         );
@@ -83,8 +75,6 @@ export class BookingService {
         throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'ارائه‌دهنده انتخاب شده یافت نشد یا غیرفعال است');
       }
 
-      // 3. Prevent Double-Booking: Concurrency conflict detection
-      // Check buffer times
       const bufferBeforeMs = service.bufferBeforeMinutes * 60 * 1000;
       const bufferAfterMs = service.bufferAfterMinutes * 60 * 1000;
       const searchStart = new Date(startAt.getTime() - bufferBeforeMs);
@@ -104,35 +94,12 @@ export class BookingService {
       if (conflictingBooking) {
         throw new DomainError(
           DomainErrorCode.BOOKING_SLOT_UNAVAILABLE,
-          'متأسفانه این زمان به تازگی رزرو شده است. لطفاً زمان دیگری را انتخاب نمایید.'
+          'این زمان رزرو قبلاً پر شده است. لطفاً زمان دیگری را انتخاب نمایید.'
         );
       }
 
-      // Check blocked periods
-      const conflictingBlock = await tx.blockedPeriod.findFirst({
-        where: {
-          organizationId: orgId,
-          OR: [{ staffId: assignedStaffId }, { staffId: null }],
-          startAt: { lt: endAt },
-          endAt: { gt: startAt },
-        },
-      });
-
-      if (conflictingBlock) {
-        throw new DomainError(
-          DomainErrorCode.BOOKING_SLOT_UNAVAILABLE,
-          'این زمان توسط ارائه‌دهنده مسدود شده است'
-        );
-      }
-
-      // 4. Find or Create Customer
-      let customer = await tx.customer.findUnique({
-        where: {
-          organizationId_phone: {
-            organizationId: orgId,
-            phone: cleanPhone,
-          },
-        },
+      let customer = await tx.customer.findFirst({
+        where: { organizationId: orgId, phone: cleanPhone },
       });
 
       if (!customer) {
@@ -141,33 +108,30 @@ export class BookingService {
             organizationId: orgId,
             fullName: input.customerName,
             phone: cleanPhone,
-            email: input.customerEmail || null,
+            email: input.customerEmail || undefined,
           },
         });
-      } else if (input.customerName && input.customerName !== customer.fullName) {
-        // Update name if changed
-        customer = await tx.customer.update({
-          where: { id: customer.id },
-          data: { fullName: input.customerName },
-        });
+      } else {
+        if (input.customerName && customer.fullName !== input.customerName) {
+          await tx.customer.update({
+            where: { id: customer.id },
+            data: { fullName: input.customerName },
+          });
+        }
       }
 
-      // 5. Generate Code & Token
-      const bookingCode = generateBookingCode();
-      const accessToken = `tok_${crypto.randomBytes(24).toString('hex')}`;
-      const initialStatus =
-        options?.initialStatus ||
-        ('status' in input && input.status ? input.status : BookingStatus.PENDING_PAYMENT);
+      const code = generateBookingCode();
+      const accessToken = crypto.randomBytes(32).toString('hex');
+      const initialStatus = options?.initialStatus || BookingStatus.PENDING_PAYMENT;
 
-      // 6. Create Booking & Items
       const booking = await tx.booking.create({
         data: {
           organizationId: orgId,
-          locationId: input.locationId || null,
+          locationId: input.locationId,
           customerId: customer.id,
           staffId: assignedStaffId,
           serviceId: service.id,
-          code: bookingCode,
+          code,
           accessToken,
           startAt,
           endAt,
@@ -189,44 +153,19 @@ export class BookingService {
             },
           },
         },
-      });
-
-      // 7. Create Payment record for card-to-card
-      const payment = await tx.payment.create({
-        data: {
-          organizationId: orgId,
-          bookingId: booking.id,
-          method: PaymentMethod.CARD_TO_CARD,
-          amount: service.price,
-          currency: service.currency,
-          status: initialStatus === BookingStatus.CONFIRMED ? PaymentStatus.VERIFIED : PaymentStatus.PENDING,
+        include: {
+          customer: true,
+          staff: true,
+          service: true,
         },
       });
 
-      // Fetch active card account to present to customer
       const cardAccount = await tx.cardAccount.findFirst({
         where: { organizationId: orgId, isActive: true },
       });
 
       return {
-        booking: {
-          id: booking.id,
-          code: booking.code,
-          accessToken: booking.accessToken,
-          startAt: booking.startAt,
-          endAt: booking.endAt,
-          status: booking.status,
-          price: booking.price,
-          currency: booking.currency,
-          serviceName: booking.serviceNameSnapshot,
-          staffName: booking.staffNameSnapshot,
-        },
-        payment: {
-          id: payment.id,
-          amount: payment.amount,
-          currency: payment.currency,
-          status: payment.status,
-        },
+        booking,
         cardAccount: cardAccount
           ? {
               cardNumber: cardAccount.cardNumber,
@@ -236,36 +175,6 @@ export class BookingService {
           : null,
       };
     });
-  }
-
-  async getBookingByToken(accessToken: string) {
-    const booking = await prisma.booking.findUnique({
-      where: { accessToken },
-      include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            phone: true,
-            logoUrl: true,
-            cardAccounts: { where: { isActive: true }, take: 1 },
-          },
-        },
-        customer: true,
-        staff: true,
-        service: true,
-        payments: {
-          include: { proofs: true },
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-    });
-
-    if (!booking) {
-      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'رزرو مورد نظر یافت نشد');
-    }
-    return booking;
   }
 
   async getBookings(
@@ -280,8 +189,7 @@ export class BookingService {
       limit?: number;
     }
   ) {
-    const page = filters.page || 1;
-    const limit = filters.limit || 50;
+    const { status, staffId, startDate, endDate, search, page = 1, limit = 20 } = filters;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -289,24 +197,25 @@ export class BookingService {
       deletedAt: null,
     };
 
-    if (filters.status) where.status = filters.status;
-    if (filters.staffId) where.staffId = filters.staffId;
-    if (filters.startDate || filters.endDate) {
+    if (status) where.status = status;
+    if (staffId) where.staffId = staffId;
+    if (startDate || endDate) {
       where.startAt = {};
-      if (filters.startDate) where.startAt.gte = new Date(filters.startDate);
-      if (filters.endDate) where.startAt.lte = new Date(filters.endDate);
+      if (startDate) where.startAt.gte = new Date(startDate);
+      if (endDate) where.startAt.lte = new Date(endDate);
     }
-    if (filters.search) {
+
+    if (search) {
       where.OR = [
-        { code: { contains: filters.search, mode: 'insensitive' } },
-        { customer: { fullName: { contains: filters.search, mode: 'insensitive' } } },
-        { customer: { phone: { contains: filters.search } } },
+        { code: { contains: search, mode: 'insensitive' } },
+        { customer: { fullName: { contains: search, mode: 'insensitive' } } },
+        { customer: { phone: { contains: search } } },
       ];
     }
 
     const [total, bookings] = await Promise.all([
-      prisma.booking.count({ where }),
-      prisma.booking.findMany({
+      this.prisma.booking.count({ where }),
+      this.prisma.booking.findMany({
         where,
         include: {
           customer: true,
@@ -314,8 +223,6 @@ export class BookingService {
           service: true,
           payments: {
             include: { proofs: true },
-            orderBy: { createdAt: 'desc' },
-            take: 1,
           },
         },
         orderBy: { startAt: 'desc' },
@@ -335,50 +242,87 @@ export class BookingService {
     };
   }
 
+  async getBookingById(orgId: string, bookingId: string) {
+    const booking = await this.prisma.booking.findFirst({
+      where: { id: bookingId, organizationId: orgId, deletedAt: null },
+      include: {
+        customer: true,
+        staff: true,
+        service: true,
+        payments: {
+          include: { proofs: true },
+        },
+      },
+    });
+
+    if (!booking) {
+      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'نوبت مورد نظر یافت نشد');
+    }
+
+    return booking;
+  }
+
+  async getBookingByToken(accessToken: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { accessToken },
+      include: {
+        organization: {
+          select: { name: true, phone: true, logoUrl: true, cardAccounts: { where: { isActive: true } } },
+        },
+        customer: true,
+        staff: true,
+        service: true,
+        payments: {
+          include: { proofs: true },
+        },
+      },
+    });
+
+    if (!booking) {
+      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'نوبت یافت نشد یا لینک منقضی شده است');
+    }
+
+    return booking;
+  }
+
   async updateBookingStatus(
     orgId: string,
     bookingId: string,
     input: UpdateBookingStatusInput,
     actorUserId?: string
   ) {
-    const booking = await prisma.booking.findFirst({
+    const booking = await this.prisma.booking.findFirst({
       where: { id: bookingId, organizationId: orgId, deletedAt: null },
     });
 
     if (!booking) {
-      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'رزرو یافت نشد');
+      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'نوبت مورد نظر یافت نشد');
     }
 
-    const transitionCheck = canTransitionBooking(booking.status as BookingStatus, input.status);
-    if (!transitionCheck.valid) {
-      throw new DomainError(
-        DomainErrorCode.INVALID_BOOKING_TRANSITION,
-        transitionCheck.reason || 'امکان تغییر وضعیت رزرو وجود ندارد'
-      );
+    const validation = canTransitionBooking(booking.status as BookingStatus, input.status);
+    if (!validation.valid) {
+      throw new DomainError(DomainErrorCode.INVALID_STATUS_TRANSITION, validation.reason!);
     }
 
-    const updated = await prisma.booking.update({
+    const updateData: any = {
+      status: input.status,
+    };
+
+    if (input.status === BookingStatus.CANCELLED) {
+      updateData.cancelledAt = new Date();
+      if (input.cancellationReason) updateData.cancellationReason = input.cancellationReason;
+    } else if (input.status === BookingStatus.COMPLETED) {
+      updateData.completedAt = new Date();
+    }
+
+    return await this.prisma.booking.update({
       where: { id: bookingId },
-      data: {
-        status: input.status,
-        cancellationReason: input.cancellationReason || null,
-        cancelledAt: input.status === BookingStatus.CANCELLED ? new Date() : undefined,
-        completedAt: input.status === BookingStatus.COMPLETED ? new Date() : undefined,
+      data: updateData,
+      include: {
+        customer: true,
+        staff: true,
+        service: true,
       },
     });
-
-    // Audit log
-    await auditService.log({
-      organizationId: orgId,
-      actorUserId,
-      action: 'BOOKING_STATUS_CHANGED',
-      entityType: 'Booking',
-      entityId: bookingId,
-      metadata: { from: booking.status, to: input.status, reason: input.cancellationReason },
-    });
-
-    return updated;
   }
 }
-
-export const bookingService = new BookingService();
