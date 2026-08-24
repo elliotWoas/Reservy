@@ -1,81 +1,84 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import multer from 'multer';
-import { SubmitPaymentProofSchema, VerifyPaymentProofSchema } from '@reservy/validation';
-import { Permission, PaymentStatus } from '@reservy/domain';
-import { paymentService } from './payment.service';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { PaymentService } from './payment.service';
 import { storageService } from '../../core/storage/storage.service';
-import { authenticate, requirePermission } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest, getOrganizationId } from '../../core/tenant-context';
+import { CurrentOrgId, CurrentUser, RequirePermission } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
+import { PaymentStatus, Permission } from '@reservy/domain';
+import { SubmitPaymentProofSchema, VerifyPaymentProofSchema } from '@reservy/validation';
+import type { UserContext } from '../../core/tenant-context';
 
-export const paymentRouter = Router();
-const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
+@Controller('payments')
+export class PaymentController {
+  constructor(private readonly paymentService: PaymentService) {}
 
-// Public receipt upload endpoint
-paymentRouter.post('/upload', upload.single('receipt'), async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (!req.file) {
-      res.status(400).json({ error: { code: 'FILE_REQUIRED', message: 'فایل رسید ارسال نشده است' } });
-      return;
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('receipt', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException({ error: { code: 'FILE_REQUIRED', message: 'فایل رسید ارسال نشده است' } });
     }
 
-    const saved = await storageService.saveFile(
-      req.file.buffer,
-      req.file.originalname,
-      req.file.mimetype
-    );
-
-    res.json({ data: saved });
-  } catch (err) {
-    next(err);
+    const saved = await storageService.saveFile(file.buffer, file.originalname, file.mimetype);
+    return { data: saved };
   }
-});
 
-// Public submit payment proof
-paymentRouter.post('/proof', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const validated = SubmitPaymentProofSchema.parse(req.body);
-    const result = await paymentService.submitPaymentProof(validated);
-    res.status(201).json({ data: result });
-  } catch (err) {
-    next(err);
+  @Post('proof')
+  async submitProof(@Body() body: unknown) {
+    const validated = SubmitPaymentProofSchema.parse(body);
+    const result = await this.paymentService.submitPaymentProof(validated);
+    return { data: result };
   }
-});
 
-// Authenticated Dashboard Payment Review
-paymentRouter.use(authenticate);
-
-paymentRouter.get('/', requirePermission(Permission.PAYMENT_READ), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await paymentService.getPayments(orgId, {
-      status: req.query.status as PaymentStatus | undefined,
-      startDate: req.query.startDate as string | undefined,
-      endDate: req.query.endDate as string | undefined,
-      page: req.query.page ? parseInt(req.query.page as string, 10) : undefined,
-      limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
+  @Get()
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission(Permission.PAYMENT_READ)
+  async getPayments(
+    @CurrentOrgId() orgId: string,
+    @Query('status') status?: PaymentStatus,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    const result = await this.paymentService.getPayments(orgId, {
+      status,
+      startDate,
+      endDate,
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
     });
-    res.json(result);
-  } catch (err) {
-    next(err);
+    return result;
   }
-});
 
-paymentRouter.post(
-  '/:id/verify',
-  requirePermission(Permission.PAYMENT_VERIFY),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = VerifyPaymentProofSchema.parse(req.body);
-      const result = await paymentService.verifyPayment(
-        orgId,
-        req.params.id,
-        validated,
-        req.user?.userId
-      );
-      res.json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  @Post(':id/verify')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission(Permission.PAYMENT_VERIFY)
+  async verifyPayment(
+    @CurrentOrgId() orgId: string,
+    @CurrentUser() user: UserContext,
+    @Param('id') id: string,
+    @Body() body: unknown
+  ) {
+    const validated = VerifyPaymentProofSchema.parse(body);
+    const result = await this.paymentService.verifyPayment(
+      orgId,
+      id,
+      validated,
+      user.userId
+    );
+    return { data: result };
   }
-);
+}

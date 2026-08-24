@@ -1,35 +1,30 @@
-import { prisma } from '@reservy/database';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import {
-  BookingStatus,
   PaymentStatus,
+  PaymentMethod,
   PaymentProofReviewStatus,
+  BookingStatus,
   DomainError,
   DomainErrorCode,
+  canTransitionPayment,
 } from '@reservy/domain';
 import { SubmitPaymentProofInput, VerifyPaymentProofInput } from '@reservy/validation';
-import { notificationService } from '../../core/notifications/notification.service';
-import { auditService } from '../../core/audit/audit.service';
 
+@Injectable()
 export class PaymentService {
-  /**
-   * Customer submits a card-to-card receipt proof.
-   */
+  constructor(private readonly prisma: PrismaService) {}
+
   async submitPaymentProof(input: SubmitPaymentProofInput) {
-    const booking = await prisma.booking.findUnique({
+    const booking = await this.prisma.booking.findUnique({
       where: { id: input.bookingId },
-      include: { organization: true, customer: true },
     });
 
     if (!booking) {
-      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'رزرو یافت نشد');
+      throw new DomainError(DomainErrorCode.BOOKING_NOT_FOUND, 'نوبت مورد نظر یافت نشد');
     }
 
-    if (booking.status === BookingStatus.CONFIRMED || booking.status === BookingStatus.COMPLETED) {
-      throw new DomainError(DomainErrorCode.PAYMENT_ALREADY_VERIFIED, 'این رزرو قبلاً تایید شده است');
-    }
-
-    return await prisma.$transaction(async (tx) => {
-      // Find or create pending payment for this booking
+    return await this.prisma.$transaction(async (tx) => {
       let payment = await tx.payment.findFirst({
         where: { bookingId: booking.id },
       });
@@ -39,10 +34,11 @@ export class PaymentService {
           data: {
             organizationId: booking.organizationId,
             bookingId: booking.id,
+            method: PaymentMethod.CARD_TO_CARD,
             amount: input.amount,
             currency: booking.currency,
             status: PaymentStatus.PROOF_SUBMITTED,
-            referenceNumber: input.referenceNumber || null,
+            referenceNumber: input.referenceNumber,
           },
         });
       } else {
@@ -50,12 +46,12 @@ export class PaymentService {
           where: { id: payment.id },
           data: {
             status: PaymentStatus.PROOF_SUBMITTED,
+            amount: input.amount,
             referenceNumber: input.referenceNumber || payment.referenceNumber,
           },
         });
       }
 
-      // Create Payment Proof record
       const proof = await tx.paymentProof.create({
         data: {
           paymentId: payment.id,
@@ -66,30 +62,15 @@ export class PaymentService {
         },
       });
 
-      // Update Booking status
       await tx.booking.update({
         where: { id: booking.id },
         data: { status: BookingStatus.PAYMENT_SUBMITTED },
       });
 
-      // Send owner notification
-      await notificationService.onPaymentSubmitted({
-        orgOwnerPhone: booking.organization.phone || undefined,
-        bookingCode: booking.code,
-        amount: input.amount,
-      });
-
-      return {
-        paymentId: payment.id,
-        proofId: proof.id,
-        status: payment.status,
-      };
+      return { payment, proof };
     });
   }
 
-  /**
-   * Admin lists payments for review/audit.
-   */
   async getPayments(
     orgId: string,
     filters: {
@@ -100,36 +81,26 @@ export class PaymentService {
       limit?: number;
     }
   ) {
-    const page = filters.page || 1;
-    const limit = filters.limit || 50;
+    const { status, startDate, endDate, page = 1, limit = 20 } = filters;
     const skip = (page - 1) * limit;
 
-    const where: any = {
-      organizationId: orgId,
-    };
-
-    if (filters.status) where.status = filters.status;
-    if (filters.startDate || filters.endDate) {
+    const where: any = { organizationId: orgId };
+    if (status) where.status = status;
+    if (startDate || endDate) {
       where.createdAt = {};
-      if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
-      if (filters.endDate) where.createdAt.lte = new Date(filters.endDate);
+      if (startDate) where.createdAt.gte = new Date(startDate);
+      if (endDate) where.createdAt.lte = new Date(endDate);
     }
 
     const [total, payments] = await Promise.all([
-      prisma.payment.count({ where }),
-      prisma.payment.findMany({
+      this.prisma.payment.count({ where }),
+      this.prisma.payment.findMany({
         where,
         include: {
           booking: {
-            include: {
-              customer: true,
-              service: true,
-              staff: true,
-            },
+            include: { customer: true, service: true, staff: true },
           },
-          proofs: {
-            orderBy: { uploadedAt: 'desc' },
-          },
+          proofs: { orderBy: { uploadedAt: 'desc' } },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -148,92 +119,71 @@ export class PaymentService {
     };
   }
 
-  /**
-   * Admin approves or rejects a payment proof.
-   */
   async verifyPayment(
     orgId: string,
     paymentId: string,
     input: VerifyPaymentProofInput,
     actorUserId?: string
   ) {
-    const payment = await prisma.payment.findFirst({
+    const payment = await this.prisma.payment.findFirst({
       where: { id: paymentId, organizationId: orgId },
-      include: {
-        booking: { include: { customer: true } },
-        proofs: { orderBy: { uploadedAt: 'desc' }, take: 1 },
-      },
+      include: { booking: true, proofs: true },
     });
 
     if (!payment) {
-      throw new DomainError(DomainErrorCode.PAYMENT_NOT_FOUND, 'پرداخت مورد نظر یافت نشد');
+      throw new DomainError(DomainErrorCode.PAYMENT_NOT_FOUND, 'تراکنش پرداخت یافت نشد');
     }
 
-    const isApproved = input.reviewStatus === PaymentProofReviewStatus.APPROVED;
+    const targetPaymentStatus =
+      input.reviewStatus === PaymentProofReviewStatus.APPROVED
+        ? PaymentStatus.VERIFIED
+        : PaymentStatus.REJECTED;
 
-    if (!isApproved && !input.rejectionReason) {
-      throw new DomainError(DomainErrorCode.INVALID_INPUT, 'در صورت رد پرداخت، ذکر دلیل رد الزامی است');
+    const validation = canTransitionPayment(payment.status as PaymentStatus, targetPaymentStatus);
+    if (!validation.valid) {
+      throw new DomainError(DomainErrorCode.INVALID_STATUS_TRANSITION, validation.reason!);
     }
 
-    return await prisma.$transaction(async (tx) => {
-      // 1. Update Payment Proof
-      if (payment.proofs.length > 0) {
+    return await this.prisma.$transaction(async (tx) => {
+      const updatedPayment = await tx.payment.update({
+        where: { id: paymentId },
+        data: {
+          status: targetPaymentStatus,
+          verifiedAt: input.reviewStatus === PaymentProofReviewStatus.APPROVED ? new Date() : undefined,
+          verifiedByUserId: actorUserId,
+        },
+      });
+
+      const latestProof = payment.proofs[0];
+      if (latestProof) {
         await tx.paymentProof.update({
-          where: { id: payment.proofs[0].id },
+          where: { id: latestProof.id },
           data: {
             reviewStatus: input.reviewStatus,
             reviewedAt: new Date(),
-            reviewedByUserId: actorUserId || null,
-            rejectionReason: input.rejectionReason || null,
+            reviewedByUserId: actorUserId,
+            rejectionReason: input.rejectionReason,
           },
         });
       }
 
-      // 2. Update Payment
-      const updatedPayment = await tx.payment.update({
-        where: { id: paymentId },
-        data: {
-          status: isApproved ? PaymentStatus.VERIFIED : PaymentStatus.REJECTED,
-          verifiedAt: isApproved ? new Date() : null,
-          verifiedByUserId: isApproved ? actorUserId : null,
-        },
-      });
+      const targetBookingStatus =
+        input.reviewStatus === PaymentProofReviewStatus.APPROVED
+          ? BookingStatus.CONFIRMED
+          : BookingStatus.REJECTED;
 
-      // 3. Synchronize Booking State
       await tx.booking.update({
         where: { id: payment.bookingId },
         data: {
-          status: isApproved ? BookingStatus.CONFIRMED : BookingStatus.REJECTED,
-          cancellationReason: !isApproved ? input.rejectionReason : null,
+          status: targetBookingStatus,
+          cancellationReason:
+            input.reviewStatus === PaymentProofReviewStatus.REJECTED
+              ? input.rejectionReason || 'رسید پرداخت توسط مدیریت رد شد'
+              : undefined,
         },
       });
-
-      // 4. Audit Log
-      await auditService.log({
-        organizationId: orgId,
-        actorUserId,
-        action: isApproved ? 'PAYMENT_APPROVED' : 'PAYMENT_REJECTED',
-        entityType: 'Payment',
-        entityId: paymentId,
-        metadata: {
-          bookingId: payment.bookingId,
-          amount: payment.amount,
-          rejectionReason: input.rejectionReason,
-        },
-      });
-
-      // 5. Notify Customer if approved
-      if (isApproved) {
-        await notificationService.onPaymentVerified({
-          customerPhone: payment.booking.customer.phone,
-          customerName: payment.booking.customer.fullName,
-          bookingCode: payment.booking.code,
-        });
-      }
 
       return updatedPayment;
     });
   }
 }
-
-export const paymentService = new PaymentService();
