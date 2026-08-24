@@ -1,29 +1,33 @@
-import { Router, Response, NextFunction } from 'express';
-import { OrganizationStatus } from '@reservy/domain';
-import { adminService } from './admin.service';
-import { authenticate, requireSuperAdmin } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest } from '../../core/tenant-context';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+import { AdminService } from './admin.service';
+import { RequireSuperAdmin } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
 
-export const adminRouter = Router();
+@Controller('admin')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+@RequireSuperAdmin()
+export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
 
-adminRouter.use(authenticate);
-adminRouter.use(requireSuperAdmin);
-
-adminRouter.get('/overview', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const result = await adminService.getPlatformOverview();
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Get('overview')
+  async getOverview() {
+    return await this.adminService.getPlatformOverview();
   }
-});
 
-adminRouter.patch('/organizations/:id/status', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const { status } = req.body as { status: OrganizationStatus };
-    const result = await adminService.setOrganizationStatus(req.params.id, status);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Patch('organizations/:id/status')
+  async updateOrgStatus(
+    @Param('id') id: string,
+    @Body('status') status: 'ACTIVE' | 'SUSPENDED'
+  ) {
+    const updated = await this.adminService.updateOrganizationStatus(id, status);
+    return { data: updated };
   }
-});
+}
