@@ -1,65 +1,55 @@
-import { prisma } from '@reservy/database';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import { BookingStatus, DomainError, DomainErrorCode } from '@reservy/domain';
 import { UpdateCustomerNotesInput } from '@reservy/validation';
 
+@Injectable()
 export class CrmService {
+  constructor(private readonly prisma: PrismaService) {}
+
   async getCustomers(
     orgId: string,
     filters: { search?: string; page?: number; limit?: number }
   ) {
-    const page = filters.page || 1;
-    const limit = filters.limit || 50;
+    const { search, page = 1, limit = 20 } = filters;
     const skip = (page - 1) * limit;
 
     const where: any = { organizationId: orgId };
-    if (filters.search) {
+    if (search) {
       where.OR = [
-        { fullName: { contains: filters.search, mode: 'insensitive' } },
-        { phone: { contains: filters.search } },
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { phone: { contains: search } },
+        { email: { contains: search, mode: 'insensitive' } },
       ];
     }
 
     const [total, customers] = await Promise.all([
-      prisma.customer.count({ where }),
-      prisma.customer.findMany({
+      this.prisma.customer.count({ where }),
+      this.prisma.customer.findMany({
         where,
         include: {
           bookings: {
             where: { deletedAt: null },
             orderBy: { startAt: 'desc' },
-            select: {
-              id: true,
-              startAt: true,
-              status: true,
-              price: true,
-            },
+            include: { service: true, staff: true },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { updatedAt: 'desc' },
         skip,
         take: limit,
       }),
     ]);
 
-    const now = new Date();
+    const formatted = customers.map((c) => {
+      const completed = c.bookings.filter((b) => b.status === BookingStatus.COMPLETED);
+      const totalSpent = completed.reduce((acc, b) => acc + b.priceSnapshot, 0);
 
-    const formattedCustomers = customers.map((c) => {
-      const totalBookings = c.bookings.length;
-      const completedBookings = c.bookings.filter((b) => b.status === BookingStatus.COMPLETED).length;
-      const cancelledBookings = c.bookings.filter((b) => b.status === BookingStatus.CANCELLED).length;
-      const noShowBookings = c.bookings.filter((b) => b.status === BookingStatus.NO_SHOW).length;
-
-      const totalSpent = c.bookings
-        .filter((b) => b.status === BookingStatus.COMPLETED || b.status === BookingStatus.CONFIRMED)
-        .reduce((sum, b) => sum + b.price, 0);
-
-      const pastBookings = c.bookings.filter((b) => new Date(b.startAt) <= now);
-      const futureBookings = c.bookings
-        .filter((b) => new Date(b.startAt) > now && b.status !== BookingStatus.CANCELLED && b.status !== BookingStatus.REJECTED)
-        .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
-
-      const lastVisit = pastBookings.length > 0 ? pastBookings[0].startAt : null;
-      const nextBooking = futureBookings.length > 0 ? futureBookings[0].startAt : null;
+      const lastVisit = completed[0]?.startAt || null;
+      const nextBooking = c.bookings.find(
+        (b) =>
+          (b.status === BookingStatus.CONFIRMED || b.status === BookingStatus.PAYMENT_SUBMITTED) &&
+          new Date(b.startAt) > new Date()
+      );
 
       return {
         id: c.id,
@@ -67,19 +57,18 @@ export class CrmService {
         phone: c.phone,
         email: c.email,
         notes: c.notes,
-        totalBookings,
-        completedBookings,
-        cancelledBookings,
-        noShowBookings,
+        totalBookings: c.bookings.length,
+        completedBookings: completed.length,
+        cancelledBookings: c.bookings.filter((b) => b.status === BookingStatus.CANCELLED).length,
         totalSpent,
         lastVisit,
-        nextBooking,
+        nextBooking: nextBooking?.startAt || null,
         createdAt: c.createdAt,
       };
     });
 
     return {
-      data: formattedCustomers,
+      data: formatted,
       meta: {
         total,
         page,
@@ -90,19 +79,17 @@ export class CrmService {
   }
 
   async updateCustomerNotes(orgId: string, customerId: string, input: UpdateCustomerNotesInput) {
-    const customer = await prisma.customer.findFirst({
+    const customer = await this.prisma.customer.findFirst({
       where: { id: customerId, organizationId: orgId },
     });
 
     if (!customer) {
-      throw new DomainError(DomainErrorCode.INVALID_INPUT, 'مشتری یافت نشد');
+      throw new DomainError(DomainErrorCode.CUSTOMER_NOT_FOUND, 'مشتری مورد نظر یافت نشد');
     }
 
-    return await prisma.customer.update({
+    return await this.prisma.customer.update({
       where: { id: customerId },
       data: { notes: input.notes },
     });
   }
 }
-
-export const crmService = new CrmService();

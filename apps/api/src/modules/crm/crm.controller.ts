@@ -1,39 +1,48 @@
-import { Router, Response, NextFunction } from 'express';
-import { UpdateCustomerNotesSchema } from '@reservy/validation';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { CrmService } from './crm.service';
+import { CurrentOrgId, RequirePermission } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
 import { Permission } from '@reservy/domain';
-import { crmService } from './crm.service';
-import { authenticate, requirePermission } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest, getOrganizationId } from '../../core/tenant-context';
+import { UpdateCustomerNotesSchema } from '@reservy/validation';
 
-export const crmRouter = Router();
+@Controller('crm')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+export class CrmController {
+  constructor(private readonly crmService: CrmService) {}
 
-crmRouter.use(authenticate);
-
-crmRouter.get('/', requirePermission(Permission.CUSTOMER_READ), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await crmService.getCustomers(orgId, {
-      search: req.query.search as string | undefined,
-      page: req.query.page ? parseInt(req.query.page as string, 10) : undefined,
-      limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
+  @Get()
+  @RequirePermission(Permission.CUSTOMER_READ)
+  async getCustomers(
+    @CurrentOrgId() orgId: string,
+    @Query('search') search?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    return await this.crmService.getCustomers(orgId, {
+      search,
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
     });
-    res.json(result);
-  } catch (err) {
-    next(err);
   }
-});
 
-crmRouter.patch(
-  '/:id/notes',
-  requirePermission(Permission.CUSTOMER_UPDATE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = UpdateCustomerNotesSchema.parse(req.body);
-      const result = await crmService.updateCustomerNotes(orgId, req.params.id, validated);
-      res.json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  @Patch(':id/notes')
+  @RequirePermission(Permission.CUSTOMER_UPDATE)
+  async updateNotes(
+    @CurrentOrgId() orgId: string,
+    @Param('id') id: string,
+    @Body() body: unknown
+  ) {
+    const validated = UpdateCustomerNotesSchema.parse(body);
+    const data = await this.crmService.updateCustomerNotes(orgId, id, validated);
+    return { data };
   }
-);
+}
