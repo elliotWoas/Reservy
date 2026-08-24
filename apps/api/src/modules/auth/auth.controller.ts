@@ -1,37 +1,32 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { RegisterSchema, LoginSchema } from '@reservy/validation';
-import { authService } from './auth.service';
-import { authenticate } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest } from '../../core/tenant-context';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { CurrentOrgId, CurrentUser } from '../../core/decorators/auth.decorators';
+import type { UserContext } from '../../core/tenant-context';
 
-export const authRouter = Router();
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-authRouter.post('/register', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const validated = RegisterSchema.parse(req.body);
-    const result = await authService.register(validated);
-    res.status(201).json({ data: result });
-  } catch (err) {
-    next(err);
+  @Post('register')
+  async register(@Body() body: unknown) {
+    const validated = RegisterSchema.parse(body);
+    const result = await this.authService.register(validated);
+    return { data: result };
   }
-});
 
-authRouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const validated = LoginSchema.parse(req.body);
-    const result = await authService.login(validated);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Post('login')
+  async login(@Body() body: unknown) {
+    const validated = LoginSchema.parse(body);
+    const result = await this.authService.login(validated);
+    return { data: result };
   }
-});
 
-authRouter.get('/me', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const activeOrgId = req.organizationId;
-    const result = await authService.getMe(req.user!.userId, activeOrgId);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async me(@CurrentUser() user: UserContext, @CurrentOrgId() orgId?: string) {
+    const result = await this.authService.getMe(user.userId, orgId);
+    return { data: result };
   }
-});
+}

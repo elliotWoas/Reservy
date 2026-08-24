@@ -1,8 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import crypto from 'crypto';
-import { prisma } from '@reservy/database';
 import { UserRole, DomainError, DomainErrorCode } from '@reservy/domain';
 import { RegisterInput, LoginInput } from '@reservy/validation';
-import { generateToken } from '../../core/guards/auth.guard';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { generateToken } from '../../core/guards/jwt-auth.guard';
 
 function hashPassword(password: string): string {
   const hasher = crypto.createHash('sha256');
@@ -10,9 +11,12 @@ function hashPassword(password: string): string {
   return hasher.digest('hex');
 }
 
+@Injectable()
 export class AuthService {
+  constructor(private readonly prisma: PrismaService) {}
+
   async register(input: RegisterInput) {
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { email: input.email },
     });
 
@@ -20,18 +24,18 @@ export class AuthService {
       throw new DomainError(DomainErrorCode.USER_ALREADY_EXISTS, 'کاربری با این ایمیل قبلاً ثبت‌نام کرده است');
     }
 
-    const existingSlug = await prisma.organization.findUnique({
+    const existingSlug = await this.prisma.organization.findUnique({
       where: { slug: input.organizationSlug },
     });
 
     if (existingSlug) {
-      throw new DomainError(DomainErrorCode.INVALID_INPUT, 'این شناسه آدرس (slug) قبلاً استفاده شده است');
+      throw new DomainError(DomainErrorCode.SLUG_ALREADY_EXISTS, 'این شناسه آدرس (slug) قبلاً استفاده شده است');
     }
 
     const passwordHash = hashPassword(input.password);
 
     // Create Tenant, Organization, User, and Membership in a transaction
-    return await prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
           email: input.email,
@@ -68,7 +72,7 @@ export class AuthService {
         },
       });
 
-      const membership = await tx.membership.create({
+      await tx.membership.create({
         data: {
           userId: user.id,
           tenantId: tenant.id,
@@ -105,7 +109,7 @@ export class AuthService {
   }
 
   async login(input: LoginInput) {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email: input.email },
       include: {
         memberships: {
@@ -125,7 +129,7 @@ export class AuthService {
     }
 
     const primaryMembership = user.memberships[0];
-    const role = primaryMembership ? (primaryMembership.role as UserRole) : user.role;
+    const role = primaryMembership ? (primaryMembership.role as UserRole) : (user.role as UserRole);
     const organizationId = primaryMembership ? primaryMembership.organizationId : undefined;
     const tenantId = primaryMembership ? primaryMembership.tenantId : undefined;
 
@@ -158,7 +162,7 @@ export class AuthService {
   }
 
   async getMe(userId: string, activeOrgId?: string) {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
         memberships: {
@@ -177,12 +181,14 @@ export class AuthService {
       : user.memberships[0];
 
     return {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      phone: user.phone,
-      role: activeMembership ? activeMembership.role : user.role,
-      isSuperAdmin: user.isSuperAdmin,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        phone: user.phone,
+        role: activeMembership ? activeMembership.role : user.role,
+        isSuperAdmin: user.isSuperAdmin,
+      },
       organizations: user.memberships.map((m) => ({
         id: m.organization.id,
         name: m.organization.name,
@@ -193,5 +199,3 @@ export class AuthService {
     };
   }
 }
-
-export const authService = new AuthService();
