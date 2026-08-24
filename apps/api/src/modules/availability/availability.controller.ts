@@ -1,105 +1,99 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AvailabilityService } from './availability.service';
 import {
   AvailabilityQuerySchema,
   SetStaffScheduleSchema,
   CreateBlockedPeriodSchema,
 } from '@reservy/validation';
 import { Permission } from '@reservy/domain';
-import { availabilityService } from './availability.service';
-import { authenticate, requirePermission } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest, getOrganizationId } from '../../core/tenant-context';
+import { CurrentOrgId, RequirePermission } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
 
-export const availabilityRouter = Router();
+@Controller('availability')
+export class AvailabilityController {
+  constructor(private readonly availabilityService: AvailabilityService) {}
 
-// Public / Internal Availability Query
-availabilityRouter.get('/slots', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const orgId = (req.query.organizationId as string) || (req.headers['x-organization-id'] as string);
+  @Get('slots')
+  async getSlots(
+    @Query('organizationId') queryOrgId: string,
+    @Headers('x-organization-id') headerOrgId: string,
+    @Query('serviceId') serviceId: string,
+    @Query('staffId') staffId: string,
+    @Query('locationId') locationId: string,
+    @Query('date') date: string
+  ) {
+    const orgId = queryOrgId || headerOrgId;
     if (!orgId) {
-      res.status(400).json({ error: { code: 'INVALID_INPUT', message: 'organizationId الزامی است' } });
-      return;
+      throw new BadRequestException({ error: { code: 'INVALID_INPUT', message: 'organizationId الزامی است' } });
     }
     const validated = AvailabilityQuerySchema.parse({
-      serviceId: req.query.serviceId,
-      staffId: req.query.staffId || undefined,
-      locationId: req.query.locationId || undefined,
-      date: req.query.date,
+      serviceId,
+      staffId: staffId || undefined,
+      locationId: locationId || undefined,
+      date,
     });
 
-    const slots = await availabilityService.getAvailableSlots(orgId, validated);
-    res.json({ data: slots });
-  } catch (err) {
-    next(err);
+    const slots = await this.availabilityService.getAvailableSlots(orgId, validated);
+    return { data: slots };
   }
-});
 
-// Authenticated Schedule & Blocked Period Endpoints
-availabilityRouter.use(authenticate);
-
-availabilityRouter.get('/staff/:staffId/schedule', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const schedules = await availabilityService.getStaffSchedule(orgId, req.params.staffId);
-    res.json({ data: schedules });
-  } catch (err) {
-    next(err);
+  @Get('staff/:staffId/schedule')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  async getSchedule(@CurrentOrgId() orgId: string, @Param('staffId') staffId: string) {
+    const schedules = await this.availabilityService.getStaffSchedule(orgId, staffId);
+    return { data: schedules };
   }
-});
 
-availabilityRouter.put(
-  '/staff/:staffId/schedule',
-  requirePermission(Permission.STAFF_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = SetStaffScheduleSchema.parse(req.body);
-      const result = await availabilityService.setStaffSchedule(orgId, {
-        staffId: req.params.staffId,
-        schedules: validated.schedules,
-      });
-      res.json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  @Put('staff/:staffId/schedule')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission(Permission.STAFF_MANAGE)
+  async setSchedule(
+    @CurrentOrgId() orgId: string,
+    @Param('staffId') staffId: string,
+    @Body() body: unknown
+  ) {
+    const validated = SetStaffScheduleSchema.parse(body);
+    const result = await this.availabilityService.setStaffSchedule(orgId, {
+      staffId,
+      schedules: validated.schedules,
+    });
+    return { data: result };
   }
-);
 
-availabilityRouter.get('/blocked-periods', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const staffId = req.query.staffId as string | undefined;
-    const periods = await availabilityService.getBlockedPeriods(orgId, staffId);
-    res.json({ data: periods });
-  } catch (err) {
-    next(err);
+  @Get('blocked-periods')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  async getBlockedPeriods(@CurrentOrgId() orgId: string, @Query('staffId') staffId?: string) {
+    const periods = await this.availabilityService.getBlockedPeriods(orgId, staffId);
+    return { data: periods };
   }
-});
 
-availabilityRouter.post(
-  '/blocked-periods',
-  requirePermission(Permission.STAFF_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = CreateBlockedPeriodSchema.parse(req.body);
-      const created = await availabilityService.createBlockedPeriod(orgId, validated);
-      res.status(201).json({ data: created });
-    } catch (err) {
-      next(err);
-    }
+  @Post('blocked-periods')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission(Permission.STAFF_MANAGE)
+  async createBlockedPeriod(@CurrentOrgId() orgId: string, @Body() body: unknown) {
+    const validated = CreateBlockedPeriodSchema.parse(body);
+    const created = await this.availabilityService.createBlockedPeriod(orgId, validated);
+    return { data: created };
   }
-);
 
-availabilityRouter.delete(
-  '/blocked-periods/:id',
-  requirePermission(Permission.STAFF_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      await availabilityService.deleteBlockedPeriod(orgId, req.params.id);
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
+  @Delete('blocked-periods/:id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission(Permission.STAFF_MANAGE)
+  async deleteBlockedPeriod(@CurrentOrgId() orgId: string, @Param('id') id: string) {
+    await this.availabilityService.deleteBlockedPeriod(orgId, id);
+    return { success: true };
   }
-);
+}

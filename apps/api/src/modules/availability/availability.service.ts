@@ -1,4 +1,5 @@
-import { prisma } from '@reservy/database';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import {
   BookingStatus,
   DomainError,
@@ -12,15 +13,17 @@ import {
   CreateBlockedPeriodInput,
 } from '@reservy/validation';
 
+@Injectable()
 export class AvailabilityService {
+  constructor(private readonly prisma: PrismaService) {}
+
   /**
    * Generates discrete available slots for a given service and optional staff member on a date.
    */
   async getAvailableSlots(orgId: string, params: AvailabilityQueryParams): Promise<AvailableSlot[]> {
-    const { serviceId, staffId, locationId, date } = params;
+    const { serviceId, staffId, date } = params;
 
-    // Verify service exists and belongs to org
-    const service = await prisma.service.findFirst({
+    const service = await this.prisma.service.findFirst({
       where: { id: serviceId, organizationId: orgId, isActive: true, deletedAt: null },
       include: {
         staffServices: {
@@ -35,7 +38,6 @@ export class AvailabilityService {
       throw new DomainError(DomainErrorCode.SERVICE_NOT_FOUND, 'خدمت مورد نظر یافت نشد یا غیرفعال است');
     }
 
-    // Determine target staff members
     let candidateStaffIds: string[] = [];
     if (staffId) {
       const isAssigned = service.staffServices.some(
@@ -49,7 +51,6 @@ export class AvailabilityService {
       }
       candidateStaffIds = [staffId];
     } else {
-      // Any staff: get all bookable staff offering this service
       candidateStaffIds = service.staffServices
         .filter((ss) => ss.staff && ss.staff.isActive && ss.staff.isBookable && !ss.staff.deletedAt)
         .map((ss) => ss.staffId);
@@ -59,11 +60,8 @@ export class AvailabilityService {
       return [];
     }
 
-    // Parse day of week: Saturday=0 ... Friday=6
-    // JS Date.getDay(): 0=Sun, 1=Mon, ..., 6=Sat
     const targetDateObj = new Date(date + 'T00:00:00Z');
     const jsDay = targetDateObj.getUTCDay();
-    // Convert to our custom Persian DayOfWeek: Sat=0, Sun=1, Mon=2, Tue=3, Wed=4, Thu=5, Fri=6
     const dayOfWeek = (jsDay + 1) % 7;
 
     const dayStartUtc = new Date(`${date}T00:00:00.000Z`);
@@ -71,10 +69,8 @@ export class AvailabilityService {
 
     const allSlotsMap = new Map<string, AvailableSlot>();
 
-    // Query availability for each candidate staff member
     for (const targetStaffId of candidateStaffIds) {
-      // 1. Fetch Staff Schedule for this dayOfWeek
-      const schedule = await prisma.staffSchedule.findUnique({
+      const schedule = await this.prisma.staffSchedule.findUnique({
         where: {
           staffId_dayOfWeek: {
             staffId: targetStaffId,
@@ -94,8 +90,7 @@ export class AvailabilityService {
         continue;
       }
 
-      // 2. Fetch Blocked Periods on this date
-      const blockedPeriods = await prisma.blockedPeriod.findMany({
+      const blockedPeriods = await this.prisma.blockedPeriod.findMany({
         where: {
           organizationId: orgId,
           OR: [{ staffId: targetStaffId }, { staffId: null }],
@@ -104,8 +99,7 @@ export class AvailabilityService {
         },
       });
 
-      // 3. Fetch Existing Bookings on this date
-      const existingBookings = await prisma.booking.findMany({
+      const existingBookings = await this.prisma.booking.findMany({
         where: {
           organizationId: orgId,
           staffId: targetStaffId,
@@ -121,7 +115,6 @@ export class AvailabilityService {
         },
       });
 
-      // Run Domain slot generator with service duration blocks
       const slotStep = service.durationMinutes > 0 ? service.durationMinutes : 30;
 
       const staffSlots = generateAvailableSlots({
@@ -155,20 +148,15 @@ export class AvailabilityService {
       }
     }
 
-    // Sort slots chronologically
     return Array.from(allSlotsMap.values()).sort(
       (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
     );
   }
 
-  /**
-   * Sets weekly schedule for a staff member
-   */
   async setStaffSchedule(orgId: string, input: SetStaffScheduleInput & { staffId: string }) {
     const { staffId, schedules } = input;
 
-    // Verify staff belongs to org
-    const staff = await prisma.staffMember.findFirst({
+    const staff = await this.prisma.staffMember.findFirst({
       where: { id: staffId, organizationId: orgId, deletedAt: null },
     });
 
@@ -176,10 +164,9 @@ export class AvailabilityService {
       throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'ارائه‌دهنده یافت نشد');
     }
 
-    // Upsert each day's schedule in a transaction
-    return await prisma.$transaction(
+    return await this.prisma.$transaction(
       schedules.map((s) =>
-        prisma.staffSchedule.upsert({
+        this.prisma.staffSchedule.upsert({
           where: {
             staffId_dayOfWeek: {
               staffId,
@@ -204,11 +191,8 @@ export class AvailabilityService {
     );
   }
 
-  /**
-   * Fetches weekly schedule for a staff member
-   */
   async getStaffSchedule(orgId: string, staffId: string) {
-    const staff = await prisma.staffMember.findFirst({
+    const staff = await this.prisma.staffMember.findFirst({
       where: { id: staffId, organizationId: orgId, deletedAt: null },
     });
 
@@ -216,17 +200,14 @@ export class AvailabilityService {
       throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'ارائه‌دهنده یافت نشد');
     }
 
-    return await prisma.staffSchedule.findMany({
+    return await this.prisma.staffSchedule.findMany({
       where: { staffId, organizationId: orgId },
       orderBy: { dayOfWeek: 'asc' },
     });
   }
 
-  /**
-   * Creates a blocked period (vacation, maintenance, etc.)
-   */
   async createBlockedPeriod(orgId: string, input: CreateBlockedPeriodInput) {
-    return await prisma.blockedPeriod.create({
+    return await this.prisma.blockedPeriod.create({
       data: {
         organizationId: orgId,
         staffId: input.staffId,
@@ -238,29 +219,21 @@ export class AvailabilityService {
     });
   }
 
-  /**
-   * Lists blocked periods for an organization
-   */
   async getBlockedPeriods(orgId: string, staffId?: string) {
     const where: any = { organizationId: orgId };
     if (staffId) {
       where.OR = [{ staffId }, { staffId: null }];
     }
-    return await prisma.blockedPeriod.findMany({
+    return await this.prisma.blockedPeriod.findMany({
       where,
       include: { staff: true, location: true },
       orderBy: { startAt: 'asc' },
     });
   }
 
-  /**
-   * Deletes a blocked period
-   */
   async deleteBlockedPeriod(orgId: string, id: string) {
-    return await prisma.blockedPeriod.deleteMany({
+    return await this.prisma.blockedPeriod.deleteMany({
       where: { id, organizationId: orgId },
     });
   }
 }
-
-export const availabilityService = new AvailabilityService();
