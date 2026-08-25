@@ -2,6 +2,8 @@
 
 Base URL: `http://localhost:4000`
 
+The API is implemented with NestJS and TypeScript. Authentication, permissions, and error handling are provided by Nest guards and the global exception filter.
+
 ---
 
 ## 1. Public Booking Endpoints (Customer Facing)

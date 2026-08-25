@@ -23,7 +23,7 @@
 
 - **Monorepo & Runtime**: Bun 1.3+ workspaces
 - **Frontend**: Next.js 14+ (App Router), React 18, TypeScript, Tailwind CSS, Lucide Icons
-- **Backend**: Modular REST API with Clean Architecture, Express / TypeScript
+- **Backend**: Modular NestJS REST API with Clean Architecture and TypeScript
 - **Database & ORM**: PostgreSQL / SQLite, Prisma ORM
 - **Security**: JWT Authentication, RBAC & granular permissions, Magic byte MIME verification, input validation with Zod
 - **Containers**: Docker & Docker Compose multi-stage production builds

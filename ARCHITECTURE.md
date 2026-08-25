@@ -1,6 +1,6 @@
 # Architecture Documentation — Reservy
 
-Reservy is a production-grade, multi-tenant online service booking SaaS platform engineered with **Clean Architecture & Domain-Oriented Modular Monolith** principles.
+Reservy is a production-grade, multi-tenant online service booking SaaS platform engineered with **Clean Architecture & Domain-Oriented Modular Monolith** principles. The API presentation layer uses NestJS and TypeScript.
 
 ---
 
