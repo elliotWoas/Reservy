@@ -1,74 +1,35 @@
-import { Router, Response, NextFunction } from 'express';
-import { UpdateOrganizationSchema, CardAccountSchema } from '@reservy/validation';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { OrganizationService } from './organization.service';
+import { CurrentOrgId, RequirePermission } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
 import { Permission } from '@reservy/domain';
-import { organizationService } from './organization.service';
-import { authenticate, requirePermission } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest, getOrganizationId } from '../../core/tenant-context';
+import { UpdateOrganizationSchema, CardAccountSchema } from '@reservy/validation';
 
-export const organizationRouter = Router();
+@Controller('organizations')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+export class OrganizationController {
+  constructor(private readonly organizationService: OrganizationService) {}
 
-organizationRouter.use(authenticate);
-
-organizationRouter.get('/current', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const org = await organizationService.getOrganization(orgId);
-    res.json({ data: org });
-  } catch (err) {
-    next(err);
+  @Get('current')
+  async getCurrent(@CurrentOrgId() orgId: string) {
+    const data = await this.organizationService.getCurrentOrganization(orgId);
+    return { data };
   }
-});
 
-organizationRouter.patch(
-  '/current',
-  requirePermission(Permission.ORGANIZATION_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = UpdateOrganizationSchema.parse(req.body);
-      const updated = await organizationService.updateOrganization(orgId, validated);
-      res.json({ data: updated });
-    } catch (err) {
-      next(err);
-    }
+  @Patch('current')
+  @RequirePermission(Permission.ORGANIZATION_UPDATE)
+  async updateCurrent(@CurrentOrgId() orgId: string, @Body() body: unknown) {
+    const validated = UpdateOrganizationSchema.parse(body);
+    const data = await this.organizationService.updateOrganization(orgId, validated);
+    return { data };
   }
-);
 
-organizationRouter.get('/card-accounts', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const accounts = await organizationService.getCardAccounts(orgId);
-    res.json({ data: accounts });
-  } catch (err) {
-    next(err);
+  @Post('card-accounts')
+  @RequirePermission(Permission.ORGANIZATION_UPDATE)
+  async setCardAccount(@CurrentOrgId() orgId: string, @Body() body: unknown) {
+    const validated = CardAccountSchema.parse(body);
+    const data = await this.organizationService.setCardAccount(orgId, validated);
+    return { data };
   }
-});
-
-organizationRouter.post(
-  '/card-accounts',
-  requirePermission(Permission.ORGANIZATION_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = CardAccountSchema.parse(req.body);
-      const created = await organizationService.setCardAccount(orgId, validated);
-      res.status(201).json({ data: created });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
-
-organizationRouter.delete(
-  '/card-accounts/:id',
-  requirePermission(Permission.ORGANIZATION_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      await organizationService.deleteCardAccount(orgId, req.params.id);
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+}
