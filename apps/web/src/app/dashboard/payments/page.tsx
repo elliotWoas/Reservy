@@ -34,7 +34,8 @@ export default function PaymentsPage() {
       let url = '/payments?limit=100';
       if (statusFilter) url += `&status=${statusFilter}`;
       const res = await ApiClient.request<any>(url);
-      setPayments(res.data || []);
+      const list = Array.isArray(res) ? res : res?.data || [];
+      setPayments(list);
     } catch (err) {
       console.error('Failed to load payments', err);
     } finally {

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, FileText, Phone, Calendar, ArrowLeft } from 'lucide-react';
+import { Users, Search, FileText, Phone, Calendar, ArrowLeft, MessageSquare } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { Avatar } from '@/components/ui/Avatar';
 import { ApiClient } from '@/lib/api-client';
 import { formatToman, formatJalaliDate, formatNumberFa } from '@/lib/utils';
 
@@ -24,7 +25,8 @@ export default function CustomersPage() {
       let url = '/crm?limit=100';
       if (search) url += `&search=${encodeURIComponent(search)}`;
       const res = await ApiClient.request<any>(url);
-      setCustomers(res.data || []);
+      const list = Array.isArray(res) ? res : res?.data || [];
+      setCustomers(list);
     } catch (err) {
       console.error('Failed to load customers', err);
     } finally {
@@ -103,7 +105,7 @@ export default function CustomersPage() {
             <table className="w-full text-right text-xs">
               <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-500 font-bold">
                 <tr>
-                  <th className="p-4">نام مشتری</th>
+                  <th className="p-4">پروفایل و نام مشتری</th>
                   <th className="p-4">شماره تماس</th>
                   <th className="p-4">تعداد نوبت‌ها</th>
                   <th className="p-4">مجموع خرید</th>
@@ -115,8 +117,21 @@ export default function CustomersPage() {
               <tbody className="divide-y divide-slate-100">
                 {customers.map((c) => (
                   <tr key={c.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-4 font-bold text-slate-900">{c.fullName}</td>
-                    <td className="p-4 font-mono font-medium text-slate-700" dir="ltr">{c.phone}</td>
+                    <td className="p-4 font-bold text-slate-900">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={c.fullName || 'مشتری'} size="sm" />
+                        <div>
+                          <span>{c.fullName}</span>
+                          {c.email && <span className="block text-[10px] text-slate-400 font-normal">{c.email}</span>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4 font-mono font-medium text-slate-700" dir="ltr">
+                      <a href={`tel:${c.phone}`} className="text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>{c.phone}</span>
+                      </a>
+                    </td>
                     <td className="p-4">
                       <span className="font-bold text-slate-800">{formatNumberFa(c.totalBookings)} نوبت</span>
                       <span className="text-[10px] text-slate-400 block">
@@ -153,42 +168,43 @@ export default function CustomersPage() {
         )}
       </Card>
 
-      {/* Customer Notes Modal */}
+      {/* Notes Modal */}
       {selectedCustomer && (
         <Modal
-          isOpen={true}
+          isOpen={!!selectedCustomer}
           onClose={() => setSelectedCustomer(null)}
-          title={`پرونده و یادداشت‌های مشتری: ${selectedCustomer.fullName}`}
-          maxWidth="md"
+          title={`یادداشت پرونده: ${selectedCustomer.fullName}`}
         >
-          <form onSubmit={handleSaveNotes} className="space-y-4 text-xs">
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1 text-slate-600">
-              <div className="flex justify-between">
-                <span>شماره تماس:</span>
-                <span className="font-mono font-bold" dir="ltr">{selectedCustomer.phone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>مجموع دریافتی تایید شده:</span>
-                <span className="font-black text-emerald-700">{formatToman(selectedCustomer.totalSpent)}</span>
+          <form onSubmit={handleSaveNotes} className="space-y-4 text-right">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <Avatar name={selectedCustomer.fullName || 'مشتری'} size="md" />
+              <div>
+                <span className="font-bold text-slate-900 block">{selectedCustomer.fullName}</span>
+                <span className="text-xs font-mono text-slate-500" dir="ltr">{selectedCustomer.phone}</span>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                یادداشت‌های محرمانه پرسنل (علایق، ترجیحات، حساسیت‌ها):
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                یادداشت‌ها و ترجیحات مشتری (فقط برای مدیریت و پرسنل قابل مشاهده است):
               </label>
               <textarea
                 rows={4}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="مثال: مشتری حساسیت به اسپری دارد، مدل موی فید با شماره ۰.۵ ترجیح می‌دهد..."
-                className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-600 bg-white"
+                placeholder="مثال: حساسیت به رنگ، مدل موی دلخواه، تخفیف اختصاصی..."
+                className="w-full p-3 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-600 leading-relaxed"
               />
             </div>
 
-            <Button type="submit" isLoading={isSavingNotes} className="w-full py-2.5 font-bold text-xs">
-              ذخیره یادداشت مشتری
-            </Button>
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <Button type="button" variant="outline" size="sm" onClick={() => setSelectedCustomer(null)}>
+                انصراف
+              </Button>
+              <Button type="submit" size="sm" disabled={isSavingNotes}>
+                {isSavingNotes ? 'در حال ذخیره...' : 'ذخیره یادداشت'}
+              </Button>
+            </div>
           </form>
         </Modal>
       )}

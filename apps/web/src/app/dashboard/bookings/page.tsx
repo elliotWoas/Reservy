@@ -9,11 +9,31 @@ import {
   XCircle,
   Eye,
   Calendar,
+  Clock,
+  User,
+  Phone,
+  Check,
+  X,
+  UserX,
+  FileText,
+  CreditCard,
+  MessageSquare,
+  AlertTriangle,
+  FileImage,
+  ZoomIn,
+  ShieldCheck,
+  Sparkles,
+  Flame,
+  CalendarDays,
+  CheckCheck,
+  Ban,
 } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { Avatar } from '@/components/ui/Avatar';
+import { ReceiptImageLightbox } from '@/components/ui/ReceiptImageLightbox';
 import { ApiClient } from '@/lib/api-client';
 import { formatToman, formatJalaliDate, formatTimeFa, formatNumberFa } from '@/lib/utils';
 
@@ -22,16 +42,35 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [dayPriorityFilter, setDayPriorityFilter] = useState<'all' | 'today' | 'tomorrow' | 'receipts'>('all');
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [cancellationReason, setCancellationReason] = useState<string>('');
+  const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [lightboxData, setLightboxData] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    amount?: number;
+    customerName?: string;
+    referenceNumber?: string | null;
+    uploadedAt?: string;
+    status?: string;
+  }>({
+    isOpen: false,
+    imageUrl: '',
+  });
 
+  // Fetch bookings list from backend API
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      let url = '/bookings?limit=100';
+      let url = '/bookings?limit=150';
       if (statusFilter) url += `&status=${statusFilter}`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
+      
       const res = await ApiClient.request<any>(url);
-      setBookings(res.data || []);
+      const list = Array.isArray(res) ? res : res?.data || [];
+      setBookings(list);
     } catch (err) {
       console.error('Failed to load bookings', err);
     } finally {
@@ -48,199 +87,610 @@ export default function BookingsPage() {
     fetchBookings();
   };
 
-  const handleUpdateStatus = async (status: string) => {
-    if (!selectedBooking) return;
+  // Status transition handler: Complete (Close invoice), Confirm, Cancel
+  const handleUpdateStatus = async (bookingId: string, status: string, reason?: string) => {
     try {
-      await ApiClient.request(`/bookings/${selectedBooking.id}/status`, {
+      setIsUpdating(true);
+      const payload: any = { status };
+      if (reason) payload.cancellationReason = reason;
+
+      await ApiClient.request(`/bookings/${bookingId}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(payload),
       });
+
       setSelectedBooking(null);
-      fetchBookings();
+      setShowCancelModal(false);
+      setCancellationReason('');
+      await fetchBookings();
     } catch (err: any) {
-      alert(err.message || 'خطا در تغییر وضعیت');
+      alert(err.message || 'خطا در تغییر وضعیت نوبت');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
+  // Daily Filter Filter Logic
+  const filteredBookings = bookings.filter((b) => {
+    if (dayPriorityFilter === 'all') return true;
+
+    const bDate = new Date(b.startAt);
+    const now = new Date();
+
+    if (dayPriorityFilter === 'today') {
+      return (
+        bDate.getFullYear() === now.getFullYear() &&
+        bDate.getMonth() === now.getMonth() &&
+        bDate.getDate() === now.getDate()
+      );
+    }
+
+    if (dayPriorityFilter === 'tomorrow') {
+      const tom = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      return (
+        bDate.getFullYear() === tom.getFullYear() &&
+        bDate.getMonth() === tom.getMonth() &&
+        bDate.getDate() === tom.getDate()
+      );
+    }
+
+    if (dayPriorityFilter === 'receipts') {
+      return b.status === 'PAYMENT_SUBMITTED' || b.payments?.[0]?.status === 'PROOF_SUBMITTED';
+    }
+
+    return true;
+  });
+
   return (
     <div className="space-y-6 animate-fade-in text-right">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500/10 via-white to-amber-500/5 p-6 rounded-3xl border border-amber-200/80 shadow-luxury-sm">
         <div>
-          <h1 className="text-xl font-black text-slate-900">مدیریت نوبت‌ها</h1>
-          <p className="text-xs text-slate-500">لیست تمامی رزروهای ثبت شده توسط مشتریان یا سیستم</p>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-600" />
+            <h1 className="text-xl font-black text-slate-900 tracking-tight">مدیریت نوبت‌ها و فاکتورها</h1>
+          </div>
+          <p className="text-xs text-slate-600 mt-1">
+            اولویت‌بندی روزانه، بررسی فیش‌های واریزی و ثبت اتمام اصلاح برای بستن فاکتور
+          </p>
         </div>
       </div>
 
-      {/* Filters & Search */}
-      <Card className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
-          <input
-            type="text"
-            placeholder="جستجو با نام مشتری، شماره تماس یا کد نوبت..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-3 pr-9 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-600"
-          />
-          <Search className="w-4 h-4 text-slate-400 absolute right-3 top-2.5" />
-        </form>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-slate-400" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs font-semibold px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 focus:outline-none w-full sm:w-auto"
+      {/* Priority Tabs & Filters Toolbar */}
+      <Card className="p-4 space-y-4">
+        {/* Priority Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 select-none">
+          <button
+            type="button"
+            onClick={() => setDayPriorityFilter('today')}
+            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              dayPriorityFilter === 'today'
+                ? 'bg-amber-500 text-white shadow-luxury-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
           >
-            <option value="">همه وضعیت‌ها</option>
-            <option value="PENDING_PAYMENT">در انتظار پرداخت</option>
-            <option value="PAYMENT_SUBMITTED">رسید ارسال شده</option>
-            <option value="CONFIRMED">تایید شده</option>
-            <option value="COMPLETED">تکمیل شده</option>
-            <option value="CANCELLED">لغو شده</option>
-            <option value="NO_SHOW">عدم مراجعه</option>
-          </select>
+            <Flame className="w-4 h-4" />
+            <span>🔥 نوبت‌های امروز</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setDayPriorityFilter('tomorrow')}
+            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              dayPriorityFilter === 'tomorrow'
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            <span>📅 نوبت‌های فردا</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setDayPriorityFilter('receipts')}
+            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              dayPriorityFilter === 'receipts'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>💳 فیش‌های در انتظار تایید</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setDayPriorityFilter('all')}
+            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              dayPriorityFilter === 'all'
+                ? 'bg-emerald-700 text-white shadow-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <span>تمام نوبت‌ها ({formatNumberFa(bookings.length)})</span>
+          </button>
+        </div>
+
+        {/* Search and Secondary Filter */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-slate-100">
+          <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-88">
+            <input
+              type="text"
+              placeholder="جستجو با نام مشتری، شماره تماس یا کد رهگیری نوبت..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-3 pr-9 py-2.5 rounded-2xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:border-amber-500 transition-colors"
+            />
+            <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
+          </form>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Filter className="w-4 h-4 text-slate-400" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="text-xs font-bold px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 focus:outline-none w-full sm:w-auto"
+            >
+              <option value="">همه وضعیت‌ها</option>
+              <option value="PENDING_PAYMENT">در انتظار پرداخت</option>
+              <option value="PAYMENT_SUBMITTED">رسید ارسال شده</option>
+              <option value="CONFIRMED">تایید شده</option>
+              <option value="IN_PROGRESS">در حال انجام</option>
+              <option value="COMPLETED">تکمیل شده</option>
+              <option value="CANCELLED">لغو شده</option>
+              <option value="NO_SHOW">عدم حضور</option>
+            </select>
+          </div>
         </div>
       </Card>
 
-      {/* Bookings Table */}
-      <Card className="p-0 overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-xs text-slate-500">در حال بارگذاری لیست نوبت‌ها...</div>
-        ) : bookings.length === 0 ? (
+      {/* Bookings List Section */}
+      {loading ? (
+        <div className="min-h-[350px] flex items-center justify-center">
+          <div className="text-center space-y-3">
+            <div className="w-10 h-10 border-3 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto shadow-luxury-sm" />
+            <p className="text-xs text-slate-500 font-bold">در حال بارگذاری لیست نوبت‌ها...</p>
+          </div>
+        </div>
+      ) : filteredBookings.length === 0 ? (
+        <Card className="p-12 text-center">
           <EmptyState
-            title="هیچ نوبتی یافت نشد"
-            description="نوبتی با فیلترهای انتخابی شما در سیستم وجود ندارد."
+            title="هیچ نوبتی در این بخش یافت نشد"
+            description="نوبتی با مشخصات فیلتر شده ثبت نگردیده است."
             icon={BookMarked}
           />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-500 font-bold">
-                <tr>
-                  <th className="p-4">کد نوبت</th>
-                  <th className="p-4">مشتری</th>
-                  <th className="p-4">خدمت</th>
-                  <th className="p-4">ارائه‌دهنده</th>
-                  <th className="p-4">تاریخ و زمان</th>
-                  <th className="p-4">مبلغ</th>
-                  <th className="p-4">وضعیت</th>
-                  <th className="p-4 text-left">عملیات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {bookings.map((b) => (
-                  <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-4 font-mono font-bold text-slate-700">{b.code}</td>
-                    <td className="p-4">
-                      <span className="font-bold text-slate-900 block">{b.customer?.fullName}</span>
-                      <span className="text-[10px] text-slate-400 font-mono" dir="ltr">{b.customer?.phone}</span>
-                    </td>
-                    <td className="p-4 font-medium text-slate-800">{b.service?.name}</td>
-                    <td className="p-4 text-slate-600">{b.staff?.displayName || 'نامشخص'}</td>
-                    <td className="p-4">
-                      <span className="font-bold text-slate-800 block">{formatJalaliDate(b.startAt)}</span>
-                      <span className="text-[10px] text-slate-500">{formatTimeFa(b.startAt)}</span>
-                    </td>
-                    <td className="p-4 font-black text-emerald-700">{formatToman(b.price)}</td>
-                    <td className="p-4">
-                      <Badge status={b.status} />
-                    </td>
-                    <td className="p-4 text-left">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSelectedBooking(b)}
-                        className="text-[11px] py-1 px-2.5"
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {filteredBookings.map((booking) => {
+            const proof = booking.payments?.[0]?.proofs?.[0];
+            const isCompleted = booking.status === 'COMPLETED';
+            const isCancelled = booking.status === 'CANCELLED' || booking.status === 'REJECTED';
+
+            return (
+              <Card
+                key={booking.id}
+                className={`p-5.5 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-3xl ${
+                  isCompleted
+                    ? 'border-emerald-200 bg-emerald-50/20'
+                    : isCancelled
+                    ? 'border-slate-200 bg-slate-50/50 opacity-70'
+                    : 'border-amber-200/80 hover:border-amber-400 shadow-luxury-sm'
+                }`}
+              >
+                {/* Left Side: Customer & Service Profile */}
+                <div className="flex items-start gap-4">
+                  <Avatar name={booking.customer?.fullName || 'مشتری'} size="lg" />
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="text-sm font-black text-slate-900">
+                        {booking.customer?.fullName || 'مشتری بدون نام'}
+                      </span>
+                      <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-900 font-bold border border-amber-200">
+                        {booking.code}
+                      </span>
+                      <Badge status={booking.status} />
+
+                      {proof && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLightboxData({
+                              isOpen: true,
+                              imageUrl: proof.fileUrl,
+                              amount: booking.priceSnapshot,
+                              customerName: booking.customer?.fullName,
+                              referenceNumber: booking.payments?.[0]?.referenceNumber,
+                              uploadedAt: proof.uploadedAt,
+                              status: booking.status,
+                            })
+                          }
+                          className="text-[10px] px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 font-bold flex items-center gap-1 cursor-pointer hover:bg-amber-200"
+                        >
+                          <FileImage className="w-3 h-3 text-amber-700" />
+                          <span>مشاهده فیش</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
+                      <span className="font-extrabold text-amber-900">
+                        {booking.service?.name || booking.serviceNameSnapshot}
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span>
+                        ارائه‌دهنده: {booking.staff?.displayName || booking.staffNameSnapshot || 'ارائه‌دهنده'}
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="font-black text-slate-900">
+                        {formatToman(booking.priceSnapshot || booking.price || 0)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-xs text-slate-500 pt-0.5 flex-wrap">
+                      <span className="flex items-center gap-1 font-bold text-slate-800">
+                        <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                        {formatJalaliDate(booking.startAt)}
+                      </span>
+                      <span className="flex items-center gap-1 font-bold text-slate-800">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        {formatTimeFa(booking.startAt)} ({booking.durationSnapshot || booking.service?.durationMinutes || 45} دقیقه)
+                      </span>
+                      <a
+                        href={`tel:${booking.customer?.phone}`}
+                        className="flex items-center gap-1 font-mono text-emerald-700 font-bold hover:underline"
+                        dir="ltr"
                       >
-                        <Eye className="w-3.5 h-3.5 ml-1" />
-                        <span>جزئیات</span>
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-
-      {/* Details Modal */}
-      {selectedBooking && (
-        <Modal
-          isOpen={true}
-          onClose={() => setSelectedBooking(null)}
-          title={`مدیریت نوبت ${selectedBooking.code}`}
-          maxWidth="md"
-        >
-          <div className="space-y-4 text-xs text-slate-700">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-              <span className="font-semibold">وضعیت فعلی:</span>
-              <Badge status={selectedBooking.status} />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-slate-500">نام مشتری:</span>
-                <span className="font-bold text-slate-900">{selectedBooking.customer?.fullName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">شماره موبایل:</span>
-                <span className="font-bold text-slate-900" dir="ltr">{selectedBooking.customer?.phone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">خدمت:</span>
-                <span className="font-bold text-slate-900">{selectedBooking.service?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">ارائه‌دهنده:</span>
-                <span className="font-bold text-slate-900">{selectedBooking.staff?.displayName || 'نامشخص'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">زمان نوبت:</span>
-                <span className="font-bold text-slate-900">{formatJalaliDate(selectedBooking.startAt)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">مبلغ:</span>
-                <span className="font-black text-emerald-700">{formatToman(selectedBooking.price)}</span>
-              </div>
-              {selectedBooking.notes && (
-                <div className="pt-2 border-t border-slate-100">
-                  <span className="text-slate-500 block mb-1">یادداشت مشتری:</span>
-                  <p className="p-2.5 rounded-xl bg-slate-50 text-slate-800 text-[11px]">{selectedBooking.notes}</p>
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>{booking.customer?.phone}</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
-              )}
+
+                {/* Right Side: Quick Action Buttons */}
+                <div className="flex items-center gap-2 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 flex-wrap justify-end">
+                  {/* 1. Complete Button (بستن فاکتور) */}
+                  {!isCompleted && !isCancelled && (
+                    <button
+                      type="button"
+                      disabled={isUpdating}
+                      onClick={() => handleUpdateStatus(booking.id, 'COMPLETED')}
+                      className="px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                      title="اصلاح انجام شد و فاکتور بسته شود"
+                    >
+                      <CheckCheck className="w-4 h-4" />
+                      <span>اصلاح انجام شد (بستن فاکتور)</span>
+                    </button>
+                  )}
+
+                  {/* 2. Quick Confirm Button */}
+                  {booking.status === 'PENDING_PAYMENT' || booking.status === 'PAYMENT_SUBMITTED' ? (
+                    <button
+                      type="button"
+                      disabled={isUpdating}
+                      onClick={() => handleUpdateStatus(booking.id, 'CONFIRMED')}
+                      className="px-3 py-2 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+                    >
+                      تایید فیش
+                    </button>
+                  ) : null}
+
+                  {/* 3. Quick Cancel Button */}
+                  {!isCompleted && !isCancelled ? (
+                    <button
+                      type="button"
+                      disabled={isUpdating}
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setShowCancelModal(true);
+                      }}
+                      className="px-3 py-2 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 text-xs font-bold cursor-pointer"
+                    >
+                      لغو نوبت
+                    </button>
+                  ) : null}
+
+                  {/* 4. Details & Receipt Modal Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBooking(booking)}
+                    className="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-slate-500" />
+                    <span>رسید و فاکتور</span>
+                  </button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ---------------------------------------------------- */}
+      {/* 1. Comprehensive Booking Receipt & Details Modal     */}
+      {/* ---------------------------------------------------- */}
+      {selectedBooking && !showCancelModal && (
+        <Modal
+          isOpen={!!selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+          title="رسید الکترونیکی و فاکتور نوبت"
+          maxWidth="lg"
+        >
+          <div className="space-y-6 text-right">
+            {/* Customer Profile Card */}
+            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-50/50 via-white to-amber-50/30 border border-amber-200/80 flex items-center gap-4">
+              <Avatar name={selectedBooking.customer?.fullName || 'مشتری'} size="xl" />
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-black text-slate-900">
+                    {selectedBooking.customer?.fullName || 'مشتری بدون نام'}
+                  </h3>
+                  <Badge status={selectedBooking.status} />
+                </div>
+
+                <div className="flex items-center gap-3 text-xs text-slate-600 flex-wrap">
+                  <a
+                    href={`tel:${selectedBooking.customer?.phone}`}
+                    className="flex items-center gap-1 font-mono text-emerald-800 font-bold hover:underline"
+                    dir="ltr"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>{selectedBooking.customer?.phone}</span>
+                  </a>
+                </div>
+              </div>
             </div>
 
-            {/* Status change actions */}
-            <div className="pt-4 border-t border-slate-100 space-y-2">
-              <span className="block font-semibold text-slate-700">تغییر وضعیت نوبت:</span>
-              <div className="flex flex-wrap gap-2">
-                {selectedBooking.status !== 'CONFIRMED' && (
-                  <Button size="sm" onClick={() => handleUpdateStatus('CONFIRMED')}>
-                    تایید نوبت
-                  </Button>
+            {/* Receipt Image Proof Section */}
+            {(() => {
+              const proof = selectedBooking.payments?.[0]?.proofs?.[0];
+              const payment = selectedBooking.payments?.[0];
+              const fileUrl = proof?.fileUrl;
+
+              if (fileUrl) {
+                const resolvedFileUrl = fileUrl.startsWith('http')
+                  ? fileUrl
+                  : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+
+                return (
+                  <div className="p-4 rounded-3xl bg-amber-50/70 border border-amber-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                        <CreditCard className="w-4 h-4 text-amber-700" />
+                        تصویر رسید فیش واریزی کارت‌به‌کارت
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLightboxData({
+                            isOpen: true,
+                            imageUrl: fileUrl,
+                            amount: payment?.amount || selectedBooking.priceSnapshot,
+                            customerName: selectedBooking.customer?.fullName,
+                            referenceNumber: payment?.referenceNumber,
+                            uploadedAt: proof.uploadedAt,
+                            status: payment?.status || selectedBooking.status,
+                          })
+                        }
+                        className="text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>بزرگ‌نمایی با انیمیشن</span>
+                      </button>
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        setLightboxData({
+                          isOpen: true,
+                          imageUrl: fileUrl,
+                          amount: payment?.amount || selectedBooking.priceSnapshot,
+                          customerName: selectedBooking.customer?.fullName,
+                          referenceNumber: payment?.referenceNumber,
+                          uploadedAt: proof.uploadedAt,
+                          status: payment?.status || selectedBooking.status,
+                        })
+                      }
+                      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-300 bg-slate-900 flex items-center justify-center max-h-48 shadow-sm"
+                    >
+                      <img
+                        src={resolvedFileUrl}
+                        alt="فیش واریزی"
+                        className="max-h-48 w-auto object-contain opacity-90 transition-all duration-300 group-hover:scale-105 group-hover:opacity-100"
+                      />
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-bold backdrop-blur-xs">
+                        <ZoomIn className="w-4 h-4" />
+                        <span>جهت بزرگ‌نمایی کلیک کنید</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <ShieldCheck className="w-4 h-4 text-slate-400" />
+                    پرداخت در محل / ثبت حضوری
+                  </span>
+                  <span className="font-bold text-slate-800 font-mono">
+                    {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
+                  </span>
+                </div>
+              );
+            })()}
+
+            {/* Receipt Summary Grid */}
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-slate-400 text-[11px] block">کد رهگیری فاکتور</span>
+                <span className="font-mono font-bold text-slate-900 text-sm">{selectedBooking.code}</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-slate-400 text-[11px] block">مبلغ کل فاکتور</span>
+                <span className="font-black text-amber-900 text-sm">
+                  {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-slate-400 text-[11px] block">تاریخ نوبت</span>
+                <span className="font-bold text-slate-800">{formatJalaliDate(selectedBooking.startAt)}</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-slate-400 text-[11px] block">ساعت و مدت زمان</span>
+                <span className="font-bold text-slate-800">
+                  {formatTimeFa(selectedBooking.startAt)} ({selectedBooking.durationSnapshot || selectedBooking.service?.durationMinutes || 45} دقیقه)
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 col-span-2">
+                <span className="text-slate-400 text-[11px] block">خدمت و ارائه‌دهنده</span>
+                <span className="font-bold text-slate-900">
+                  {selectedBooking.service?.name || selectedBooking.serviceNameSnapshot} — ارائه‌دهنده:{' '}
+                  {selectedBooking.staff?.displayName || selectedBooking.staffNameSnapshot || 'ارائه‌دهنده'}
+                </span>
+              </div>
+            </div>
+
+            {/* Notes if any */}
+            {selectedBooking.notes && (
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60 text-xs space-y-1">
+                <span className="font-bold text-amber-800 block">یادداشت مشتری:</span>
+                <p className="text-slate-700 leading-relaxed">{selectedBooking.notes}</p>
+              </div>
+            )}
+
+            {/* Cancellation Reason if cancelled */}
+            {selectedBooking.cancellationReason && (
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs space-y-1">
+                <span className="font-bold text-rose-800 block">علت لغو نوبت:</span>
+                <p className="text-rose-700 leading-relaxed">{selectedBooking.cancellationReason}</p>
+              </div>
+            )}
+
+            {/* Actions Bar */}
+            <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <a
+                href={`tel:${selectedBooking.customer?.phone}`}
+                className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-2"
+              >
+                <Phone className="w-4 h-4 text-emerald-600" />
+                <span>تماس با مشتری ({selectedBooking.customer?.phone})</span>
+              </a>
+
+              <div className="flex items-center gap-2 justify-end">
+                {selectedBooking.status !== 'COMPLETED' && selectedBooking.status !== 'CANCELLED' && (
+                  <button
+                    type="button"
+                    disabled={isUpdating}
+                    onClick={() => handleUpdateStatus(selectedBooking.id, 'COMPLETED')}
+                    className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <CheckCheck className="w-4 h-4" />
+                    <span>اصلاح انجام شد (بستن فاکتور)</span>
+                  </button>
                 )}
-                {selectedBooking.status !== 'COMPLETED' && (
-                  <Button size="sm" variant="secondary" onClick={() => handleUpdateStatus('COMPLETED')}>
-                    ثبت به عنوان انجام شده
-                  </Button>
+
+                {selectedBooking.status !== 'CONFIRMED' && selectedBooking.status !== 'COMPLETED' && (
+                  <button
+                    type="button"
+                    disabled={isUpdating}
+                    onClick={() => handleUpdateStatus(selectedBooking.id, 'CONFIRMED')}
+                    className="px-3.5 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold cursor-pointer"
+                  >
+                    تایید فیش
+                  </button>
                 )}
-                {selectedBooking.status !== 'NO_SHOW' && (
-                  <Button size="sm" variant="outline" onClick={() => handleUpdateStatus('NO_SHOW')}>
-                    عدم مراجعه مشتری
-                  </Button>
-                )}
-                {selectedBooking.status !== 'CANCELLED' && (
-                  <Button size="sm" variant="danger" onClick={() => handleUpdateStatus('CANCELLED')}>
+
+                {selectedBooking.status !== 'CANCELLED' && selectedBooking.status !== 'COMPLETED' && (
+                  <button
+                    type="button"
+                    disabled={isUpdating}
+                    onClick={() => setShowCancelModal(true)}
+                    className="px-3.5 py-2.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 text-xs font-bold cursor-pointer"
+                  >
                     لغو نوبت
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>
           </div>
         </Modal>
       )}
+
+      {/* ---------------------------------------------------- */}
+      {/* 2. Cancellation Prompt Modal with Reason Input       */}
+      {/* ---------------------------------------------------- */}
+      {showCancelModal && selectedBooking && (
+        <Modal
+          isOpen={showCancelModal}
+          onClose={() => {
+            setShowCancelModal(false);
+            setCancellationReason('');
+          }}
+          title="لغو نوبت رزرو"
+        >
+          <div className="space-y-4 text-right">
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1">
+              <span className="font-bold flex items-center gap-1.5 text-rose-900">
+                <AlertTriangle className="w-4 h-4 text-rose-600" />
+                آیا از لغو نوبت {selectedBooking.customer?.fullName} اطمینان دارید؟
+              </span>
+              <p className="text-[11px] text-rose-700 leading-relaxed">
+                پس از لغو، وضعیت نوبت به «لغو شده» تغییر یافته و فاکتور باطل می‌شود.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 block">
+                علت لغو نوبت (اختیاری):
+              </label>
+              <textarea
+                rows={3}
+                placeholder="مثال: درخواست مشتری، عدم حضور، جابجایی زمان..."
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                className="w-full p-3.5 rounded-2xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:border-rose-500"
+              />
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setCancellationReason('');
+                }}
+              >
+                انصراف
+              </Button>
+              <Button
+                size="sm"
+                disabled={isUpdating}
+                onClick={() => handleUpdateStatus(selectedBooking.id, 'CANCELLED', cancellationReason)}
+                className="bg-rose-600 hover:bg-rose-700"
+              >
+                تایید و لغو نوبت
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Smooth Animated Receipt Lightbox */}
+      <ReceiptImageLightbox
+        isOpen={lightboxData.isOpen}
+        onClose={() => setLightboxData((prev) => ({ ...prev, isOpen: false }))}
+        imageUrl={lightboxData.imageUrl}
+        amount={lightboxData.amount}
+        customerName={lightboxData.customerName}
+        referenceNumber={lightboxData.referenceNumber}
+        uploadedAt={lightboxData.uploadedAt}
+        status={lightboxData.status}
+      />
     </div>
   );
 }
