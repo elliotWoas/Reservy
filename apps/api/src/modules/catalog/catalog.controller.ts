@@ -1,172 +1,104 @@
-import { Router, Response, NextFunction } from 'express';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { CatalogService } from './catalog.service';
+import { CurrentOrgId, RequirePermission } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
+import { Permission } from '@reservy/domain';
 import {
   CreateServiceSchema,
   UpdateServiceSchema,
+  CreateServiceCategorySchema,
   CreateStaffSchema,
   UpdateStaffSchema,
-  CreateServiceCategorySchema,
 } from '@reservy/validation';
-import { Permission } from '@reservy/domain';
-import { catalogService } from './catalog.service';
-import { authenticate, requirePermission } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest, getOrganizationId } from '../../core/tenant-context';
 
-export const catalogRouter = Router();
+@Controller('catalog')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+export class CatalogController {
+  constructor(private readonly catalogService: CatalogService) {}
 
-catalogRouter.use(authenticate);
-
-// ----------------------------------------------------
-// Categories
-// ----------------------------------------------------
-catalogRouter.get('/categories', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await catalogService.getCategories(orgId);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  // Services
+  @Get('services')
+  async getServices(@CurrentOrgId() orgId: string) {
+    const data = await this.catalogService.getServices(orgId);
+    return { data };
   }
-});
 
-catalogRouter.post(
-  '/categories',
-  requirePermission(Permission.SERVICE_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = CreateServiceCategorySchema.parse(req.body);
-      const result = await catalogService.createCategory(orgId, validated.name, validated.description, validated.sortOrder);
-      res.status(201).json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  @Post('services')
+  @RequirePermission(Permission.SERVICE_CREATE)
+  async createService(@CurrentOrgId() orgId: string, @Body() body: unknown) {
+    const validated = CreateServiceSchema.parse(body);
+    const data = await this.catalogService.createService(orgId, validated);
+    return { data };
   }
-);
 
-catalogRouter.delete(
-  '/categories/:id',
-  requirePermission(Permission.SERVICE_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      await catalogService.deleteCategory(orgId, req.params.id);
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
+  @Patch('services/:id')
+  @RequirePermission(Permission.SERVICE_UPDATE)
+  async updateService(
+    @CurrentOrgId() orgId: string,
+    @Param('id') id: string,
+    @Body() body: unknown
+  ) {
+    const validated = UpdateServiceSchema.parse(body);
+    const data = await this.catalogService.updateService(orgId, id, validated);
+    return { data };
   }
-);
 
-// ----------------------------------------------------
-// Services
-// ----------------------------------------------------
-catalogRouter.get('/services', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await catalogService.getServices(orgId, { includeInactive: true });
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Delete('services/:id')
+  @RequirePermission(Permission.SERVICE_DELETE)
+  async deleteService(@CurrentOrgId() orgId: string, @Param('id') id: string) {
+    const data = await this.catalogService.deleteService(orgId, id);
+    return { data };
   }
-});
 
-catalogRouter.post(
-  '/services',
-  requirePermission(Permission.SERVICE_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = CreateServiceSchema.parse(req.body);
-      const result = await catalogService.createService(orgId, validated);
-      res.status(201).json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  // Categories
+  @Get('categories')
+  async getCategories(@CurrentOrgId() orgId: string) {
+    const data = await this.catalogService.getCategories(orgId);
+    return { data };
   }
-);
 
-catalogRouter.patch(
-  '/services/:id',
-  requirePermission(Permission.SERVICE_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = UpdateServiceSchema.parse(req.body);
-      const result = await catalogService.updateService(orgId, req.params.id, validated);
-      res.json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  @Post('categories')
+  @RequirePermission(Permission.SERVICE_CREATE)
+  async createCategory(@CurrentOrgId() orgId: string, @Body() body: unknown) {
+    const validated = CreateServiceCategorySchema.parse(body);
+    const data = await this.catalogService.createCategory(orgId, validated);
+    return { data };
   }
-);
 
-catalogRouter.delete(
-  '/services/:id',
-  requirePermission(Permission.SERVICE_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      await catalogService.deleteService(orgId, req.params.id);
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
+  // Staff
+  @Get('staff')
+  async getStaff(@CurrentOrgId() orgId: string) {
+    const data = await this.catalogService.getStaff(orgId);
+    return { data };
   }
-);
 
-// ----------------------------------------------------
-// Staff Members
-// ----------------------------------------------------
-catalogRouter.get('/staff', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await catalogService.getStaffMembers(orgId, { includeInactive: true });
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Post('staff')
+  @RequirePermission(Permission.STAFF_CREATE)
+  async createStaff(@CurrentOrgId() orgId: string, @Body() body: unknown) {
+    const validated = CreateStaffSchema.parse(body);
+    const data = await this.catalogService.createStaff(orgId, validated);
+    return { data };
   }
-});
 
-catalogRouter.post(
-  '/staff',
-  requirePermission(Permission.STAFF_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = CreateStaffSchema.parse(req.body);
-      const result = await catalogService.createStaff(orgId, validated);
-      res.status(201).json({ data: result });
-    } catch (err) {
-      next(err);
-    }
+  @Patch('staff/:id')
+  @RequirePermission(Permission.STAFF_UPDATE)
+  async updateStaff(
+    @CurrentOrgId() orgId: string,
+    @Param('id') id: string,
+    @Body() body: unknown
+  ) {
+    const validated = UpdateStaffSchema.parse(body);
+    const data = await this.catalogService.updateStaff(orgId, id, validated);
+    return { data };
   }
-);
-
-catalogRouter.patch(
-  '/staff/:id',
-  requirePermission(Permission.STAFF_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      const validated = UpdateStaffSchema.parse(req.body);
-      const result = await catalogService.updateStaff(orgId, req.params.id, validated);
-      res.json({ data: result });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
-
-catalogRouter.delete(
-  '/staff/:id',
-  requirePermission(Permission.STAFF_MANAGE),
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const orgId = getOrganizationId(req);
-      await catalogService.deleteStaff(orgId, req.params.id);
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+}

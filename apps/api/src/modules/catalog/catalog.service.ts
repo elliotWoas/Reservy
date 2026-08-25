@@ -1,54 +1,22 @@
-import { prisma } from '@reservy/database';
-import { DomainError, DomainErrorCode } from '@reservy/domain';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import {
   CreateServiceInput,
   UpdateServiceInput,
   CreateStaffInput,
   UpdateStaffInput,
-  CreateServiceCategorySchema,
+  CreateServiceCategoryInput,
 } from '@reservy/validation';
+import { DomainError, DomainErrorCode } from '@reservy/domain';
 
+@Injectable()
 export class CatalogService {
-  // ----------------------------------------------------
-  // Categories
-  // ----------------------------------------------------
-  async getCategories(orgId: string) {
-    return await prisma.serviceCategory.findMany({
-      where: { organizationId: orgId },
-      orderBy: { sortOrder: 'asc' },
-      include: {
-        _count: { select: { services: { where: { deletedAt: null } } } },
-      },
-    });
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async createCategory(orgId: string, name: string, description?: string, sortOrder?: number) {
-    return await prisma.serviceCategory.create({
-      data: {
-        organizationId: orgId,
-        name,
-        description,
-        sortOrder: sortOrder || 0,
-      },
-    });
-  }
-
-  async deleteCategory(orgId: string, categoryId: string) {
-    return await prisma.serviceCategory.deleteMany({
-      where: { id: categoryId, organizationId: orgId },
-    });
-  }
-
-  // ----------------------------------------------------
   // Services
-  // ----------------------------------------------------
-  async getServices(orgId: string, options?: { includeInactive?: boolean }) {
-    return await prisma.service.findMany({
-      where: {
-        organizationId: orgId,
-        deletedAt: null,
-        ...(options?.includeInactive ? {} : { isActive: true }),
-      },
+  async getServices(orgId: string) {
+    return await this.prisma.service.findMany({
+      where: { organizationId: orgId, deletedAt: null },
       include: {
         category: true,
         staffServices: {
@@ -60,100 +28,101 @@ export class CatalogService {
   }
 
   async createService(orgId: string, input: CreateServiceInput) {
-    return await prisma.service.create({
+    return await this.prisma.service.create({
       data: {
         organizationId: orgId,
-        name: input.name,
-        description: input.description,
-        categoryId: input.categoryId,
-        durationMinutes: input.durationMinutes,
-        price: input.price,
-        depositAmount: input.depositAmount || 0,
-        currency: input.currency,
-        bufferBeforeMinutes: input.bufferBeforeMinutes || 0,
-        bufferAfterMinutes: input.bufferAfterMinutes || 0,
-        isActive: input.isActive ?? true,
-        isPublic: input.isPublic ?? true,
+        ...input,
       },
     });
   }
 
-  async updateService(orgId: string, serviceId: string, input: UpdateServiceInput) {
-    const service = await prisma.service.findFirst({
-      where: { id: serviceId, organizationId: orgId, deletedAt: null },
+  async updateService(orgId: string, id: string, input: UpdateServiceInput) {
+    const service = await this.prisma.service.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null },
     });
-
     if (!service) {
       throw new DomainError(DomainErrorCode.SERVICE_NOT_FOUND, 'خدمت مورد نظر یافت نشد');
     }
-
-    return await prisma.service.update({
-      where: { id: serviceId },
+    return await this.prisma.service.update({
+      where: { id },
       data: input,
     });
   }
 
-  async deleteService(orgId: string, serviceId: string) {
-    return await prisma.service.updateMany({
-      where: { id: serviceId, organizationId: orgId },
-      data: { deletedAt: new Date(), isActive: false },
+  async deleteService(orgId: string, id: string) {
+    const service = await this.prisma.service.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null },
+    });
+    if (!service) {
+      throw new DomainError(DomainErrorCode.SERVICE_NOT_FOUND, 'خدمت مورد نظر یافت نشد');
+    }
+    return await this.prisma.service.update({
+      where: { id },
+      data: { deletedAt: new Date() },
     });
   }
 
-  // ----------------------------------------------------
-  // Staff Members
-  // ----------------------------------------------------
-  async getStaffMembers(orgId: string, options?: { includeInactive?: boolean }) {
-    return await prisma.staffMember.findMany({
-      where: {
+  // Categories
+  async getCategories(orgId: string) {
+    return await this.prisma.serviceCategory.findMany({
+      where: { organizationId: orgId },
+      orderBy: { sortOrder: 'asc' },
+    });
+  }
+
+  async createCategory(orgId: string, input: CreateServiceCategoryInput) {
+    return await this.prisma.serviceCategory.create({
+      data: {
         organizationId: orgId,
-        deletedAt: null,
-        ...(options?.includeInactive ? {} : { isActive: true }),
+        ...input,
       },
+    });
+  }
+
+  // Staff
+  async getStaff(orgId: string) {
+    return await this.prisma.staffMember.findMany({
+      where: { organizationId: orgId, deletedAt: null },
       include: {
         staffServices: {
           include: { service: true },
         },
-        schedules: true,
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async createStaff(orgId: string, input: CreateStaffInput) {
-    return await prisma.$transaction(async (tx) => {
+    const { serviceIds = [], ...staffData } = input;
+
+    return await this.prisma.$transaction(async (tx) => {
       const staff = await tx.staffMember.create({
         data: {
           organizationId: orgId,
-          displayName: input.displayName,
-          bio: input.bio,
-          avatarUrl: input.avatarUrl,
-          phone: input.phone,
-          isBookable: input.isBookable ?? true,
-          isActive: input.isActive ?? true,
+          ...staffData,
         },
       });
 
-      if (input.serviceIds && input.serviceIds.length > 0) {
+      if (serviceIds.length > 0) {
         await tx.staffService.createMany({
-          data: input.serviceIds.map((serviceId) => ({
+          data: serviceIds.map((serviceId) => ({
             staffId: staff.id,
             serviceId,
           })),
         });
       }
 
-      // Initialize default working schedule (Sat-Thu 10:00-20:00, Fri off)
+      // Initialize default 7-day schedule (Sat-Thu 10:00-20:00, Fri off)
       for (let day = 0; day <= 6; day++) {
-        const isFriday = day === 6;
+        const isOff = day === 6;
         await tx.staffSchedule.create({
           data: {
             organizationId: orgId,
             staffId: staff.id,
             dayOfWeek: day,
-            isDayOff: isFriday,
-            shiftsJson: isFriday ? '[]' : JSON.stringify([{ startTime: '10:00', endTime: '20:00' }]),
-            breaksJson: isFriday ? '[]' : JSON.stringify([{ startTime: '14:00', endTime: '15:00' }]),
+            isDayOff: isOff,
+            shiftsJson: isOff ? '[]' : JSON.stringify([{ startTime: '10:00', endTime: '20:00' }]),
+            breaksJson: isOff ? '[]' : JSON.stringify([{ startTime: '13:00', endTime: '14:00' }]),
           },
         });
       }
@@ -162,43 +131,35 @@ export class CatalogService {
     });
   }
 
-  async updateStaff(orgId: string, staffId: string, input: UpdateStaffInput) {
-    const staff = await prisma.staffMember.findFirst({
-      where: { id: staffId, organizationId: orgId, deletedAt: null },
+  async updateStaff(orgId: string, id: string, input: UpdateStaffInput) {
+    const staff = await this.prisma.staffMember.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null },
     });
-
     if (!staff) {
-      throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'عضو تیم یافت نشد');
+      throw new DomainError(DomainErrorCode.STAFF_NOT_FOUND, 'ارائه‌دهنده یافت نشد');
     }
 
-    return await prisma.$transaction(async (tx) => {
-      if (input.serviceIds) {
-        await tx.staffService.deleteMany({ where: { staffId } });
-        if (input.serviceIds.length > 0) {
+    const { serviceIds, ...staffData } = input;
+
+    return await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.staffMember.update({
+        where: { id },
+        data: staffData,
+      });
+
+      if (serviceIds !== undefined) {
+        await tx.staffService.deleteMany({ where: { staffId: id } });
+        if (serviceIds.length > 0) {
           await tx.staffService.createMany({
-            data: input.serviceIds.map((serviceId) => ({
-              staffId,
+            data: serviceIds.map((serviceId) => ({
+              staffId: id,
               serviceId,
             })),
           });
         }
       }
 
-      const { serviceIds, ...updateData } = input;
-      return await tx.staffMember.update({
-        where: { id: staffId },
-        data: updateData,
-        include: { staffServices: { include: { service: true } } },
-      });
-    });
-  }
-
-  async deleteStaff(orgId: string, staffId: string) {
-    return await prisma.staffMember.updateMany({
-      where: { id: staffId, organizationId: orgId },
-      data: { deletedAt: new Date(), isActive: false, isBookable: false },
+      return updated;
     });
   }
 }
-
-export const catalogService = new CatalogService();
