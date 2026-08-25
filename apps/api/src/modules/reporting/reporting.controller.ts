@@ -1,29 +1,24 @@
-import { Router, Response, NextFunction } from 'express';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ReportingService } from './reporting.service';
+import { CurrentOrgId, RequirePermission } from '../../core/decorators/auth.decorators';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../core/guards/permissions.guard';
 import { Permission } from '@reservy/domain';
-import { reportingService } from './reporting.service';
-import { authenticate, requirePermission } from '../../core/guards/auth.guard';
-import { AuthenticatedRequest, getOrganizationId } from '../../core/tenant-context';
 
-export const reportingRouter = Router();
+@Controller('reporting')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+export class ReportingController {
+  constructor(private readonly reportingService: ReportingService) {}
 
-reportingRouter.use(authenticate);
-
-reportingRouter.get('/summary', requirePermission(Permission.REPORTS_READ), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await reportingService.getDashboardSummary(orgId);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Get('summary')
+  @RequirePermission(Permission.REPORTING_READ)
+  async getSummary(@CurrentOrgId() orgId: string) {
+    return await this.reportingService.getDashboardSummary(orgId);
   }
-});
 
-reportingRouter.get('/performance', requirePermission(Permission.REPORTS_READ), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const orgId = getOrganizationId(req);
-    const result = await reportingService.getPerformanceReport(orgId);
-    res.json({ data: result });
-  } catch (err) {
-    next(err);
+  @Get('performance')
+  @RequirePermission(Permission.REPORTING_READ)
+  async getPerformance(@CurrentOrgId() orgId: string) {
+    return await this.reportingService.getPerformanceReports(orgId);
   }
-});
+}
