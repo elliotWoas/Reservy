@@ -1,21 +1,46 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { prisma } from '@reservy/database';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import { DomainError, DomainErrorCode } from '@reservy/domain';
-import { PublicCreateBookingSchema, AvailabilityQuerySchema, SubmitPaymentProofSchema } from '@reservy/validation';
-import { availabilityService } from '../availability/availability.service';
-import { bookingService } from '../booking/booking.service';
-import { paymentService } from '../payment/payment.service';
+import {
+  PublicCreateBookingSchema,
+  AvailabilityQuerySchema,
+  SubmitPaymentProofSchema,
+} from '@reservy/validation';
+import { AvailabilityService } from '../availability/availability.service';
+import { BookingService } from '../booking/booking.service';
+import { PaymentService } from '../payment/payment.service';
 
-export const publicRouter = Router();
+@Controller()
+export class PublicController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly availabilityService: AvailabilityService,
+    private readonly bookingService: BookingService,
+    private readonly paymentService: PaymentService
+  ) {}
 
-// Public Organization Profile
-publicRouter.get('/organizations/:slug', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const org = await prisma.organization.findUnique({
-      where: { slug: req.params.slug, status: 'ACTIVE' },
+  @Get('health')
+  getHealth() {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  }
+
+  @Get('public/organizations/:slug')
+  async getPublicProfile(@Param('slug') slug: string) {
+    const org = await this.prisma.organization.findUnique({
+      where: { slug, status: 'ACTIVE' },
       include: {
         locations: { where: { isActive: true } },
-        cardAccounts: { where: { isActive: true }, select: { cardNumber: true, cardHolderName: true, bankName: true } },
+        cardAccounts: {
+          where: { isActive: true },
+          select: { cardNumber: true, cardHolderName: true, bankName: true },
+        },
         categories: {
           orderBy: { sortOrder: 'asc' },
           include: {
@@ -24,7 +49,9 @@ publicRouter.get('/organizations/:slug', async (req: Request, res: Response, nex
               include: {
                 staffServices: {
                   include: {
-                    staff: { select: { id: true, displayName: true, avatarUrl: true, bio: true } },
+                    staff: {
+                      select: { id: true, displayName: true, avatarUrl: true, bio: true },
+                    },
                   },
                 },
               },
@@ -37,7 +64,9 @@ publicRouter.get('/organizations/:slug', async (req: Request, res: Response, nex
             category: true,
             staffServices: {
               include: {
-                staff: { select: { id: true, displayName: true, avatarUrl: true, bio: true } },
+                staff: {
+                  select: { id: true, displayName: true, avatarUrl: true, bio: true },
+                },
               },
             },
           },
@@ -59,17 +88,19 @@ publicRouter.get('/organizations/:slug', async (req: Request, res: Response, nex
       throw new DomainError(DomainErrorCode.ORGANIZATION_NOT_FOUND, 'کسب‌وکار مورد نظر یافت نشد');
     }
 
-    res.json({ data: org });
-  } catch (err) {
-    next(err);
+    return { data: org };
   }
-});
 
-// Public Availability Engine Query
-publicRouter.get('/organizations/:slug/availability', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const org = await prisma.organization.findUnique({
-      where: { slug: req.params.slug, status: 'ACTIVE' },
+  @Get('public/organizations/:slug/availability')
+  async getPublicAvailability(
+    @Param('slug') slug: string,
+    @Query('serviceId') serviceId: string,
+    @Query('staffId') staffId: string,
+    @Query('locationId') locationId: string,
+    @Query('date') date: string
+  ) {
+    const org = await this.prisma.organization.findUnique({
+      where: { slug, status: 'ACTIVE' },
     });
 
     if (!org) {
@@ -77,45 +108,35 @@ publicRouter.get('/organizations/:slug/availability', async (req: Request, res: 
     }
 
     const validated = AvailabilityQuerySchema.parse({
-      serviceId: req.query.serviceId,
-      staffId: req.query.staffId || undefined,
-      locationId: req.query.locationId || undefined,
-      date: req.query.date,
+      serviceId,
+      staffId: staffId || undefined,
+      locationId: locationId || undefined,
+      date,
     });
 
-    const slots = await availabilityService.getAvailableSlots(org.id, validated);
-    res.json({ data: slots });
-  } catch (err) {
-    next(err);
+    const slots = await this.availabilityService.getAvailableSlots(org.id, validated);
+    return { data: slots };
   }
-});
 
-// Public Create Booking
-publicRouter.post('/organizations/:slug/bookings', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const org = await prisma.organization.findUnique({
-      where: { slug: req.params.slug, status: 'ACTIVE' },
+  @Post('public/organizations/:slug/bookings')
+  async createPublicBooking(@Param('slug') slug: string, @Body() body: unknown) {
+    const org = await this.prisma.organization.findUnique({
+      where: { slug, status: 'ACTIVE' },
     });
 
     if (!org) {
       throw new DomainError(DomainErrorCode.ORGANIZATION_NOT_FOUND, 'کسب‌وکار مورد نظر یافت نشد');
     }
 
-    const validated = PublicCreateBookingSchema.parse(req.body);
-    const result = await bookingService.createBooking(org.id, validated);
-    res.status(201).json(result);
-  } catch (err) {
-    next(err);
+    const validated = PublicCreateBookingSchema.parse(body);
+    const result = await this.bookingService.createBooking(org.id, validated);
+    return result;
   }
-});
 
-// Public Submit Payment Proof
-publicRouter.post('/payments/proof', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const validated = SubmitPaymentProofSchema.parse(req.body);
-    const result = await paymentService.submitPaymentProof(validated);
-    res.status(201).json({ data: result });
-  } catch (err) {
-    next(err);
+  @Post('public/payments/proof')
+  async submitPublicPaymentProof(@Body() body: unknown) {
+    const validated = SubmitPaymentProofSchema.parse(body);
+    const result = await this.paymentService.submitPaymentProof(validated);
+    return { data: result };
   }
-});
+}
