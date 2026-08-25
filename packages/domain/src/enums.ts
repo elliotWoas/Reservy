@@ -19,7 +19,12 @@ export enum Permission {
 
   // Catalog
   SERVICE_MANAGE = 'service:manage',
+  SERVICE_CREATE = 'service:manage',
+  SERVICE_UPDATE = 'service:manage',
+  SERVICE_DELETE = 'service:manage',
   STAFF_MANAGE = 'staff:manage',
+  STAFF_CREATE = 'staff:manage',
+  STAFF_UPDATE = 'staff:manage',
 
   // Payment
   PAYMENT_READ = 'payment:read',
@@ -27,12 +32,15 @@ export enum Permission {
 
   // Reports
   REPORTS_READ = 'reports:read',
+  REPORTING_READ = 'reports:read',
 
   // Organization Settings
   ORGANIZATION_MANAGE = 'organization:manage',
+  ORGANIZATION_UPDATE = 'organization:manage',
 
   // Super Admin Platform
   ADMIN_ALL = 'admin:all',
+  PLATFORM_MANAGE = 'admin:all',
 }
 
 export enum TenantStatus {
@@ -61,10 +69,10 @@ export enum BookingStatus {
 
 export enum PaymentMethod {
   CARD_TO_CARD = 'CARD_TO_CARD',
-  ONLINE_GATEWAY = 'ONLINE_GATEWAY',
-  WALLET = 'WALLET',
-  CASH = 'CASH',
+  GATEWAY_ZARINPAL = 'GATEWAY_ZARINPAL',
+  GATEWAY_IDPAY = 'GATEWAY_IDPAY',
   POS = 'POS',
+  CASH = 'CASH',
 }
 
 export enum PaymentStatus {
@@ -83,18 +91,22 @@ export enum PaymentProofReviewStatus {
 }
 
 export enum Currency {
-  IRR = 'IRR',
-  IRT = 'IRT', // Toman
+  IRT = 'IRT', // Iranian Toman (default)
+  IRR = 'IRR', // Iranian Rial
   USD = 'USD',
   EUR = 'EUR',
 }
 
-export enum DayOfWeek {
-  SATURDAY = 0,
-  SUNDAY = 1,
-  MONDAY = 2,
-  TUESDAY = 3,
-  WEDNESDAY = 4,
-  THURSDAY = 5,
-  FRIDAY = 6,
+export enum NotificationChannel {
+  SMS_KAVENEGAR = 'SMS_KAVENEGAR',
+  SMS_FARAZ = 'SMS_FARAZ',
+  EMAIL = 'EMAIL',
+  TELEGRAM = 'TELEGRAM',
+  WEB_PUSH = 'WEB_PUSH',
+}
+
+export enum NotificationStatus {
+  PENDING = 'PENDING',
+  SENT = 'SENT',
+  FAILED = 'FAILED',
 }

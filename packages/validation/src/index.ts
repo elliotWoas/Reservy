@@ -101,6 +101,7 @@ export const CreateServiceSchema = z.object({
 
 export const UpdateServiceSchema = CreateServiceSchema.partial();
 
+export type CreateServiceCategoryInput = z.infer<typeof CreateServiceCategorySchema>;
 export type CreateServiceInput = z.infer<typeof CreateServiceSchema>;
 export type UpdateServiceInput = z.infer<typeof UpdateServiceSchema>;
 
