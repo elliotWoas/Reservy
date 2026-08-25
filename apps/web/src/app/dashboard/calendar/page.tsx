@@ -105,7 +105,7 @@ export default function CalendarPage() {
         }
 
         const res = await ApiClient.request<any>(url);
-        setBookings(res.data || []);
+        setBookings(Array.isArray(res) ? res : res?.data || []);
       } catch (err) {
         console.error('Failed to load bookings', err);
       } finally {
