@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, FileText, Phone, Calendar, ArrowLeft, MessageSquare } from 'lucide-react';
+import { Users, Search, FileText, Phone, Calendar, ArrowLeft, MessageSquare, Sparkles } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -69,31 +69,40 @@ export default function CustomersPage() {
   return (
     <div className="space-y-6 animate-fade-in text-right">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
-          <h1 className="text-xl font-black text-slate-900">مدیریت ارتباط با مشتریان (CRM)</h1>
-          <p className="text-xs text-slate-500">لیست سوابق مراجعات، مجموع دریافتی‌ها و یادداشت‌های پرسنل برای هر مشتری</p>
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-black text-white">مدیریت مشتریان و پرونده‌ها (CRM)</h1>
+              <p className="text-xs text-slate-400 mt-0.5">
+                لیست سوابق مراجعات، مجموع دریافتی‌ها و یادداشت‌های اختصاصی هر مشتری
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Search */}
-      <Card className="p-4">
+      <Card className="p-4 border-amber-500/15 bg-[#111726]/90">
         <form onSubmit={handleSearchSubmit} className="relative max-w-md">
           <input
             type="text"
             placeholder="جستجو با نام یا شماره تماس مشتری..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-3 pr-9 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-600"
+            className="w-full pl-3 pr-9 py-2.5 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute right-3 top-2.5" />
+          <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
         </form>
       </Card>
 
       {/* Customers Table */}
-      <Card className="p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden border-amber-500/15 bg-[#111726]/90">
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-500">در حال بارگذاری پرونده مشتریان...</div>
+          <div className="p-12 text-center text-xs text-slate-400 font-bold">در حال بارگذاری پرونده مشتریان...</div>
         ) : customers.length === 0 ? (
           <EmptyState
             title="هیچ مشتری‌ای یافت نشد"
@@ -103,7 +112,7 @@ export default function CustomersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-500 font-bold">
+              <thead className="bg-[#0E131F] border-b border-amber-500/10 text-slate-400 font-bold">
                 <tr>
                   <th className="p-4">پروفایل و نام مشتری</th>
                   <th className="p-4">شماره تماس</th>
@@ -114,10 +123,10 @@ export default function CustomersPage() {
                   <th className="p-4 text-left">یادداشت و پرونده</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-amber-500/10">
                 {customers.map((c) => (
-                  <tr key={c.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-4 font-bold text-slate-900">
+                  <tr key={c.id} className="hover:bg-white/5 transition-colors">
+                    <td className="p-4 font-bold text-white">
                       <div className="flex items-center gap-3">
                         <Avatar name={c.fullName || 'مشتری'} size="sm" />
                         <div>
@@ -126,25 +135,25 @@ export default function CustomersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 font-mono font-medium text-slate-700" dir="ltr">
-                      <a href={`tel:${c.phone}`} className="text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                    <td className="p-4 font-mono font-medium text-slate-300" dir="ltr">
+                      <a href={`tel:${c.phone}`} className="text-emerald-400 font-bold hover:underline flex items-center gap-1">
                         <Phone className="w-3.5 h-3.5" />
                         <span>{c.phone}</span>
                       </a>
                     </td>
                     <td className="p-4">
-                      <span className="font-bold text-slate-800">{formatNumberFa(c.totalBookings)} نوبت</span>
+                      <span className="font-bold text-slate-200">{formatNumberFa(c.totalBookings)} نوبت</span>
                       <span className="text-[10px] text-slate-400 block">
                         ({formatNumberFa(c.completedBookings)} انجام شده / {formatNumberFa(c.cancelledBookings)} لغو)
                       </span>
                     </td>
-                    <td className="p-4 font-black text-emerald-700">{formatToman(c.totalSpent)}</td>
-                    <td className="p-4 text-slate-600">
+                    <td className="p-4 font-black text-amber-400">{formatToman(c.totalSpent)}</td>
+                    <td className="p-4 text-slate-300">
                       {c.lastVisit ? formatJalaliDate(c.lastVisit) : '—'}
                     </td>
-                    <td className="p-4 text-slate-600">
+                    <td className="p-4 text-slate-300">
                       {c.nextBooking ? (
-                        <span className="text-emerald-700 font-bold">{formatJalaliDate(c.nextBooking)}</span>
+                        <span className="text-emerald-400 font-bold">{formatJalaliDate(c.nextBooking)}</span>
                       ) : (
                         '—'
                       )}
@@ -152,7 +161,7 @@ export default function CustomersPage() {
                     <td className="p-4 text-left">
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="goldOutline"
                         onClick={() => handleOpenNotes(c)}
                         className="text-[11px] py-1 px-3"
                       >
@@ -176,16 +185,16 @@ export default function CustomersPage() {
           title={`یادداشت پرونده: ${selectedCustomer.fullName}`}
         >
           <form onSubmit={handleSaveNotes} className="space-y-4 text-right">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#0E131F] border border-amber-500/20">
               <Avatar name={selectedCustomer.fullName || 'مشتری'} size="md" />
               <div>
-                <span className="font-bold text-slate-900 block">{selectedCustomer.fullName}</span>
-                <span className="text-xs font-mono text-slate-500" dir="ltr">{selectedCustomer.phone}</span>
+                <span className="font-bold text-white block">{selectedCustomer.fullName}</span>
+                <span className="text-xs font-mono text-slate-400" dir="ltr">{selectedCustomer.phone}</span>
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">
+              <label className="text-xs font-bold text-slate-300 block mb-1.5">
                 یادداشت‌ها و ترجیحات مشتری (فقط برای مدیریت و پرسنل قابل مشاهده است):
               </label>
               <textarea
@@ -193,15 +202,15 @@ export default function CustomersPage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="مثال: حساسیت به رنگ، مدل موی دلخواه، تخفیف اختصاصی..."
-                className="w-full p-3 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:border-emerald-600 leading-relaxed"
+                className="w-full p-3.5 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 leading-relaxed"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
               <Button type="button" variant="outline" size="sm" onClick={() => setSelectedCustomer(null)}>
                 انصراف
               </Button>
-              <Button type="submit" size="sm" disabled={isSavingNotes}>
+              <Button type="submit" variant="gold" size="sm" disabled={isSavingNotes}>
                 {isSavingNotes ? 'در حال ذخیره...' : 'ذخیره یادداشت'}
               </Button>
             </div>
