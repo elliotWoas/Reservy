@@ -4,20 +4,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 
+  =============================================================================
+  ✨ پالت‌های رنگی دارک و لاکچری (LUXURY DARK COLOR PALETTES)
+  جهت تست هر تم، مقادیر داخل :root زیر را با هر یک از پالت‌های زیر جایگزین فرمایید:
+  =============================================================================
+
+  👑 [گزینه پیش‌فرض فعال] Royal Obsidian & Gold (آبسیدین سلطنتی و طلای متالیک):
+  --bg-app: #0B0F17;
+  --bg-card: #111726;
+  --bg-card-hover: #172033;
+  --border-card: rgba(212, 175, 55, 0.16);
+  --accent-gold: #D4AF37;
+  --accent-gold-light: #F3E5AB;
+
+  💎 [گزینه ۱] Velvet Onyx & Champagne (مشکی اونیکس مخملی و شامپاینی):
+  --bg-app: #0D0D11;
+  --bg-card: #14141A;
+  --bg-card-hover: #1B1B24;
+  --border-card: rgba(230, 200, 140, 0.15);
+  --accent-gold: #E5C158;
+  --accent-gold-light: #FDF6E2;
+
+  🌌 [گزینه ۲] Midnight Sapphire & Imperial Gold (سورمه‌ای عمیق شب و طلای شاهانه):
+  --bg-app: #070B14;
+  --bg-card: #0D1322;
+  --bg-card-hover: #131D33;
+  --border-card: rgba(184, 137, 52, 0.20);
+  --accent-gold: #C59B27;
+  --accent-gold-light: #F5E8C8;
+
+  ☕ [گزینه ۳] Luxury Smoked Espresso / Dark Mocha (قهوه‌ای اسپرسو دارک و برنز لوکس):
+  --bg-app: #0F0C0A;
+  --bg-card: #171310;
+  --bg-card-hover: #221C17;
+  --border-card: rgba(203, 163, 87, 0.18);
+  --accent-gold: #CBA357;
+  --accent-gold-light: #FAF2E4;
+
+  🖤 [گزینه ۴] Stealth Matte Black & Platinum (مشکی مات خالص مینیمال و متالیک):
+  --bg-app: #09090B;
+  --bg-card: #121216;
+  --bg-card-hover: #18181E;
+  --border-card: rgba(255, 255, 255, 0.10);
+  --accent-gold: #E2B755;
+  --accent-gold-light: #FFFFFF;
+  =============================================================================
+*/
+
 @layer base {
   :root {
     --font-sans: 'Vazirmatn', Tahoma, sans-serif;
+
+    /* Active Luxury Dark Palette: Royal Obsidian & Brushed Gold */
+    --bg-app: #0B0F17;
+    --bg-card: #111726;
+    --bg-card-hover: #172033;
+    --border-card: rgba(212, 175, 55, 0.16);
+    --accent-gold: #D4AF37;
+    --accent-gold-light: #F3E5AB;
   }
 
   body {
     font-family: var(--font-sans);
     direction: rtl;
     text-align: right;
-    @apply bg-slate-50/80 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white;
+    background-color: var(--bg-app);
+    @apply text-slate-100 antialiased selection:bg-amber-500 selection:text-black;
     background-image: 
-      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(187, 207, 238, 0.04) 0px, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 45%),
+      radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 40%),
+      radial-gradient(at 50% 100%, rgba(212, 175, 55, 0.06) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, rgba(30, 41, 59, 0.35) 0px, transparent 60%);
     background-attachment: fixed;
   }
 }
@@ -25,39 +83,53 @@
 /* Luxury card and glass styles */
 @layer components {
   .luxury-glass {
-    @apply bg-white/90 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+    background-color: rgba(17, 23, 38, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
   }
 
   .luxury-card {
-    @apply bg-white border border-slate-200/70 rounded-3xl p-6 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.06)] transition-all duration-200;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .luxury-card:hover {
+    background-color: var(--bg-card-hover);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.6), 0 0 20px -2px rgba(212, 175, 55, 0.08);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 30px -5px rgba(212, 175, 55, 0.3);
   }
 
   .glow-emerald {
-    box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
-  }
-
-  .glow-amber {
-    box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+    box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.3);
   }
 }
 
-/* Custom smooth scrollbars */
+/* Custom smooth dark scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0B0F17;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #253147;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #D4AF37;
 }
 
 /* Fade in & zoom keyframes */
