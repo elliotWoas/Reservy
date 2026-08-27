@@ -98,8 +98,8 @@ export default function DashboardOverviewPage() {
     return (
       <div className="min-h-[450px] flex items-center justify-center">
         <div className="text-center space-y-3.5">
-          <div className="w-10 h-10 border-3 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto shadow-luxury-md" />
-          <p className="text-xs text-slate-600 font-bold">در حال بارگذاری پیشخوان هوشمند و لوکس...</p>
+          <div className="w-10 h-10 border-3 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto shadow-luxury-md" />
+          <p className="text-xs text-slate-400 font-bold">در حال بارگذاری پیشخوان هوشمند و لوکس...</p>
         </div>
       </div>
     );
@@ -116,15 +116,15 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 1. Header with Luxury Gold Accent & Action Buttons   */}
       {/* ---------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500/10 via-white to-amber-500/5 p-6 rounded-3xl border border-amber-200/80 shadow-luxury-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-800 border border-amber-300">
-              <Sparkles className="w-5 h-5 text-amber-700" />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
+              <Sparkles className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h1 className="text-xl font-black text-slate-900 tracking-tight">پیشخوان مدیریت نوبت‌ها و فاکتورها</h1>
-              <p className="text-xs text-slate-600 mt-0.5">
+              <h1 className="text-xl font-black text-white tracking-tight">پیشخوان مدیریت نوبت‌ها و فاکتورها</h1>
+              <p className="text-xs text-slate-400 mt-0.5">
                 اولویت‌بندی روزانه نوبت‌ها، بررسی فیش‌های واریزی و ثبت وضعیت اتمام خدمت
               </p>
             </div>
@@ -134,13 +134,13 @@ export default function DashboardOverviewPage() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <Link href="/dashboard/calendar">
             <Button size="sm" variant="goldOutline" className="flex items-center gap-1.5 rounded-2xl">
-              <Calendar className="w-4 h-4 text-amber-700" />
+              <Calendar className="w-4 h-4 text-amber-400" />
               <span>مشاهده تقویم</span>
             </Button>
           </Link>
           <Link href="/dashboard/bookings">
             <Button size="sm" variant="goldOutline" className="flex items-center gap-1.5 rounded-2xl">
-              <Receipt className="w-4 h-4 text-amber-700" />
+              <Receipt className="w-4 h-4 text-amber-400" />
               <span>تمام فاکتورها</span>
             </Button>
           </Link>
@@ -167,14 +167,14 @@ export default function DashboardOverviewPage() {
           title="نوبت‌های فردا"
           value={formatNumberFa(metrics.bookingsTomorrow || 0)}
           icon={CalendarDays}
-          subtitle="رزروهای برنامه ریزی شده فردا"
+          subtitle="رزروهای برنامه‌ریزی شده فردا"
         />
         <StatCard
           title="فیش‌های در انتظار تایید"
           value={formatNumberFa(metrics.pendingProofsCount || 0)}
           icon={CreditCard}
           subtitle="رسیدهای کارت‌به‌کارت معوقه"
-          className={metrics.pendingProofsCount > 0 ? 'ring-2 ring-amber-500 bg-amber-50/40' : ''}
+          className={metrics.pendingProofsCount > 0 ? 'ring-2 ring-amber-500 bg-amber-500/10' : ''}
         />
         <StatCard
           title="درآمد امروز"
@@ -187,20 +187,20 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 3. Priority 1: TODAY'S APPOINTMENTS (مهم‌ترین اولویت) */}
       {/* ---------------------------------------------------- */}
-      <Card className="space-y-4 p-6 border-amber-200/80 bg-gradient-to-b from-white to-amber-50/20 shadow-luxury-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200/60 pb-4">
+      <Card className="space-y-4 p-6 border-amber-500/25 bg-gradient-to-b from-[#141B2D] to-[#0E131F] shadow-luxury-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-500/15 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 flex items-center justify-center shadow-xs font-black">
               <Flame className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-black text-slate-900">اولویت اول: نوبت‌های امروز ({formatNumberFa(upcomingToday.length)})</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                <h2 className="text-base font-black text-white">اولویت اول: نوبت‌های امروز ({formatNumberFa(upcomingToday.length)})</h2>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                   اقدام فوری
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 پس از انجام کار، روی «اصلاح انجام شد» کلیک کنید تا فاکتور تکمیل و بسته شود.
               </p>
             </div>
@@ -223,12 +223,12 @@ export default function DashboardOverviewPage() {
               return (
                 <div
                   key={booking.id}
-                  className={`p-5 rounded-3xl bg-white border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                  className={`p-5 rounded-3xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
                     isCompleted
-                      ? 'border-emerald-200/80 bg-emerald-50/20'
+                      ? 'border-emerald-500/30 bg-emerald-950/20'
                       : isCancelled
-                      ? 'border-slate-200 bg-slate-50/50 opacity-70'
-                      : 'border-amber-200 hover:border-amber-300 shadow-[0_4px_20px_-4px_rgba(184,137,52,0.08)]'
+                      ? 'border-slate-800 bg-slate-900/40 opacity-60'
+                      : 'border-amber-500/20 bg-[#111726] hover:border-amber-500/40 hover:bg-[#161D2E] shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
                   }`}
                 >
                   {/* Customer & Booking Details */}
@@ -237,10 +237,10 @@ export default function DashboardOverviewPage() {
 
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="text-sm font-black text-slate-900">
+                        <span className="text-sm font-black text-white">
                           {booking.customer?.fullName || 'مشتری بدون نام'}
                         </span>
-                        <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-200">
+                        <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/30">
                           {booking.code}
                         </span>
                         <Badge status={booking.status} />
@@ -259,30 +259,30 @@ export default function DashboardOverviewPage() {
                                 status: booking.status,
                               })
                             }
-                            className="text-[10px] px-2 py-0.5 rounded-md bg-amber-100/80 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                            className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold flex items-center gap-1 transition-colors cursor-pointer"
                           >
-                            <FileImage className="w-3 h-3 text-amber-700" />
+                            <FileImage className="w-3 h-3 text-amber-400" />
                             <span>مشاهده فیش</span>
                           </button>
                         )}
                       </div>
 
-                      <div className="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
-                        <span className="font-extrabold text-amber-900">{booking.service?.name || booking.serviceNameSnapshot}</span>
-                        <span className="text-slate-300">•</span>
+                      <div className="text-xs text-slate-300 flex items-center gap-2 flex-wrap">
+                        <span className="font-extrabold text-amber-300">{booking.service?.name || booking.serviceNameSnapshot}</span>
+                        <span className="text-slate-600">•</span>
                         <span>ارائه‌دهنده: {booking.staff?.displayName || booking.staffNameSnapshot || 'ارائه‌دهنده'}</span>
-                        <span className="text-slate-300">•</span>
-                        <span className="font-black text-slate-900">{formatToman(booking.priceSnapshot || booking.price || 0)}</span>
+                        <span className="text-slate-600">•</span>
+                        <span className="font-black text-white">{formatToman(booking.priceSnapshot || booking.price || 0)}</span>
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-slate-500 pt-0.5 flex-wrap">
-                        <span className="flex items-center gap-1 font-black text-slate-800">
-                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                      <div className="flex items-center gap-4 text-xs text-slate-400 pt-0.5 flex-wrap">
+                        <span className="flex items-center gap-1 font-bold text-amber-300/90">
+                          <Clock className="w-3.5 h-3.5 text-amber-400" />
                           ساعت {formatTimeFa(booking.startAt)} ({booking.durationSnapshot || booking.service?.durationMinutes || 45} دقیقه)
                         </span>
                         <a
                           href={`tel:${booking.customer?.phone}`}
-                          className="font-mono text-emerald-700 font-bold hover:underline flex items-center gap-1"
+                          className="font-mono text-emerald-400 font-bold hover:underline flex items-center gap-1"
                           dir="ltr"
                         >
                           <Phone className="w-3.5 h-3.5" />
@@ -293,14 +293,14 @@ export default function DashboardOverviewPage() {
                   </div>
 
                   {/* Prominent Barber Action Buttons */}
-                  <div className="flex items-center gap-2 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 flex-wrap justify-end">
+                  <div className="flex items-center gap-2 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800 flex-wrap justify-end">
                     {/* 1. Confirm Receipt & Booking */}
                     {booking.status === 'PENDING_PAYMENT' || booking.status === 'PAYMENT_SUBMITTED' ? (
                       <button
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleQuickStatusUpdate(booking.id, 'CONFIRMED')}
-                        className="px-3.5 py-2 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                        className="px-3.5 py-2 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-luxury-sm transition-colors cursor-pointer"
                         title="تایید فیش و نوبت"
                       >
                         <Check className="w-4 h-4" />
@@ -314,7 +314,7 @@ export default function DashboardOverviewPage() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleQuickStatusUpdate(booking.id, 'COMPLETED')}
-                        className="px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                        className="px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-luxury-sm transition-all cursor-pointer"
                         title="اصلاح انجام شد و فاکتور بسته شود"
                       >
                         <CheckCheck className="w-4 h-4" />
@@ -332,7 +332,7 @@ export default function DashboardOverviewPage() {
                             handleQuickStatusUpdate(booking.id, 'CANCELLED', 'لغو توسط آرایشگر');
                           }
                         }}
-                        className="px-3 py-2 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold flex items-center gap-1 border border-rose-200 transition-colors cursor-pointer"
+                        className="px-3 py-2 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold flex items-center gap-1 border border-rose-500/30 transition-colors cursor-pointer"
                         title="لغو یا رد نوبت"
                       >
                         <Ban className="w-3.5 h-3.5" />
@@ -344,9 +344,9 @@ export default function DashboardOverviewPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedBooking(booking)}
-                      className="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3.5 py-2 rounded-2xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-white/5"
                     >
-                      <Eye className="w-3.5 h-3.5 text-slate-500" />
+                      <Eye className="w-3.5 h-3.5 text-amber-400" />
                       <span>رسید و فاکتور</span>
                     </button>
                   </div>
@@ -360,15 +360,15 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 4. Priority 2: TOMORROW'S APPOINTMENTS (اولویت فردا) */}
       {/* ---------------------------------------------------- */}
-      <Card className="space-y-4 p-6 border-slate-200/80 bg-white">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <Card className="space-y-4 p-6 border-amber-500/15 bg-[#111726]/90">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-xs">
+            <div className="w-9 h-9 rounded-2xl bg-slate-800 text-amber-400 flex items-center justify-center shadow-xs border border-slate-700">
               <CalendarDays className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900">اولویت دوم: نوبت‌های فردا ({formatNumberFa(upcomingTomorrow.length)})</h2>
-              <p className="text-xs text-slate-500 mt-0.5">آمادگی و بررسی نوبت‌ها و رزروهای ثبت شده برای فردا</p>
+              <h2 className="text-base font-black text-white">اولویت دوم: نوبت‌های فردا ({formatNumberFa(upcomingTomorrow.length)})</h2>
+              <p className="text-xs text-slate-400 mt-0.5">آمادگی و بررسی نوبت‌ها و رزروهای ثبت شده برای فردا</p>
             </div>
           </div>
         </div>
@@ -382,33 +382,32 @@ export default function DashboardOverviewPage() {
         ) : (
           <div className="space-y-3.5">
             {upcomingTomorrow.map((booking: any) => {
-              const proof = booking.payments?.[0]?.proofs?.[0];
               return (
                 <div
                   key={booking.id}
-                  className="p-4.5 rounded-3xl bg-slate-50/70 hover:bg-slate-50 border border-slate-200/80 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="p-4.5 rounded-3xl bg-[#0E131F] hover:bg-[#141B2D] border border-amber-500/10 hover:border-amber-500/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="flex items-start gap-3.5">
                     <Avatar name={booking.customer?.fullName || 'مشتری'} size="md" />
 
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-black text-slate-900">{booking.customer?.fullName}</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white text-slate-700 border border-slate-200">
+                        <span className="text-sm font-black text-white">{booking.customer?.fullName}</span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/10 text-amber-300 border border-amber-500/20">
                           {booking.code}
                         </span>
                         <Badge status={booking.status} />
                       </div>
 
-                      <p className="text-xs text-slate-600">
+                      <p className="text-xs text-slate-300">
                         {booking.service?.name} با {booking.staff?.displayName || 'ارائه‌دهنده'}
                       </p>
 
-                      <div className="flex items-center gap-3.5 text-xs text-slate-500">
-                        <span className="font-bold text-slate-800">
+                      <div className="flex items-center gap-3.5 text-xs text-slate-400">
+                        <span className="font-bold text-amber-300">
                           فردا ساعت {formatTimeFa(booking.startAt)} ({booking.durationSnapshot || 45} دقیقه)
                         </span>
-                        <a href={`tel:${booking.customer?.phone}`} className="font-mono text-emerald-700 font-bold hover:underline" dir="ltr">
+                        <a href={`tel:${booking.customer?.phone}`} className="font-mono text-emerald-400 font-bold hover:underline" dir="ltr">
                           {booking.customer?.phone}
                         </a>
                       </div>
@@ -421,7 +420,7 @@ export default function DashboardOverviewPage() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => handleQuickStatusUpdate(booking.id, 'CONFIRMED')}
-                        className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold"
+                        className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold cursor-pointer"
                       >
                         تایید نوبت
                       </button>
@@ -429,7 +428,7 @@ export default function DashboardOverviewPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedBooking(booking)}
-                      className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200"
+                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold border border-white/5 cursor-pointer"
                     >
                       رسید و فاکتور
                     </button>
@@ -444,20 +443,20 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 5. Priority 3: SENT RECEIPTS AWAITING CONFIRMATION  */}
       {/* ---------------------------------------------------- */}
-      <Card className="space-y-4 p-6 border-amber-300 bg-amber-50/30 shadow-luxury-sm">
-        <div className="flex items-center justify-between border-b border-amber-200 pb-3">
+      <Card className="space-y-4 p-6 border-amber-500/20 bg-[#111726]/90 shadow-luxury-md">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-2xs">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-black text-slate-900">
+              <h3 className="text-sm font-black text-white">
                 تمام فیش‌ها و رسیدهای ارسالی در انتظار تایید ({formatNumberFa(recentPendingPayments.length)})
               </h3>
-              <p className="text-[11px] text-slate-500">رسیدهای کارت‌به‌کارت آپلود شده توسط مشتریان</p>
+              <p className="text-[11px] text-slate-400">رسیدهای کارت‌به‌کارت آپلود شده توسط مشتریان</p>
             </div>
           </div>
-          <Link href="/dashboard/payments" className="text-xs font-bold text-amber-800 hover:underline">
+          <Link href="/dashboard/payments" className="text-xs font-bold text-amber-400 hover:underline">
             مشاهده در بخش پرداخت‌ها
           </Link>
         </div>
@@ -475,15 +474,15 @@ export default function DashboardOverviewPage() {
               return (
                 <div
                   key={payment.id}
-                  className="p-4 rounded-2xl bg-white border border-amber-200 shadow-xs flex items-center justify-between gap-3"
+                  className="p-4 rounded-2xl bg-[#0E131F] border border-amber-500/20 shadow-xs flex items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-black text-slate-900">{payment.booking?.customer?.fullName}</span>
-                      <span className="text-[10px] text-slate-500 font-mono">{payment.booking?.code}</span>
+                      <span className="text-xs font-black text-white">{payment.booking?.customer?.fullName}</span>
+                      <span className="text-[10px] text-slate-400 font-mono">{payment.booking?.code}</span>
                     </div>
-                    <p className="text-[11px] text-slate-600">{payment.booking?.service?.name}</p>
-                    <span className="text-xs font-black text-emerald-800 block">{formatToman(payment.amount)}</span>
+                    <p className="text-[11px] text-slate-300">{payment.booking?.service?.name}</p>
+                    <span className="text-xs font-black text-amber-400 block">{formatToman(payment.amount)}</span>
                   </div>
 
                   <div className="space-y-1.5 text-left">
@@ -501,7 +500,7 @@ export default function DashboardOverviewPage() {
                             status: payment.status,
                           })
                         }
-                        className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black flex items-center gap-1 cursor-pointer shadow-luxury-sm"
                       >
                         <ZoomIn className="w-3.5 h-3.5" />
                         <span>مشاهده فیش</span>
@@ -527,19 +526,19 @@ export default function DashboardOverviewPage() {
         >
           <div className="space-y-6 text-right">
             {/* Customer Profile Header */}
-            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-50/50 via-white to-amber-50/30 border border-amber-200/80 flex items-center gap-4">
+            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-[#111726] to-amber-500/10 border border-amber-500/20 flex items-center gap-4">
               <Avatar name={selectedBooking.customer?.fullName || 'مشتری'} size="xl" />
               <div className="space-y-1 flex-1">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-black text-slate-900">
+                  <h3 className="text-base font-black text-white">
                     {selectedBooking.customer?.fullName || 'مشتری بدون نام'}
                   </h3>
                   <Badge status={selectedBooking.status} />
                 </div>
-                <div className="flex items-center gap-3 text-xs text-slate-600 flex-wrap">
+                <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap">
                   <a
                     href={`tel:${selectedBooking.customer?.phone}`}
-                    className="flex items-center gap-1 font-mono text-emerald-800 font-bold hover:underline"
+                    className="flex items-center gap-1 font-mono text-emerald-400 font-bold hover:underline"
                     dir="ltr"
                   >
                     <Phone className="w-3.5 h-3.5" />
@@ -561,10 +560,10 @@ export default function DashboardOverviewPage() {
                   : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
 
                 return (
-                  <div className="p-4 rounded-3xl bg-amber-50/70 border border-amber-200 space-y-3">
+                  <div className="p-4 rounded-3xl bg-[#0E131F] border border-amber-500/30 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-amber-950 flex items-center gap-1.5">
-                        <CreditCard className="w-4 h-4 text-amber-700" />
+                      <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
+                        <CreditCard className="w-4 h-4 text-amber-400" />
                         تصویر رسید فیش واریزی کارت‌به‌کارت
                       </span>
                       <button
@@ -580,7 +579,7 @@ export default function DashboardOverviewPage() {
                             status: payment?.status || selectedBooking.status,
                           })
                         }
-                        className="text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1 hover:underline cursor-pointer"
+                        className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         <ZoomIn className="w-3.5 h-3.5" />
                         <span>بزرگ‌نمایی با انیمیشن</span>
@@ -599,14 +598,14 @@ export default function DashboardOverviewPage() {
                           status: payment?.status || selectedBooking.status,
                         })
                       }
-                      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-300 bg-slate-900 flex items-center justify-center max-h-48 shadow-sm"
+                      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-500/40 bg-black flex items-center justify-center max-h-48 shadow-lg"
                     >
                       <img
                         src={resolvedFileUrl}
                         alt="رسید پرداخت"
                         className="max-h-48 w-auto object-contain opacity-90 transition-all duration-300 group-hover:scale-105 group-hover:opacity-100"
                       />
-                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-bold backdrop-blur-xs">
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-bold backdrop-blur-xs">
                         <ZoomIn className="w-4 h-4" />
                         <span>جهت بزرگ‌نمایی کلیک کنید</span>
                       </div>
@@ -616,12 +615,12 @@ export default function DashboardOverviewPage() {
               }
 
               return (
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium">
                     <ShieldCheck className="w-4 h-4 text-slate-400" />
                     پرداخت حضوری / در محل
                   </span>
-                  <span className="font-bold text-slate-800 font-mono">
+                  <span className="font-bold text-amber-400 font-mono">
                     {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
                   </span>
                 </div>
@@ -630,33 +629,33 @@ export default function DashboardOverviewPage() {
 
             {/* Receipt Summary Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">کد رهگیری فاکتور</span>
-                <span className="font-mono font-bold text-slate-900 text-sm">{selectedBooking.code}</span>
+                <span className="font-mono font-bold text-white text-sm">{selectedBooking.code}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">مبلغ کل فاکتور</span>
-                <span className="font-black text-amber-900 text-sm">
+                <span className="font-black text-amber-400 text-sm">
                   {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
                 </span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">تاریخ نوبت</span>
-                <span className="font-bold text-slate-800">{formatJalaliDate(selectedBooking.startAt)}</span>
+                <span className="font-bold text-white">{formatJalaliDate(selectedBooking.startAt)}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">ساعت نوبت</span>
-                <span className="font-bold text-slate-800">{formatTimeFa(selectedBooking.startAt)}</span>
+                <span className="font-bold text-white">{formatTimeFa(selectedBooking.startAt)}</span>
               </div>
             </div>
 
             {/* Modal Decision Buttons */}
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-3 flex-wrap">
+            <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-3 flex-wrap">
               <a
                 href={`tel:${selectedBooking.customer?.phone}`}
-                className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-white/5"
               >
-                <Phone className="w-4 h-4 text-emerald-600" />
+                <Phone className="w-4 h-4 text-emerald-400" />
                 <span>تماس با مشتری</span>
               </a>
 
@@ -666,7 +665,7 @@ export default function DashboardOverviewPage() {
                     type="button"
                     disabled={isUpdating}
                     onClick={() => handleQuickStatusUpdate(selectedBooking.id, 'COMPLETED')}
-                    className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-luxury-sm cursor-pointer"
                   >
                     <CheckCheck className="w-4 h-4" />
                     <span>اصلاح انجام شد (بستن فاکتور)</span>
@@ -678,7 +677,7 @@ export default function DashboardOverviewPage() {
                     type="button"
                     disabled={isUpdating}
                     onClick={() => handleQuickStatusUpdate(selectedBooking.id, 'CONFIRMED')}
-                    className="px-3.5 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold cursor-pointer"
+                    className="px-3.5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black cursor-pointer shadow-luxury-sm"
                   >
                     تایید فیش
                   </button>
@@ -693,7 +692,7 @@ export default function DashboardOverviewPage() {
                         handleQuickStatusUpdate(selectedBooking.id, 'CANCELLED');
                       }
                     }}
-                    className="px-3.5 py-2.5 rounded-2xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold border border-rose-200 cursor-pointer"
+                    className="px-3.5 py-2.5 rounded-2xl bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 text-xs font-bold border border-rose-500/30 cursor-pointer"
                   >
                     لغو / رد
                   </button>

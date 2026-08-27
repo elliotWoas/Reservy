@@ -8,6 +8,7 @@ import {
   Eye,
   FileText,
   AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -92,42 +93,49 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6 animate-fade-in text-right">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
-          <h1 className="text-xl font-black text-slate-900">بررسی و تایید پرداخت‌ها</h1>
-          <p className="text-xs text-slate-500">رسیدهای واریز کارت‌به‌کارت ارسال شده توسط مشتریان</p>
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-black text-white">بررسی و تایید پرداخت‌ها</h1>
+              <p className="text-xs text-slate-400 mt-0.5">رسیدهای واریز کارت‌به‌کارت ارسال شده توسط مشتریان</p>
+            </div>
+          </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex bg-slate-100 p-1 rounded-xl">
+        <div className="flex bg-[#0E131F] p-1.5 rounded-2xl border border-amber-500/15">
           <button
             onClick={() => setStatusFilter('PROOF_SUBMITTED')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === 'PROOF_SUBMITTED' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === 'PROOF_SUBMITTED' ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             نیازمند بررسی
           </button>
           <button
             onClick={() => setStatusFilter('VERIFIED')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === 'VERIFIED' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === 'VERIFIED' ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             تایید شده
           </button>
           <button
             onClick={() => setStatusFilter('REJECTED')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === 'REJECTED' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === 'REJECTED' ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             رد شده
           </button>
           <button
             onClick={() => setStatusFilter('')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === '' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === '' ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             همه
@@ -136,9 +144,9 @@ export default function PaymentsPage() {
       </div>
 
       {/* Payments Table */}
-      <Card className="p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden border-amber-500/15 bg-[#111726]/90">
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-500">در حال دریافت لیست پرداخت‌ها...</div>
+          <div className="p-12 text-center text-xs text-slate-400 font-bold">در حال دریافت لیست پرداخت‌ها...</div>
         ) : payments.length === 0 ? (
           <EmptyState
             title="هیچ پرداختی در این وضعیت وجود ندارد"
@@ -148,7 +156,7 @@ export default function PaymentsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-500 font-bold">
+              <thead className="bg-[#0E131F] border-b border-amber-500/10 text-slate-400 font-bold">
                 <tr>
                   <th className="p-4">مشتری</th>
                   <th className="p-4">کد نوبت</th>
@@ -159,29 +167,36 @@ export default function PaymentsPage() {
                   <th className="p-4 text-left">عملیات</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-amber-500/10">
                 {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-4">
-                      <span className="font-bold text-slate-900 block">{p.booking?.customer?.fullName}</span>
-                      <span className="text-[10px] text-slate-400 font-mono" dir="ltr">{p.booking?.customer?.phone}</span>
+                  <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                    <td className="p-4 font-bold text-white">
+                      {p.booking?.customer?.fullName || 'مشتری بدون نام'}
                     </td>
-                    <td className="p-4 font-mono font-bold text-slate-700">{p.booking?.code}</td>
-                    <td className="p-4 text-slate-700">{p.booking?.service?.name}</td>
-                    <td className="p-4 font-black text-emerald-700">{formatToman(p.amount)}</td>
-                    <td className="p-4 text-slate-500">{formatJalaliDate(p.createdAt)}</td>
+                    <td className="p-4 font-mono font-bold text-amber-300">
+                      {p.booking?.code || '—'}
+                    </td>
+                    <td className="p-4 text-slate-300">
+                      {p.booking?.service?.name || '—'}
+                    </td>
+                    <td className="p-4 font-black text-amber-400">
+                      {formatToman(p.amount)}
+                    </td>
+                    <td className="p-4 text-slate-400">
+                      {formatJalaliDate(p.createdAt)} ساعت {formatTimeFa(p.createdAt)}
+                    </td>
                     <td className="p-4">
                       <Badge status={p.status} />
                     </td>
                     <td className="p-4 text-left">
                       <Button
                         size="sm"
-                        variant={p.status === 'PROOF_SUBMITTED' ? 'primary' : 'outline'}
+                        variant="goldOutline"
                         onClick={() => setSelectedPayment(p)}
                         className="text-[11px] py-1 px-3"
                       >
                         <Eye className="w-3.5 h-3.5 ml-1" />
-                        <span>{p.status === 'PROOF_SUBMITTED' ? 'بررسی رسید' : 'مشاهده'}</span>
+                        <span>بررسی فیش</span>
                       </Button>
                     </td>
                   </tr>
@@ -195,112 +210,117 @@ export default function PaymentsPage() {
       {/* Review Payment Modal */}
       {selectedPayment && (
         <Modal
-          isOpen={true}
+          isOpen={!!selectedPayment}
           onClose={() => setSelectedPayment(null)}
-          title="بررسی رسید پرداخت کارت‌به‌کارت"
+          title="بررسی رسید واریز کارت‌به‌کارت"
           maxWidth="lg"
         >
-          <div className="space-y-6 text-xs text-slate-700">
-            {/* Booking Summary */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 grid grid-cols-2 gap-3">
+          <div className="space-y-6 text-right">
+            {/* Info Summary */}
+            <div className="grid grid-cols-2 gap-4 text-xs bg-[#0E131F] p-4 rounded-2xl border border-amber-500/15">
               <div>
-                <span className="text-slate-500 block">نام مشتری:</span>
-                <span className="font-bold text-slate-900">{selectedPayment.booking?.customer?.fullName}</span>
+                <span className="text-slate-400 block">مشتری:</span>
+                <strong className="text-white font-bold text-sm">{selectedPayment.booking?.customer?.fullName}</strong>
+                <span className="text-slate-400 block font-mono text-[11px] mt-0.5" dir="ltr">
+                  {selectedPayment.booking?.customer?.phone}
+                </span>
               </div>
               <div>
-                <span className="text-slate-500 block">شماره موبایل:</span>
-                <span className="font-bold text-slate-900" dir="ltr">{selectedPayment.booking?.customer?.phone}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block">کد پیگیری نوبت:</span>
-                <span className="font-mono font-bold text-slate-900">{selectedPayment.booking?.code}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block">مبلغ نوبت:</span>
-                <span className="font-black text-emerald-700">{formatToman(selectedPayment.amount)}</span>
+                <span className="text-slate-400 block">مبلغ واریزی:</span>
+                <strong className="text-amber-400 font-black text-sm">{formatToman(selectedPayment.amount)}</strong>
+                <span className="text-slate-400 block text-[11px] mt-0.5">کد: {selectedPayment.booking?.code}</span>
               </div>
             </div>
 
-            {/* Receipt Image / Document Preview */}
+            {/* Proof Image */}
             <div>
-              <span className="block font-semibold text-slate-800 mb-2">تصویر فیش / رسید ارسالی مشتری:</span>
+              <label className="text-xs font-bold text-slate-300 block mb-2">تصویر ارسالی مشتری:</label>
               {selectedPayment.proofs && selectedPayment.proofs.length > 0 ? (
-                <div className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center min-h-[220px] max-h-[350px]">
-                  {selectedPayment.proofs[0].mimeType === 'application/pdf' ? (
-                    <div className="text-center p-6 text-white space-y-2">
-                      <FileText className="w-12 h-12 mx-auto text-emerald-400" />
-                      <p>سند PDF رسید بانکی</p>
-                      <a
-                        href={`${apiBase}${selectedPayment.proofs[0].fileUrl}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs text-emerald-400 underline font-bold"
-                      >
-                        باز کردن و دانلود فایل PDF
-                      </a>
-                    </div>
-                  ) : (
-                    <img
-                      src={`${apiBase}${selectedPayment.proofs[0].fileUrl}`}
-                      alt="Payment Receipt"
-                      className="max-h-[350px] w-auto object-contain"
-                    />
-                  )}
+                <div className="border border-amber-500/30 rounded-2xl overflow-hidden bg-black max-h-80 flex items-center justify-center p-2">
+                  <img
+                    src={
+                      selectedPayment.proofs[0].fileUrl.startsWith('http')
+                        ? selectedPayment.proofs[0].fileUrl
+                        : `${apiBase}${selectedPayment.proofs[0].fileUrl.startsWith('/') ? '' : '/'}${selectedPayment.proofs[0].fileUrl}`
+                    }
+                    alt="رسید پرداخت"
+                    className="max-h-72 object-contain rounded-xl"
+                  />
                 </div>
               ) : (
-                <div className="p-6 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-500">
-                  تصویر رسیدی یافت نشد.
+                <div className="p-8 text-center bg-[#0E131F] border border-dashed border-slate-700 rounded-2xl text-xs text-slate-400">
+                  فایلی پیوست نشده است
                 </div>
               )}
             </div>
 
-            {/* Action Buttons */}
-            {selectedPayment.status === 'PROOF_SUBMITTED' && (
-              <div className="flex gap-3 pt-4 border-t border-slate-100">
-                <Button
-                  isLoading={isProcessing}
-                  onClick={handleApprove}
-                  className="flex-1 py-2.5 font-bold"
-                >
-                  <CheckCircle2 className="w-4 h-4 ml-1.5" />
-                  <span>تایید پرداخت و قطعی کردن نوبت</span>
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => setIsRejectModalOpen(true)}
-                  className="flex-1 py-2.5 font-bold"
-                >
-                  <XCircle className="w-4 h-4 ml-1.5" />
-                  <span>رد رسید پرداخت</span>
-                </Button>
-              </div>
-            )}
+            {/* Actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedPayment(null)}
+              >
+                بستن
+              </Button>
+
+              {selectedPayment.status === 'PROOF_SUBMITTED' && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => setIsRejectModalOpen(true)}
+                    disabled={isProcessing}
+                  >
+                    <XCircle className="w-4 h-4 ml-1" />
+                    <span>رد پرداخت</span>
+                  </Button>
+                  <Button
+                    variant="gold"
+                    size="sm"
+                    onClick={handleApprove}
+                    disabled={isProcessing}
+                  >
+                    <CheckCircle2 className="w-4 h-4 ml-1" />
+                    <span>تایید پرداخت</span>
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </Modal>
       )}
 
-      {/* Reject Reason Modal */}
-      {isRejectModalOpen && (
+      {/* Reject Modal with Reason */}
+      {isRejectModalOpen && selectedPayment && (
         <Modal
-          isOpen={true}
+          isOpen={isRejectModalOpen}
           onClose={() => setIsRejectModalOpen(false)}
-          title="دلیل رد رسید پرداخت"
-          maxWidth="sm"
+          title="دلیل رد پرداخت"
         >
-          <form onSubmit={handleReject} className="space-y-4">
-            <Input
-              label="علت رد رسید (به مشتری نمایش داده می‌شود)"
-              required
-              placeholder="مثال: تصویر فیش ناخواناست، مبلغ واریزی کسری دارد..."
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-            />
-            <div className="flex gap-2">
-              <Button type="submit" variant="danger" isLoading={isProcessing} className="flex-1 py-2 text-xs font-bold">
-                ثبت رد پرداخت
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setIsRejectModalOpen(false)} className="py-2 text-xs">
+          <form onSubmit={handleReject} className="space-y-4 text-right">
+            <div className="p-3 bg-rose-950/40 border border-rose-500/30 rounded-2xl text-xs text-rose-300">
+              دلیل رد شدن رسید به مشتری اطلاع داده خواهد شد تا بتواند مجدداً فیش معتبر ارسال کند.
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-300 block mb-1">علت رد فیش:</label>
+              <textarea
+                required
+                rows={3}
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="مثال: مبلغ واریزی ناخوانا است، شماره حساب اشتباه است..."
+                className="w-full p-3 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-rose-500 leading-relaxed"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <Button type="button" variant="outline" size="sm" onClick={() => setIsRejectModalOpen(false)}>
                 انصراف
+              </Button>
+              <Button type="submit" variant="danger" size="sm" disabled={isProcessing}>
+                {isProcessing ? 'در حال ثبت...' : 'تایید رد فیش'}
               </Button>
             </div>
           </form>
