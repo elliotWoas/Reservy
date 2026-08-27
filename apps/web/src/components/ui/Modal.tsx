@@ -37,23 +37,23 @@ export function Modal({ isOpen, onClose, title, description, children, maxWidth 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-fade-in" dir="rtl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in" dir="rtl">
       <div className="fixed inset-0" onClick={onClose} />
       <div
         className={cn(
-          'relative w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-10 overflow-hidden max-h-[90vh] flex flex-col',
+          'relative w-full bg-[#111726]/95 border border-amber-500/20 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] z-10 overflow-hidden max-h-[90vh] flex flex-col text-slate-100',
           maxWidths[maxWidth]
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between px-6 py-4.5 border-b border-amber-500/10 bg-[#0E131F]/90">
           <div>
-            {title && <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">{title}</h3>}
-            {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
+            {title && <h3 className="text-base font-black text-white">{title}</h3>}
+            {description && <p className="text-xs text-slate-400 mt-0.5">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

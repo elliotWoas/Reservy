@@ -35,7 +35,6 @@ export function ReceiptImageLightbox({
     if (isOpen) {
       setIsRendered(true);
       setZoomLevel(1);
-      // Small timeout to allow DOM mounting before trigger transition
       const timer = setTimeout(() => {
         setAnimationClass('scale-100 opacity-100');
       }, 20);
@@ -81,7 +80,7 @@ export function ReceiptImageLightbox({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md transition-opacity duration-300 ${
         isOpen ? 'opacity-100' : 'opacity-0'
       }`}
       dir="rtl"
@@ -90,21 +89,21 @@ export function ReceiptImageLightbox({
       {/* Lightbox Container */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-4xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl border border-white/40 dark:border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col max-h-[92vh] transform transition-all duration-300 ease-out ${animationClass}`}
+        className={`relative w-full max-w-4xl bg-[#111726]/95 backdrop-blur-2xl rounded-3xl border border-amber-500/30 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[92vh] transform transition-all duration-300 ease-out ${animationClass}`}
       >
         {/* Top Luxury Toolbar */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white border-b border-slate-700/60 select-none">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] text-white border-b border-amber-500/15 select-none">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-extrabold tracking-tight">تصویر رسید پرداخت کارت‌به‌کارت</h3>
+                <h3 className="text-sm font-extrabold tracking-tight text-white">تصویر رسید پرداخت کارت‌به‌کارت</h3>
                 <Badge status={status} />
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                مشتری: <span className="text-slate-200 font-semibold">{customerName || 'مشتری'}</span>
+                مشتری: <span className="text-amber-300 font-semibold">{customerName || 'مشتری'}</span>
                 {amount ? ` • مبلغ: ${formatToman(amount)}` : ''}
               </p>
             </div>
@@ -115,7 +114,7 @@ export function ReceiptImageLightbox({
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors cursor-pointer"
               title="بزرگ‌نمایی (+)"
             >
               <ZoomIn className="w-4 h-4" />
@@ -123,7 +122,7 @@ export function ReceiptImageLightbox({
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors cursor-pointer"
               title="کوچک‌نمایی (-)"
             >
               <ZoomOut className="w-4 h-4" />
@@ -133,7 +132,7 @@ export function ReceiptImageLightbox({
               target="_blank"
               rel="noreferrer"
               download
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors cursor-pointer"
               title="دانلود فایل اصلی یا باز کردن در تب جدید"
             >
               <ExternalLink className="w-4 h-4" />
@@ -141,7 +140,7 @@ export function ReceiptImageLightbox({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-white transition-colors ml-1"
+              className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 hover:text-white transition-colors ml-1 cursor-pointer"
               title="بستن (Esc)"
             >
               <X className="w-4 h-4" />
@@ -150,7 +149,7 @@ export function ReceiptImageLightbox({
         </div>
 
         {/* High-Resolution Interactive Image Viewport */}
-        <div className="relative flex-1 min-h-[350px] max-h-[65vh] bg-slate-950/90 flex items-center justify-center p-4 overflow-auto cursor-zoom-in">
+        <div className="relative flex-1 min-h-[350px] max-h-[65vh] bg-black/90 flex items-center justify-center p-4 overflow-auto cursor-zoom-in">
           <img
             src={resolvedImageUrl}
             alt={`رسید پرداخت ${customerName || ''}`}
@@ -164,17 +163,17 @@ export function ReceiptImageLightbox({
         </div>
 
         {/* Bottom Receipt Metadata Details */}
-        <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-4 text-slate-600 dark:text-slate-400 flex-wrap">
+        <div className="px-6 py-3.5 bg-[#0E131F] border-t border-amber-500/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-4 text-slate-400 flex-wrap">
             {referenceNumber && (
-              <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
-                شماره پیگیری: <strong className="text-slate-900 dark:text-white">{referenceNumber}</strong>
+              <span className="font-mono bg-black/40 px-2 py-0.5 rounded-md border border-amber-500/20 text-amber-300">
+                شماره پیگیری: <strong className="text-white">{referenceNumber}</strong>
               </span>
             )}
             {uploadedAt && (
               <span>
-                تاریخ ثبت رسید: <strong className="text-slate-800 dark:text-slate-200">{formatJalaliDate(uploadedAt)}</strong> ساعت{' '}
-                <strong className="text-slate-800 dark:text-slate-200">{formatTimeFa(uploadedAt)}</strong>
+                تاریخ ثبت رسید: <strong className="text-slate-200">{formatJalaliDate(uploadedAt)}</strong> ساعت{' '}
+                <strong className="text-slate-200">{formatTimeFa(uploadedAt)}</strong>
               </span>
             )}
           </div>
@@ -184,7 +183,7 @@ export function ReceiptImageLightbox({
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors cursor-pointer"
             >
               بستن
             </button>
