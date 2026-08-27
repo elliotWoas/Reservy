@@ -15,10 +15,10 @@ export function DashboardHeader({ user, organization }: { user?: any; organizati
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800 text-right shadow-2xs">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-[#0E131F]/80 backdrop-blur-xl border-b border-amber-500/10 text-right shadow-lg">
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-gradient-to-r from-emerald-50 to-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 border border-emerald-100/60 dark:border-slate-700">
-          <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 text-xs font-bold text-amber-300 border border-amber-500/20">
+          <Building2 className="w-4 h-4 text-amber-400" />
           <span>{organization?.name || 'کسب‌وکار من'}</span>
         </div>
       </div>
@@ -27,7 +27,7 @@ export function DashboardHeader({ user, organization }: { user?: any; organizati
         <div className="flex items-center gap-3">
           <Avatar name={user?.fullName || 'کاربر'} size="sm" />
           <div className="hidden sm:block text-right">
-            <span className="block text-xs font-extrabold text-slate-900 dark:text-slate-100">{user?.fullName || 'مدیریت'}</span>
+            <span className="block text-xs font-extrabold text-white">{user?.fullName || 'مدیریت'}</span>
             <span className="block text-[10px] text-slate-400 font-medium">{user?.email}</span>
           </div>
         </div>
@@ -35,7 +35,7 @@ export function DashboardHeader({ user, organization }: { user?: any; organizati
         <button
           onClick={handleLogout}
           title="خروج از حساب"
-          className="p-2 text-slate-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+          className="p-2 text-slate-400 hover:text-rose-400 rounded-xl hover:bg-rose-500/10 transition-colors"
         >
           <LogOut className="w-4 h-4" />
         </button>

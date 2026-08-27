@@ -18,7 +18,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex justify-around select-none">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E131F]/95 backdrop-blur-xl border-t border-amber-500/15 px-2 py-1.5 flex justify-around select-none shadow-2xl">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;
@@ -29,8 +29,8 @@ export function MobileBottomNav() {
             className={cn(
               'flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-bold transition-colors',
               isActive
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                ? 'text-amber-400 font-black'
+                : 'text-slate-400 hover:text-slate-200'
             )}
           >
             <Icon className="w-5 h-5" />

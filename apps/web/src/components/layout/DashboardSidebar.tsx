@@ -37,19 +37,19 @@ export function DashboardSidebar({ orgSlug, isSuperAdmin }: { orgSlug?: string; 
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-l border-slate-200/70 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl min-h-screen text-right select-none shadow-[4px_0_24px_-4px_rgba(0,0,0,0.02)]">
+    <aside className="hidden lg:flex flex-col w-64 border-l border-amber-500/10 bg-[#0E131F]/95 backdrop-blur-xl min-h-screen text-right select-none shadow-[4px_0_30px_rgba(0,0,0,0.5)]">
       {/* Brand Header */}
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="p-6 border-b border-amber-500/10 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-600/20">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center text-slate-950 font-black text-xl shadow-luxury-sm">
             R
           </div>
           <div>
             <div className="flex items-center gap-1">
-              <span className="font-black text-base text-slate-900 dark:text-slate-100 tracking-tight">رزِروی</span>
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span className="font-black text-base text-white tracking-tight">رزِروی</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <span className="block text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">پلتفرم مدیریت رزرو هوشمند</span>
+            <span className="block text-[10px] text-amber-400/80 font-bold">پلتفرم مدیریت رزرو هوشمند</span>
           </div>
         </Link>
       </div>
@@ -66,25 +66,25 @@ export function DashboardSidebar({ orgSlug, isSuperAdmin }: { orgSlug?: string; 
               className={cn(
                 'flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200',
                 isActive
-                  ? 'bg-gradient-to-r from-emerald-50 to-emerald-100/50 dark:from-emerald-950/60 dark:to-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-extrabold shadow-2xs border border-emerald-200/60 dark:border-emerald-800/40'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
+                  ? 'bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent text-amber-300 font-extrabold border border-amber-500/30 shadow-luxury-sm'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
               )}
             >
-              <Icon className={cn('w-4 h-4 transition-colors', isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400')} />
+              <Icon className={cn('w-4 h-4 transition-colors', isActive ? 'text-amber-400' : 'text-slate-500')} />
               <span>{item.label}</span>
             </Link>
           );
         })}
 
         {isSuperAdmin && (
-          <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="pt-4 mt-4 border-t border-amber-500/10">
             <Link
               href="/admin"
               className={cn(
                 'flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-colors',
                 pathname === '/admin'
-                  ? 'bg-purple-50 text-purple-700 border border-purple-200/60'
-                  : 'text-purple-600 hover:bg-purple-50/50'
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                  : 'text-purple-400 hover:bg-purple-500/10'
               )}
             >
               <ShieldCheck className="w-4 h-4" />
@@ -96,17 +96,17 @@ export function DashboardSidebar({ orgSlug, isSuperAdmin }: { orgSlug?: string; 
 
       {/* Public Booking Link Footer */}
       {orgSlug && (
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="p-4 border-t border-amber-500/10">
           <Link
             href={`/${orgSlug}`}
             target="_blank"
-            className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-br from-slate-50 to-emerald-50/40 dark:bg-slate-800/60 hover:border-emerald-300 dark:hover:bg-emerald-950/40 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-emerald-300 transition-all border border-slate-200/70 dark:border-slate-800 shadow-2xs group"
+            className="flex items-center justify-between p-3.5 rounded-2xl bg-amber-500/5 hover:bg-amber-500/10 text-xs font-bold text-slate-300 hover:text-amber-300 transition-all border border-amber-500/20 shadow-2xs group"
           >
             <div className="flex items-center gap-2">
-              <ExternalLink className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
+              <ExternalLink className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
               <span>مشاهده صفحه مشتریان</span>
             </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-lg bg-white dark:bg-slate-700 text-slate-500 font-mono">
+            <span className="text-[10px] px-2 py-0.5 rounded-lg bg-black/40 text-amber-400/80 font-mono">
               /{orgSlug}
             </span>
           </Link>
