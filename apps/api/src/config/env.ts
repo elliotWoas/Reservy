@@ -1,5 +1,26 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import fs from 'fs';
+import path from 'path';
+
+function findEnvPath(startDir: string): string | undefined {
+  let currentDir = startDir;
+
+  while (true) {
+    const candidate = path.join(currentDir, '.env');
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      return undefined;
+    }
+
+    currentDir = parentDir;
+  }
+}
+
+dotenv.config({ path: findEnvPath(process.cwd()) });
 
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || 'development',
