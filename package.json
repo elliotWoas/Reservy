@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "bun --filter \"*\" dev",
-    "dev:api": "bun --filter @reservy/api dev",
+    "dev:api": "bun run scripts/dev-api.ts",
     "dev:web": "bun --filter @reservy/web dev",
     "build": "bun --filter \"*\" build",
     "build:api": "bun --filter @reservy/api build",
