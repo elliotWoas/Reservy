@@ -44,6 +44,10 @@
 | `bun typecheck` | Run TypeScript type checks across all packages |
 | `bun lint` | Run code linter across all workspaces |
 
+**⚠️ Port 5432 conflict (macOS)**: If you have Postgres.app or Homebrew PostgreSQL installed, Docker can't bind to 5432. Fix:
+- **Option A**: Stop local PostgreSQL (`brew services stop postgresql@18` + quit Postgres.app), then use default port 5432
+- **Option B**: Add `DB_PORT=5433` to `.env` and update `DATABASE_URL` to use port 5433
+
 ### 2. Database & Prisma Commands
 
 | Command | Description |
@@ -54,6 +58,8 @@
 | `bun db:migrate:prod` | Deploy pending database migrations to production |
 | `bun db:seed` | Populate database with realistic Persian demo data |
 | `bun db:studio` | Launch visual Prisma Studio database GUI |
+
+**Note**: `db:seed` is not idempotent — if it fails mid-way, reset first: `bun db:push --force-reset`, then reseed.
 
 ### 3. Production & Build Commands
 
