@@ -142,12 +142,12 @@ export default function BookingsPage() {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in text-right">
+    <div className="space-y-3 animate-fade-in text-right">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
+            <div className="p-3 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
               <Sparkles className="w-5 h-5 text-amber-400" />
             </div>
             <div>
@@ -161,13 +161,13 @@ export default function BookingsPage() {
       </div>
 
       {/* Priority Tabs & Filters Toolbar */}
-      <Card className="p-5 space-y-4 border-amber-500/15 bg-[#111726]/90">
+      <Card className="p-3 space-y-4 border-amber-500/15 bg-[#111726]/90">
         {/* Priority Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 select-none">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 select-none">
           <button
             type="button"
             onClick={() => setDayPriorityFilter('today')}
-            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+            className={`px-2 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'today'
                 ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black'
                 : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
@@ -180,7 +180,7 @@ export default function BookingsPage() {
           <button
             type="button"
             onClick={() => setDayPriorityFilter('tomorrow')}
-            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'tomorrow'
                 ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black'
                 : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
@@ -193,7 +193,7 @@ export default function BookingsPage() {
           <button
             type="button"
             onClick={() => setDayPriorityFilter('receipts')}
-            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'receipts'
                 ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black'
                 : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
@@ -206,7 +206,7 @@ export default function BookingsPage() {
           <button
             type="button"
             onClick={() => setDayPriorityFilter('all')}
-            className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'all'
                 ? 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-sm font-black'
                 : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
@@ -224,7 +224,7 @@ export default function BookingsPage() {
               placeholder="جستجو با نام مشتری، شماره تماس یا کد رهگیری نوبت..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-3 pr-9 py-2.5 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
+              className="w-full pl-3 pr-9 py-2.5 rounded-xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
             />
             <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
           </form>
@@ -234,7 +234,7 @@ export default function BookingsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="text-xs font-bold px-3.5 py-2.5 rounded-2xl bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none w-full sm:w-auto"
+              className="text-xs font-bold px-3.5 py-2.5 rounded-xl bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none w-full sm:w-auto"
             >
               <option value="">همه وضعیت‌ها</option>
               <option value="PENDING_PAYMENT">در انتظار پرداخت</option>
@@ -266,7 +266,7 @@ export default function BookingsPage() {
           />
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           {filteredBookings.map((booking) => {
             const proof = booking.payments?.[0]?.proofs?.[0];
             const isCompleted = booking.status === 'COMPLETED';
@@ -275,7 +275,7 @@ export default function BookingsPage() {
             return (
               <Card
                 key={booking.id}
-                className={`p-5.5 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-3xl ${
+                className={`p-1.5 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-3xl ${
                   isCompleted
                     ? 'border-emerald-500/30 bg-emerald-950/20'
                     : isCancelled
@@ -355,14 +355,14 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Right Side: Quick Action Buttons */}
-                <div className="flex items-center gap-2 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800 flex-wrap justify-end">
+                <div className="flex items-center gap-1 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800 flex-wrap justify-end">
                   {/* 1. Complete Button (بستن فاکتور) */}
                   {!isCompleted && !isCancelled && (
                     <button
                       type="button"
                       disabled={isUpdating}
                       onClick={() => handleUpdateStatus(booking.id, 'COMPLETED')}
-                      className="px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-luxury-sm transition-all cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-luxury-sm transition-all cursor-pointer"
                       title="اصلاح انجام شد و فاکتور بسته شود"
                     >
                       <CheckCheck className="w-4 h-4" />
@@ -376,7 +376,7 @@ export default function BookingsPage() {
                       type="button"
                       disabled={isUpdating}
                       onClick={() => handleUpdateStatus(booking.id, 'CONFIRMED')}
-                      className="px-3.5 py-2 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-luxury-sm cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-luxury-sm cursor-pointer"
                     >
                       تایید فیش
                     </button>
@@ -391,7 +391,7 @@ export default function BookingsPage() {
                         setSelectedBooking(booking);
                         setShowCancelModal(true);
                       }}
-                      className="px-3 py-2 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 text-xs font-bold cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 text-xs font-bold cursor-pointer"
                     >
                       لغو نوبت
                     </button>
@@ -401,7 +401,7 @@ export default function BookingsPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedBooking(booking)}
-                    className="px-3.5 py-2 rounded-2xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold flex items-center gap-1 cursor-pointer border border-white/5"
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold flex items-center gap-1 cursor-pointer border border-white/5"
                   >
                     <Eye className="w-3.5 h-3.5 text-amber-400" />
                     <span>رسید و فاکتور</span>
@@ -498,7 +498,7 @@ export default function BookingsPage() {
                           status: payment?.status || selectedBooking.status,
                         })
                       }
-                      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-500/40 bg-black flex items-center justify-center max-h-48 shadow-lg"
+                      className="group relative cursor-pointer overflow-hidden rounded-xl border border-amber-500/40 bg-black flex items-center justify-center max-h-48 shadow-lg"
                     >
                       <img
                         src={resolvedFileUrl}
@@ -515,7 +515,7 @@ export default function BookingsPage() {
               }
 
               return (
-                <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium">
                     <ShieldCheck className="w-4 h-4 text-slate-400" />
                     پرداخت در محل / ثبت حضوری
@@ -529,27 +529,27 @@ export default function BookingsPage() {
 
             {/* Receipt Summary Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">کد رهگیری فاکتور</span>
                 <span className="font-mono font-bold text-white text-sm">{selectedBooking.code}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">مبلغ کل فاکتور</span>
                 <span className="font-black text-amber-400 text-sm">
                   {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
                 </span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">تاریخ نوبت</span>
                 <span className="font-bold text-white">{formatJalaliDate(selectedBooking.startAt)}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">ساعت و مدت زمان</span>
                 <span className="font-bold text-white">
                   {formatTimeFa(selectedBooking.startAt)} ({selectedBooking.durationSnapshot || selectedBooking.service?.durationMinutes || 45} دقیقه)
                 </span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/15 space-y-1 col-span-2">
+              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1 col-span-2">
                 <span className="text-slate-400 text-[11px] block">خدمت و ارائه‌دهنده</span>
                 <span className="font-bold text-white">
                   {selectedBooking.service?.name || selectedBooking.serviceNameSnapshot} — ارائه‌دهنده:{' '}
@@ -560,7 +560,7 @@ export default function BookingsPage() {
 
             {/* Notes if any */}
             {selectedBooking.notes && (
-              <div className="p-3.5 rounded-2xl bg-[#0E131F] border border-amber-500/20 text-xs space-y-1">
+              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/20 text-xs space-y-1">
                 <span className="font-bold text-amber-400 block">یادداشت مشتری:</span>
                 <p className="text-slate-300 leading-relaxed">{selectedBooking.notes}</p>
               </div>
@@ -568,7 +568,7 @@ export default function BookingsPage() {
 
             {/* Cancellation Reason if cancelled */}
             {selectedBooking.cancellationReason && (
-              <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs space-y-1">
+              <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs space-y-1">
                 <span className="font-bold text-rose-300 block">علت لغو نوبت:</span>
                 <p className="text-rose-400 leading-relaxed">{selectedBooking.cancellationReason}</p>
               </div>
@@ -578,7 +578,7 @@ export default function BookingsPage() {
             <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <a
                 href={`tel:${selectedBooking.customer?.phone}`}
-                className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 border border-white/5"
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 border border-white/5"
               >
                 <Phone className="w-4 h-4 text-emerald-400" />
                 <span>تماس با مشتری ({selectedBooking.customer?.phone})</span>
@@ -590,7 +590,7 @@ export default function BookingsPage() {
                     type="button"
                     disabled={isUpdating}
                     onClick={() => handleUpdateStatus(selectedBooking.id, 'COMPLETED')}
-                    className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-luxury-sm cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-luxury-sm cursor-pointer"
                   >
                     <CheckCheck className="w-4 h-4" />
                     <span>اصلاح انجام شد (بستن فاکتور)</span>
@@ -602,7 +602,7 @@ export default function BookingsPage() {
                     type="button"
                     disabled={isUpdating}
                     onClick={() => handleUpdateStatus(selectedBooking.id, 'CONFIRMED')}
-                    className="px-3.5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black cursor-pointer shadow-luxury-sm"
+                    className="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black cursor-pointer shadow-luxury-sm"
                   >
                     تایید فیش
                   </button>
@@ -613,7 +613,7 @@ export default function BookingsPage() {
                     type="button"
                     disabled={isUpdating}
                     onClick={() => setShowCancelModal(true)}
-                    className="px-3.5 py-2.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 text-xs font-bold cursor-pointer"
+                    className="px-3.5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 text-xs font-bold cursor-pointer"
                   >
                     لغو نوبت
                   </button>
@@ -637,7 +637,7 @@ export default function BookingsPage() {
           title="لغو نوبت رزرو"
         >
           <div className="space-y-4 text-right">
-            <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 space-y-1">
+            <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 space-y-1">
               <span className="font-bold flex items-center gap-1.5 text-rose-200">
                 <AlertTriangle className="w-4 h-4 text-rose-400" />
                 آیا از لغو نوبت {selectedBooking.customer?.fullName} اطمینان دارید؟
@@ -656,7 +656,7 @@ export default function BookingsPage() {
                 placeholder="مثال: درخواست مشتری، عدم حضور، جابجایی زمان..."
                 value={cancellationReason}
                 onChange={(e) => setCancellationReason(e.target.value)}
-                className="w-full p-3.5 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-rose-500"
+                className="w-full p-3.5 rounded-xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-rose-500"
               />
             </div>
 
