@@ -206,7 +206,7 @@ export default function CalendarPage() {
   const hours = Array.from({ length: 14 }, (_, i) => i + 9);
 
   return (
-    <div className="space-y-6 animate-fade-in text-right">
+    <div className="space-y-2 animate-fade-in text-right">
       {/* Calendar Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -219,7 +219,7 @@ export default function CalendarPage() {
           <select
             value={selectedStaffId}
             onChange={(e) => setSelectedStaffId(e.target.value)}
-            className="text-xs font-semibold px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 focus:outline-none"
+            className="text-xs font-semibold px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-700 focus:outline-none"
           >
             <option value="">همه ارائه‌دهندگان</option>
             {staffList.map((st) => (
@@ -230,20 +230,18 @@ export default function CalendarPage() {
           </select>
 
           {/* View Mode Toggle */}
-          <div className="flex bg-slate-100 p-1 rounded-xl">
+          <div className="flex bg-slate-100 p-1 rounded-md">
             <button
               onClick={() => setViewMode('day')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                viewMode === 'day' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'day' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
+                }`}
             >
               روزانه
             </button>
             <button
               onClick={() => setViewMode('week')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                viewMode === 'week' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'week' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
+                }`}
             >
               هفتگی
             </button>
@@ -253,7 +251,7 @@ export default function CalendarPage() {
           <div className="flex items-center gap-1">
             <button
               onClick={handlePrev}
-              className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
+              className="p-2 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -262,12 +260,13 @@ export default function CalendarPage() {
             </Button>
             <button
               onClick={handleNext}
-              className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
+              className="p-2 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
           </div>
 
+          {/* Manual Booking Button */}
           <Button
             size="sm"
             onClick={() => {
@@ -277,7 +276,7 @@ export default function CalendarPage() {
               setMDate(`${yyyy}-${mm}-${dd}`);
               setIsManualModalOpen(true);
             }}
-            className="flex items-center gap-1.5"
+            className="rounded-md flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
             <span>ثبت نوبت دستی</span>
@@ -300,7 +299,7 @@ export default function CalendarPage() {
               return (
                 <div key={hour} className="flex min-h-[72px] hover:bg-slate-50/50 transition-colors">
                   {/* Time column */}
-                  <div className="w-20 p-3 border-l border-slate-100 flex items-start justify-center text-xs font-bold text-slate-400">
+                  <div className="w-13 p-3 border-l border-slate-100 flex items-start justify-center text-xs font-bold text-slate-400 h-7">
                     {timeString}
                   </div>
 
@@ -310,13 +309,12 @@ export default function CalendarPage() {
                       <div
                         key={b.id}
                         onClick={() => setSelectedBooking(b)}
-                        className={`p-2.5 rounded-xl border text-xs cursor-pointer shadow-sm transition-all hover:scale-[1.01] flex items-center gap-3 ${
-                          b.status === 'CONFIRMED'
+                        className={`p-2.5 rounded-md border text-xs cursor-pointer shadow-sm transition-all hover:scale-[1.01] flex items-center gap-3 ${b.status === 'CONFIRMED'
                             ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
                             : b.status === 'PAYMENT_SUBMITTED'
-                            ? 'bg-amber-50 border-amber-300 text-amber-900'
-                            : 'bg-slate-50 border-slate-200 text-slate-800'
-                        }`}
+                              ? 'bg-amber-50 border-amber-300 text-amber-900'
+                              : 'bg-slate-50 border-slate-200 text-slate-800'
+                          }`}
                       >
                         <div>
                           <div className="flex items-center gap-1.5 font-bold">
@@ -352,7 +350,7 @@ export default function CalendarPage() {
                 required
                 value={mServiceId}
                 onChange={(e) => setMServiceId(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-800"
+                className="w-full text-xs font-semibold px-3 py-2.5 rounded-md bg-white border border-slate-200 text-slate-800"
               >
                 <option value="">-- انتخاب خدمت --</option>
                 {servicesList.map((s) => (
@@ -368,7 +366,7 @@ export default function CalendarPage() {
               <select
                 value={mStaffId}
                 onChange={(e) => setMStaffId(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-800"
+                className="w-full text-xs font-semibold px-3 py-2.5 rounded-md bg-white border border-slate-200 text-slate-800"
               >
                 <option value="">اولین فرد در دسترس</option>
                 {staffList.map((st) => (
@@ -397,7 +395,7 @@ export default function CalendarPage() {
               {mSlotsLoading ? (
                 <div className="text-xs text-slate-400 py-4 text-center">در حال استعلام زمان‌های خالی...</div>
               ) : mAvailableSlots.length === 0 ? (
-                <div className="text-xs text-rose-600 bg-rose-50 p-3 rounded-xl">
+                <div className="text-xs text-rose-600 bg-rose-50 p-3 rounded-md">
                   هیچ سانس خالی در این روز یافت نشد.
                 </div>
               ) : (
@@ -407,11 +405,10 @@ export default function CalendarPage() {
                       type="button"
                       key={slot.startAt}
                       onClick={() => setMSlot(slot)}
-                      className={`py-2 px-1 rounded-xl text-xs font-bold border transition-all ${
-                        mSlot?.startAt === slot.startAt
+                      className={`py-2 px-1 rounded-md text-xs font-bold border transition-all ${mSlot?.startAt === slot.startAt
                           ? 'border-emerald-600 bg-emerald-600 text-white'
                           : 'border-slate-200 bg-white hover:border-emerald-500'
-                      }`}
+                        }`}
                     >
                       {slot.startTimeLocal}
                     </button>
@@ -447,7 +444,7 @@ export default function CalendarPage() {
           />
 
           {mError && (
-            <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl">{mError}</div>
+            <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-md">{mError}</div>
           )}
 
           <Button
