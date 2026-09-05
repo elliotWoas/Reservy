@@ -80,7 +80,7 @@ export function ReceiptImageLightbox({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-xs transition-opacity duration-300 ${
         isOpen ? 'opacity-100' : 'opacity-0'
       }`}
       dir="rtl"
@@ -99,7 +99,7 @@ export function ReceiptImageLightbox({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-extrabold tracking-tight text-white">تصویر رسید پرداخت کارت‌به‌کارت</h3>
+                <h3 className="text-sm font-extrabold tracking-tight text-white">تصویر رسید  کارت‌به‌کارت</h3>
                 <Badge status={status} />
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -110,7 +110,7 @@ export function ReceiptImageLightbox({
           </div>
 
           {/* Action Toolbar */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={handleZoomIn}

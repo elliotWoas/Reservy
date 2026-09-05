@@ -70,7 +70,7 @@ export function Badge({ status, variant, children, className }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border select-none',
+        'inline-flex items-center px-2.5 mx-2 py-0.5  rounded-xl text-xs  border select-none',
         variants[computedVariant],
         className
       )}
