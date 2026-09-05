@@ -112,11 +112,11 @@ export default function DashboardOverviewPage() {
   const recentBookings = summary?.recentBookings || [];
 
   return (
-    <div className="space-y-8 animate-fade-in text-right">
+    <div className="space-y-4 animate-fade-in text-right">
       {/* ---------------------------------------------------- */}
       {/* 1. Header with Luxury Gold Accent & Action Buttons   */}
       {/* ---------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-xl border border-amber-500/20 shadow-luxury-md">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30">
