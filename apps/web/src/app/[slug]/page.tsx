@@ -41,7 +41,7 @@ export default async function StorefrontPage({ params }: { params: { slug: strin
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-500 pb-20">
       {/* Cover & Hero */}
-      <div className="relative h-64 sm:h-80 w-full bg-slate-900 overflow-hidden">
+      <div className="relative h-64 sm:h-80 w-full bg-slate-900 overflow-hidden  rounded-b-3xl border-b-black shadow-2xl">
         {org.coverUrl ? (
           <img
             src={org.coverUrl}
@@ -53,8 +53,8 @@ export default async function StorefrontPage({ params }: { params: { slug: strin
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
 
-        <div className="absolute bottom-6 right-6 left-6 max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 text-white">
-          <div className="flex items-center gap-4">
+        <div className="absolute bottom-4 right-6 left-6 max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 text-white">
+          <div className="flex items-center gap-2">
             {org.logoUrl ? (
               <img
                 src={org.logoUrl}
@@ -87,12 +87,12 @@ export default async function StorefrontPage({ params }: { params: { slug: strin
         {/* Services & Categories */}
         <div className="lg:col-span-2 space-y-8">
           <div>
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2 mb-4">
+            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2 mb-2">
               <Scissors className="w-5 h-5 text-emerald-600" />
               <span>لیست خدمات</span>
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               {org.services?.map((service: any) => (
                 <div
                   key={service.id}
