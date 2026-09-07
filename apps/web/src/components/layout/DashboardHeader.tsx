@@ -15,22 +15,27 @@ export function DashboardHeader({ user, organization }: { user?: any; organizati
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-[#0E131F]/80 backdrop-blur-xl border-b border-amber-500/10 text-right shadow-lg">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-12 px-6 bg-[#0E131F]/80 backdrop-blur-xl border-b border-amber-500/10 text-right shadow-lg">
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 text-xs font-bold text-amber-300 border border-amber-500/20">
-          <Building2 className="w-4 h-4 text-amber-400" />
-          <span>{organization?.name || 'کسب‌وکار من'}</span>
+        <Avatar name={user?.fullName || 'کاربر'} size="sm" />
+        <div className="hidden sm:block text-right">
+          <span className="block text-xs font-extrabold text-white">{user?.fullName || 'مدیریت'}</span>
+          <span className="block text-[10px] text-slate-400 font-medium">{user?.email}</span>
+        </div>
+      </div>
+
+      
+      <div className="h-screen w-full flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 text-xs font-bold text-amber-300 border border-amber-500/20">
+            <Building2 className="w-4 h-4 text-amber-400" />
+            <span>{organization?.name || 'کسب‌وکار من'}</span>
+          </div>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <Avatar name={user?.fullName || 'کاربر'} size="sm" />
-          <div className="hidden sm:block text-right">
-            <span className="block text-xs font-extrabold text-white">{user?.fullName || 'مدیریت'}</span>
-            <span className="block text-[10px] text-slate-400 font-medium">{user?.email}</span>
-          </div>
-        </div>
+
 
         <button
           onClick={handleLogout}
