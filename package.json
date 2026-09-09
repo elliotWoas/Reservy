@@ -33,5 +33,9 @@
   },
   "devDependencies": {
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "framer-motion": "^13.2.0",
+    "lucide-react": "^1.43.0"
   }
 }
