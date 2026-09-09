@@ -6,11 +6,9 @@ import {
     Scissors,
     User,
     Clock,
-    Briefcase,
     Star,
     Sparkles,
     Info,
-    CalendarCheck,
 } from 'lucide-react';
 import { formatToman } from '@/lib/utils';
 
@@ -60,15 +58,17 @@ export default function StorefrontTabs({ org, primaryLocation }: StorefrontTabsP
                             key={tab.id}
                             type="button"
                             onClick={() => setActiveTab(tab.id)}
-                            className={`relative py-2.5 px-3 min-w-[64px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold whitespace-nowrap transition-all ${isActive ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-700'
-                                }`}
+                            className={`relative py-2.5 px-3 min-w-[64px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold whitespace-nowrap transition-colors ${
+                                isActive ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-700'
+                            }`}
                         >
                             <div className="relative">
-                                <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
+                                <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
                                 {typeof tab.count === 'number' && (
                                     <span
-                                        className={`absolute -top-1.5 -left-2 text-[9px] px-1 rounded-full ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
-                                            }`}
+                                        className={`absolute -top-1.5 -left-2 text-[9px] px-1 rounded-full ${
+                                            isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                                        }`}
                                     >
                                         {tab.count}
                                     </span>
@@ -83,22 +83,23 @@ export default function StorefrontTabs({ org, primaryLocation }: StorefrontTabsP
                 })}
             </div>
 
-            {/* ۲. محتوای هر تب */}
+            {/* ۲. محتوای هر تب با انیمیشن سریع و بهینه CSS */}
             <div className="p-4 sm:p-3">
                 {/* تب خدمات */}
                 {activeTab === 'services' && (
-                    <div className="space-y-3">
-                        {/* چیپ‌های فیلتر دسته‌بندی زیرمجموعه خدمات */}
+                    <div key="services-tab" className="animate-tab-enter space-y-3">
+                        {/* چیپ‌های فیلتر دسته‌بندی */}
                         {serviceCategories.length > 1 && (
                             <div className="flex items-center gap-1 px-2 border-b border-slate-100 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden bg-slate-50/50">
                                 {serviceCategories.map((cat) => (
                                     <button
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.id)}
-                                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${selectedCategory === cat.id
+                                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                                            selectedCategory === cat.id
                                                 ? 'bg-green-500 text-white shadow-sm'
                                                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                                            }`}
+                                        }`}
                                     >
                                         {cat.name}
                                     </button>
@@ -107,7 +108,7 @@ export default function StorefrontTabs({ org, primaryLocation }: StorefrontTabsP
                         )}
 
                         {/* لیست کارت‌های خدمات */}
-                        <div className="space-y-3">
+                        <div key={`services-${selectedCategory}`} className="animate-tab-enter space-y-3">
                             {filteredServices.map((service: any) => (
                                 <div
                                     key={service.id}
@@ -158,7 +159,7 @@ export default function StorefrontTabs({ org, primaryLocation }: StorefrontTabsP
 
                 {/* تب متخصصین */}
                 {activeTab === 'staff' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div key="staff-tab" className="animate-tab-enter grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {org.staffMembers?.map((staff: any) => (
                             <div
                                 key={staff.id}
@@ -191,7 +192,7 @@ export default function StorefrontTabs({ org, primaryLocation }: StorefrontTabsP
 
                 {/* تب درباره مجموعه */}
                 {activeTab === 'about' && (
-                    <div className="space-y-4 text-xs text-slate-600 leading-relaxed">
+                    <div key="about-tab" className="animate-tab-enter space-y-4 text-xs text-slate-600 leading-relaxed">
                         <h4 className="text-sm font-bold text-slate-900">درباره {org.name}</h4>
                         <p>{org.description || 'توضیحاتی برای این مجموعه ثبت نشده است.'}</p>
                         {primaryLocation?.address && (
@@ -205,7 +206,7 @@ export default function StorefrontTabs({ org, primaryLocation }: StorefrontTabsP
 
                 {/* تب‌های خالی نمونه‌کار و نظرات */}
                 {(activeTab === 'reviews' || activeTab === 'portfolio') && (
-                    <div className="text-center py-16">
+                    <div key={`empty-${activeTab}`} className="animate-tab-enter text-center py-16">
                         <Sparkles className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                         <p className="text-xs text-slate-400">این بخش به‌زودی فعال خواهد شد.</p>
                     </div>
