@@ -140,9 +140,11 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Graphify
-.graphify
 .graphify/
 .graphify/branch.json
 .graphify/worktree.json
 .graphify/needs_update
 .graphify/cache/
+.graphify-out/
+graphify-out/
+
