@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Clock,
   LayoutDashboard,
+  Scissors,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -63,6 +64,13 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+              <Link
+                href="/hairstyle"
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95"
+              >
+                <Scissors className="w-4 h-4 text-slate-950" />
+                <span>پرو مجازی مدل مو با هوش مصنوعی</span>
+              </Link>
               <Link
                 href="/aria-beauty"
                 className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95"
