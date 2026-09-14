@@ -46,8 +46,16 @@ export async function POST(req: NextRequest) {
       body.hairstyle
     );
 
-    // 2. Select image-editing provider (OpenAI / Replicate / Fal / DevMock)
+    // 2. Select image-editing provider (Gemini / Replicate / OpenAI / Fal / DevMock)
     const provider = getActiveImageEditingProvider();
+
+    console.log('\n==============================================');
+    console.log(`[API /api/hairstyle/try-on] 🚀 دریافت درخواست پرو مجازی مدل مو`);
+    console.log(`[API /api/hairstyle/try-on] 👤 فرم چهره: ${body.userProfile.face?.shape?.label || 'نامشخص'}`);
+    const hairstylePersian = body.hairstyle.persianName || body.hairstyle.nameFa || body.hairstyle.name;
+    console.log(`[API /api/hairstyle/try-on] ✂️ مدل موی انتخابی: ${hairstylePersian} (${body.hairstyle.name})`);
+    console.log(`[API /api/hairstyle/try-on] 🤖 پرووایدر فعال: ${provider.id} (${provider.name})`);
+    console.log('==============================================');
 
     // 3. Execute image editing request
     const result = await provider.editHairstyle({
@@ -60,6 +68,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.success) {
+      console.warn(`[API /api/hairstyle/try-on] ⚠️ پردازش ناموفق بود: ${result.error}`);
       return NextResponse.json(
         {
           success: false,
@@ -75,10 +84,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log(`[API /api/hairstyle/try-on] ✅ پردازش موفق (${result.processingTimeMs}ms)`);
+
+    const finalImageUrl = result.imageUrl || result.generatedImageUrl;
+    const finalFaceShape = result.faceShape || body.userProfile.face?.shape?.label || 'oblong';
+    const finalHairStyle = result.hairStyle || body.hairstyle.name;
+
     const responsePayload: TryOnResponsePayload = {
       success: true,
+      imageUrl: finalImageUrl,
+      faceShape: finalFaceShape,
+      hairStyle: finalHairStyle,
       originalImageUrl: body.frontImage,
-      generatedImageUrl: result.generatedImageUrl,
+      generatedImageUrl: finalImageUrl,
       hairstyle: body.hairstyle,
       provider: provider.id,
       isDevMock: result.isDevMock,
@@ -88,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(responsePayload);
   } catch (err: any) {
-    console.error('[API /api/hairstyle/try-on error]:', err);
+    console.error('[API /api/hairstyle/try-on] ❌ خطای غیرمنتظره در پردازش درخواست:', err);
     return NextResponse.json(
       {
         success: false,

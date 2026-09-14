@@ -4,10 +4,24 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const avalaiKey = process.env.AVALAI_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
   const replicateToken = process.env.REPLICATE_API_TOKEN;
   const falKey = process.env.FAL_KEY || process.env.FAL_API_KEY;
+
+  if (avalaiKey) {
+    return NextResponse.json({
+      connected: true,
+      provider: 'avalai',
+      providerName: 'AvalAI (gpt-image-1-mini / gpt-image-1)',
+      isDevMock: false,
+      hasKey: true,
+      keyPreview: `${avalaiKey.substring(0, 6)}...${avalaiKey.substring(avalaiKey.length - 4)}`,
+      statusText: 'متصل به سرویس هوش مصنوعی AvalAI (موتور اصلی)',
+      isStandardKey: true,
+    });
+  }
 
   if (geminiKey) {
     const isModernAuthKey = geminiKey.startsWith('AQ.');
