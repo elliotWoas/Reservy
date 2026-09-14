@@ -17,11 +17,26 @@ import {
   ExternalLink,
   ShieldCheck,
   Sparkles,
+  PanelRightClose,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function DashboardSidebar({ orgSlug, isSuperAdmin }: { orgSlug?: string; isSuperAdmin?: boolean }) {
+export function DashboardSidebar({
+  orgSlug,
+  isSuperAdmin,
+  isPinned = true,
+  onTogglePin,
+}: {
+  orgSlug?: string;
+  isSuperAdmin?: boolean;
+  isPinned?: boolean;
+  onTogglePin?: () => void;
+}) {
   const pathname = usePathname();
+
+  if (!isPinned) {
+    return null;
+  }
 
   const navItems = [
     { label: 'پیشخوان', href: '/dashboard', icon: LayoutDashboard },
@@ -37,7 +52,7 @@ export function DashboardSidebar({ orgSlug, isSuperAdmin }: { orgSlug?: string; 
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-l border-amber-500/10 bg-[#0E131F]/95 backdrop-blur-xl min-h-screen text-right select-none shadow-[4px_0_30px_rgba(0,0,0,0.5)]">
+    <aside className="hidden lg:flex flex-col w-64 border-l border-amber-500/10 bg-[#0E131F]/95 backdrop-blur-xl min-h-screen text-right select-none shadow-[4px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 shrink-0">
       {/* Brand Header */}
       <div className="p-6 border-b border-amber-500/10 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-3">
@@ -52,6 +67,17 @@ export function DashboardSidebar({ orgSlug, isSuperAdmin }: { orgSlug?: string; 
             <span className="block text-[10px] text-amber-400/80 font-bold">پلتفرم مدیریت رزرو هوشمند</span>
           </div>
         </Link>
+
+        {onTogglePin && (
+          <button
+            type="button"
+            onClick={onTogglePin}
+            title="بستن سایدبار و استفاده از منوی شناور"
+            className="p-1.5 text-slate-400 hover:text-amber-400 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer"
+          >
+            <PanelRightClose className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Nav List */}
