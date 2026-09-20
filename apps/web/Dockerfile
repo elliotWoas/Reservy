@@ -20,10 +20,14 @@ RUN bun install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app/apps/web
 
-ARG NEXT_PUBLIC_API_URL=http://localhost:4000
-ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+ARG NEXT_PUBLIC_API_URL=http://localhost:4002
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3002
+ARG NEXT_PUBLIC_BASE_URL=http://localhost:3002
+ARG NEXT_PUBLIC_BASE_PATH=
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH
 ENV NODE_ENV=production
 
 RUN bun run build
@@ -35,7 +39,7 @@ FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3002
 
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/packages ./packages
@@ -46,6 +50,6 @@ COPY --from=base /app/package.json ./package.json
 
 WORKDIR /app/apps/web
 
-EXPOSE 3000
+EXPOSE 3002
 
 CMD ["bun", "run", "start"]

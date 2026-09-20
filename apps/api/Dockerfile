@@ -26,7 +26,7 @@ FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=4000
+ENV PORT=4002
 
 # Copy node_modules and built code
 COPY --from=base /app/node_modules ./node_modules
@@ -39,9 +39,9 @@ RUN mkdir -p /app/apps/api/uploads
 
 WORKDIR /app/apps/api
 
-EXPOSE 4000
+EXPOSE 4002
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4002/health || exit 1
 
 CMD ["bun", "src/main.ts"]
