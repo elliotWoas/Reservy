@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, ZoomIn, ZoomOut, Download, ExternalLink, ShieldCheck, CreditCard } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, RotateCcw, Download, ExternalLink, ShieldCheck, CreditCard } from 'lucide-react';
+import { resolveAssetUrl } from '@/lib/config';
 import { formatToman, formatJalaliDate, formatTimeFa } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 
@@ -74,9 +75,7 @@ export function ReceiptImageLightbox({
   };
 
   // Build full backend URL for relative storage paths
-  const resolvedImageUrl = imageUrl.startsWith('http')
-    ? imageUrl
-    : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+  const resolvedImageUrl = resolveAssetUrl(imageUrl);
 
   return (
     <div

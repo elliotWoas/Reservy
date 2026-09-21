@@ -15,23 +15,36 @@ async function bootstrap() {
 
   // Security & Headers
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+  
+  const corsOrigin = ENV.CORS_ORIGIN.includes(',')
+    ? ENV.CORS_ORIGIN.split(',').map((s) => s.trim())
+    : ENV.CORS_ORIGIN === '*' ? true : ENV.CORS_ORIGIN;
+
   app.enableCors({
-    origin: ENV.CORS_ORIGIN,
+    origin: corsOrigin,
     credentials: true,
   });
 
+  // Optional Global API Prefix (e.g. 'reservy-api' or 'api/reservy')
+  const apiPrefix = ENV.API_PREFIX.replace(/^\/+|\/+$/g, '');
+  if (apiPrefix) {
+    app.setGlobalPrefix(apiPrefix);
+  }
+
   // Serve Static Uploads
   const uploadPath = path.resolve(process.cwd(), ENV.LOCAL_STORAGE_PATH);
-  app.useStaticAssets(uploadPath, { prefix: '/uploads' });
+  const staticPrefix = apiPrefix ? `/${apiPrefix}/uploads` : '/uploads';
+  app.useStaticAssets(uploadPath, { prefix: staticPrefix });
 
   // Global Exceptions Filter
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  const port = ENV.PORT || 4000;
+  const port = ENV.PORT || 4002;
   await app.listen(port);
 
+  const healthPath = apiPrefix ? `/${apiPrefix}/health` : '/health';
   console.log(`🚀 NestJS Reservy API Server running on port ${port} [${ENV.NODE_ENV}]`);
-  console.log(`📍 Health Check: http://localhost:${port}/health`);
+  console.log(`📍 Health Check: http://localhost:${port}${healthPath}`);
 }
 
 bootstrap();

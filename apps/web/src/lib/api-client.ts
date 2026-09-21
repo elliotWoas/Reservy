@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+import { APP_CONFIG, resolveApiUrl } from './config';
 
 export interface ApiError {
   code: string;
@@ -59,7 +59,7 @@ export class ApiClient {
       headers['X-Organization-Id'] = activeOrgId;
     }
 
-    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+    const url = resolveApiUrl(endpoint);
 
     const res = await fetch(url, {
       ...options,
@@ -92,7 +92,7 @@ export class ApiClient {
     const headers: Record<string, string> = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(`${API_BASE}/payments/upload`, {
+    const res = await fetch(resolveApiUrl('/payments/upload'), {
       method: 'POST',
       headers,
       body: formData,

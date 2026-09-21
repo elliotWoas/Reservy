@@ -9,11 +9,11 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import StorefrontTabs from '@/components/layout/StorefrontTabs';
+import { resolveApiUrl } from '@/lib/config';
 
 async function getOrganization(slug: string) {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   try {
-    const res = await fetch(`${apiBase}/public/organizations/${slug}`, {
+    const res = await fetch(resolveApiUrl(`/public/organizations/${slug}`), {
       cache: 'no-store',
     });
     if (!res.ok) return null;

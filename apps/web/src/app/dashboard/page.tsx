@@ -37,6 +37,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Avatar } from '@/components/ui/Avatar';
 import { ReceiptImageLightbox } from '@/components/ui/ReceiptImageLightbox';
 import { ApiClient } from '@/lib/api-client';
+import { resolveAssetUrl } from '@/lib/config';
 import { formatToman, formatJalaliDate, formatTimeFa, formatNumberFa } from '@/lib/utils';
 
 export default function DashboardOverviewPage() {
@@ -555,9 +556,7 @@ export default function DashboardOverviewPage() {
               const fileUrl = proof?.fileUrl;
 
               if (fileUrl) {
-                const resolvedFileUrl = fileUrl.startsWith('http')
-                  ? fileUrl
-                  : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+                const resolvedFileUrl = resolveAssetUrl(fileUrl);
 
                 return (
                   <div className="p-4 rounded-3xl bg-[#0E131F] border border-amber-500/30 space-y-3">

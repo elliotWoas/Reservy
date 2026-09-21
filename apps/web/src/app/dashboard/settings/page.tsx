@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ApiClient } from '@/lib/api-client';
+import { resolveAppUrl } from '@/lib/config';
 
 export default function SettingsPage() {
   const [org, setOrg] = useState<any>(null);
@@ -116,7 +117,7 @@ export default function SettingsPage() {
         <div className="space-y-1">
           <span className="text-xs text-emerald-300 font-bold block">آدرس صفحه رزرو عمومی شما:</span>
           <span className="font-mono text-sm tracking-wider text-white" dir="ltr">
-            http://localhost:3000/{org?.slug}
+            {org?.slug ? resolveAppUrl(`/${org.slug}`) : '...'}
           </span>
         </div>
         <Link
