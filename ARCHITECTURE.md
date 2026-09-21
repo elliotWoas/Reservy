@@ -135,3 +135,29 @@ Business Admin reviews receipt in Dashboard
 
 - **Storage**: `IStorageService` implemented by `LocalStorageService` (development) and `S3StorageService` (production).
 - **Notifications**: `INotificationService` and `ISmsProvider` interface prepared for Iranian SMS gateways (Kavenegar, FarazSMS, etc.).
+
+---
+
+## 7. Production Deployment & Runtime Architecture (No Docker)
+
+For environments running directly on the host without containerizing the Node/Bun application layer:
+
+### Process Management with PM2 & Bun
+- **Process Manager**: PM2 supervises the compiled NestJS API via `ecosystem.config.cjs`.
+- **Runtime**: Bun executes `apps/api/dist/main.js` (`interpreter: 'bun'`).
+- **Zero-Subpackage Operations**: All Prisma generation, schema migrations, builds, and process management run directly from the repository root:
+  ```bash
+  # 1. Generate Prisma Client & Sync DB
+  bun run db:generate
+  bun run db:migrate:prod
+
+  # 2. Build NestJS API
+  bun run build:api
+
+  # 3. Start or reload PM2 process
+  bun run pm2:start
+  ```
+- **Automatic Lifecycle Hooks**:
+  - `postinstall`: Automatically triggers `bun run db:generate` upon package installation.
+  - `prebuild`: Automatically ensures `@prisma/client` is up-to-date before compiling workspace artifacts.
+

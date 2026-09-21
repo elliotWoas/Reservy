@@ -148,3 +148,7 @@ vite.config.ts.timestamp-*
 .graphify-out/
 graphify-out/
 
+# PM2
+.pm2/
+
+

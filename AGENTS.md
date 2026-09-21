@@ -51,16 +51,26 @@ packages/
 | `bun typecheck` | `tsc -b` across all packages |
 | `bun lint` | Lint all workspaces (API: none configured, Web: next lint) |
 
-### Database (Prisma) — runs in `packages/database/`
+### Database (Prisma) — managed directly from monorepo root
 
 | Command | Description |
 |---------|-------------|
-| `bun db:generate` | Generate Prisma Client |
+| `bun db:generate` / `bun prisma:generate` | Generate Prisma Client |
 | `bun db:push` | Sync schema to DB (dev) |
 | `bun db:migrate` | Create + apply migration (dev) |
 | `bun db:migrate:prod` | Deploy migrations (prod) |
 | `bun db:seed` | Seed Persian demo data |
 | `bun db:studio` | Open Prisma Studio |
+
+### PM2 Process Management (No-Docker API Deployment)
+
+| Command | Description |
+|---------|-------------|
+| `bun pm2:start` | Launch API process via PM2 |
+| `bun pm2:stop` | Stop `reservy-api` PM2 process |
+| `bun pm2:restart` | Restart `reservy-api` PM2 process |
+| `bun pm2:logs` | Stream `reservy-api` logs |
+| `bun pm2:status` | Check PM2 process status |
 
 ### Docker
 
