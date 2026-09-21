@@ -4,19 +4,45 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Optional,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { HttpAdapterHost } from '@nestjs/core';
 import { ZodError } from 'zod';
 import { DomainError, DomainErrorCode } from '@reservy/domain';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  constructor(@Optional() private readonly httpAdapterHost?: HttpAdapterHost) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-    const method = request.method;
-    const path = request.originalUrl || request.url;
+    const response = ctx.getResponse<any>();
+    const request = ctx.getRequest<any>();
+
+    const httpAdapter = this.httpAdapterHost?.httpAdapter;
+    const method = httpAdapter
+      ? httpAdapter.getRequestMethod(request)
+      : request?.method || 'UNKNOWN';
+    const path = httpAdapter
+      ? httpAdapter.getRequestUrl(request)
+      : request?.originalUrl || request?.url || '';
+
+    const sendResponse = (statusCode: number, errorBody: { code: string; message: string; details?: any }) => {
+      const responsePayload = { error: errorBody };
+      if (httpAdapter) {
+        httpAdapter.reply(response, responsePayload, statusCode);
+      } else if (typeof response?.status === 'function' && typeof response?.json === 'function') {
+        response.status(statusCode).json(responsePayload);
+      } else if (typeof response?.code === 'function' && typeof response?.send === 'function') {
+        response.code(statusCode).send(responsePayload);
+      } else {
+        response.statusCode = statusCode;
+        if (typeof response?.setHeader === 'function') {
+          response.setHeader('Content-Type', 'application/json');
+        }
+        response?.end?.(JSON.stringify(responsePayload));
+      }
+    };
 
     // 1. Zod Schema Validation Error
     if (exception instanceof ZodError) {
@@ -30,12 +56,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       console.warn(`\x1b[33m[VALIDATION_ERROR]\x1b[0m ${method} ${path} - 400 Bad Request`);
       console.warn(`  ↳ Reason: ${firstMsg}`);
 
-      return response.status(HttpStatus.BAD_REQUEST).json({
-        error: {
-          code: DomainErrorCode.VALIDATION_ERROR,
-          message: firstMsg,
-          details: fieldErrors,
-        },
+      return sendResponse(HttpStatus.BAD_REQUEST, {
+        code: DomainErrorCode.VALIDATION_ERROR,
+        message: firstMsg,
+        details: fieldErrors,
       });
     }
 
@@ -72,12 +96,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         `\x1b[33m[DOMAIN_ERROR]\x1b[0m ${method} ${path} - ${statusCode} [${exception.code}] - ${exception.message}`
       );
 
-      return response.status(statusCode).json({
-        error: {
-          code: exception.code,
-          message: exception.message,
-          details: exception.details,
-        },
+      return sendResponse(statusCode, {
+        code: exception.code,
+        message: exception.message,
+        details: exception.details,
       });
     }
 
@@ -94,12 +116,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       console.warn(`\x1b[33m[HTTP_EXCEPTION]\x1b[0m ${method} ${path} - ${status} - ${message}`);
 
-      return response.status(status).json({
-        error: {
-          code: typeof resPayload === 'object' && resPayload.code ? resPayload.code : 'HTTP_ERROR',
-          message,
-          details: typeof resPayload === 'object' && resPayload.details ? resPayload.details : undefined,
-        },
+      return sendResponse(status, {
+        code: typeof resPayload === 'object' && resPayload.code ? resPayload.code : 'HTTP_ERROR',
+        message,
+        details: typeof resPayload === 'object' && resPayload.details ? resPayload.details : undefined,
       });
     }
 
@@ -107,11 +127,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     console.error(`\x1b[31m[UNHANDLED_ERROR]\x1b[0m ${method} ${path} - 500 Internal Server Error`);
     console.error(`  ↳ Stack:`, (exception as Error)?.stack || exception);
 
-    return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'یک خطای غیرمنتظره در سرور رخ داده است. لطفاً مجدداً تلاش کنید.',
-      },
+    return sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, {
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'یک خطای غیرمنتظره در سرور رخ داده است. لطفاً مجدداً تلاش کنید.',
     });
   }
 }
