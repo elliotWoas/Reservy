@@ -29,15 +29,18 @@ if (fs.existsSync(rootEnvPath)) {
   }
 }
 
-const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() || '';
+// مقدار پیش‌فرض را مستقیماً روی /reservy می‌گذاریم تا حتی اگر .env ست نبود، تداخل با سایت اصلی رخ ندهد
+const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() || '/reservy';
 const basePath = rawBasePath
   ? (rawBasePath.startsWith('/') ? rawBasePath : `/${rawBasePath}`).replace(/\/+$/, '')
-  : undefined;
+  : '/reservy';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   basePath: basePath,
+  assetPrefix: basePath,
+  trailingSlash: false,
   transpilePackages: ['@reservy/domain', '@reservy/validation'],
   images: {
     remotePatterns: [
