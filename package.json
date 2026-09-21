@@ -18,6 +18,7 @@
     "start:web": "bun --filter @reservy/web start",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
+    "test:ai": "bun run ./scripts/test-ai-connection.ts",
     "db:generate": "bun run ./packages/database/node_modules/prisma/build/index.js generate --schema=./packages/database/prisma/schema.prisma",
     "db:push": "bun run ./packages/database/node_modules/prisma/build/index.js db push --schema=./packages/database/prisma/schema.prisma",
     "db:migrate": "bun run ./packages/database/node_modules/prisma/build/index.js migrate dev --schema=./packages/database/prisma/schema.prisma",
@@ -36,6 +37,7 @@
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
-    "lucide-react": "^1.43.0"
+    "lucide-react": "^1.43.0",
+    "openai": "^7.15.0"
   }
 }
