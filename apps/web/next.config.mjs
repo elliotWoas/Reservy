@@ -29,11 +29,14 @@ if (fs.existsSync(rootEnvPath)) {
   }
 }
 
-// مقدار پیش‌فرض را مستقیماً روی /reservy می‌گذاریم تا حتی اگر .env ست نبود، تداخل با سایت اصلی رخ ندهد
-const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() || '/reservy';
+// پشتیبانی از مسیر اصلی در لوکال (NEXT_PUBLIC_BASE_PATH="") و مسیر پیش‌فرض /reservy در پروداکشن
+const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH !== undefined
+  ? process.env.NEXT_PUBLIC_BASE_PATH.trim()
+  : (process.env.NODE_ENV === 'production' ? '/reservy' : '');
+
 const basePath = rawBasePath
   ? (rawBasePath.startsWith('/') ? rawBasePath : `/${rawBasePath}`).replace(/\/+$/, '')
-  : '/reservy';
+  : undefined;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
