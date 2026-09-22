@@ -14,7 +14,7 @@
     "build:api": "bun --filter @reservy/api build",
     "build:web": "bun --filter @reservy/web build",
     "start": "bun --filter \"*\" start",
-    "start:api": "bun --cwd @reservy/api start",
+    "start:api": "bun run --cwd apps/api start",
     "start:web": "bun --filter @reservy/web start",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
