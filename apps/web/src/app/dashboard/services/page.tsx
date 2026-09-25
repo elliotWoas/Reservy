@@ -187,7 +187,7 @@ export default function ServicesPage() {
                       {s.description && <span className="text-[11px] text-slate-500 line-clamp-1">{s.description}</span>}
                     </td>
                     <td className="p-4">
-                      <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px]">
+                      <span className="px-2 py-0.5 rounded-md  text-slate-400 text-[11px]">
                         {s.category?.name || 'بدون دسته‌بندی'}
                       </span>
                     </td>

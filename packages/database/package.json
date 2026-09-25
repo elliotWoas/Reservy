@@ -5,10 +5,13 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "bun run ./prisma/seed.ts"
+    "db:generate": "bun --env-file=../../.env run prisma generate",
+    "prisma:generate": "bun --env-file=../../.env run prisma generate",
+    "db:push": "bun --env-file=../../.env run prisma db push",
+    "db:migrate": "bun --env-file=../../.env run prisma migrate dev",
+    "db:migrate:prod": "bun --env-file=../../.env run prisma migrate deploy",
+    "db:seed": "bun --env-file=../../.env run ./prisma/seed.ts",
+    "db:studio": "bun --env-file=../../.env run prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",

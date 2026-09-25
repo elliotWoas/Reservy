@@ -66,13 +66,25 @@
 | Command | Description |
 | :--- | :--- |
 | `bun build` | Compile and bundle all workspaces for production |
-| `bun build:api` | Build Backend API for production |
+| `bun build:api` | Build Backend API for production (`apps/api/dist`) |
 | `bun build:web` | Build Next.js Web App for production |
 | `bun start` | Start production servers |
 | `bun start:api` | Start Backend API in production mode |
 | `bun start:web` | Start Next.js Web App in production mode |
 
-### 4. Docker & Container Commands
+### 4. PM2 Process Management (No-Docker Deployment)
+
+All operations are executed directly from the monorepo root:
+
+| Command | Description |
+| :--- | :--- |
+| `bun pm2:start` | Start API via PM2 using `ecosystem.config.cjs` |
+| `bun pm2:stop` | Stop the `reservy-api` PM2 instance |
+| `bun pm2:restart` | Restart the `reservy-api` PM2 instance |
+| `bun pm2:logs` | View real-time logs for `reservy-api` |
+| `bun pm2:status` | Check the status of PM2 processes |
+
+### 5. Docker & Container Commands
 
 | Command | Description |
 | :--- | :--- |

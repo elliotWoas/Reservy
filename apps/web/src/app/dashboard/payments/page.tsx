@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
+import { resolveAssetUrl } from '@/lib/config';
 import { ApiClient } from '@/lib/api-client';
 import { formatToman, formatJalaliDate, formatTimeFa } from '@/lib/utils';
 
@@ -87,8 +88,6 @@ export default function PaymentsPage() {
       setIsProcessing(false);
     }
   };
-
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   return (
     <div className="space-y-6 animate-fade-in text-right">
@@ -238,11 +237,7 @@ export default function PaymentsPage() {
               {selectedPayment.proofs && selectedPayment.proofs.length > 0 ? (
                 <div className="border border-amber-500/30 rounded-2xl overflow-hidden bg-black max-h-80 flex items-center justify-center p-2">
                   <img
-                    src={
-                      selectedPayment.proofs[0].fileUrl.startsWith('http')
-                        ? selectedPayment.proofs[0].fileUrl
-                        : `${apiBase}${selectedPayment.proofs[0].fileUrl.startsWith('/') ? '' : '/'}${selectedPayment.proofs[0].fileUrl}`
-                    }
+                    src={resolveAssetUrl(selectedPayment.proofs[0].fileUrl)}
                     alt="رسید پرداخت"
                     className="max-h-72 object-contain rounded-xl"
                   />

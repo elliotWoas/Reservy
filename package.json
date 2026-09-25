@@ -14,16 +14,25 @@
     "build:api": "bun --filter @reservy/api build",
     "build:web": "bun --filter @reservy/web build",
     "start": "bun --filter \"*\" start",
-    "start:api": "bun --filter @reservy/api start",
+    "start:api": "bun run --cwd apps/api start",
     "start:web": "bun --filter @reservy/web start",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
-    "db:generate": "bun run ./packages/database/node_modules/prisma/build/index.js generate --schema=./packages/database/prisma/schema.prisma",
-    "db:push": "bun run ./packages/database/node_modules/prisma/build/index.js db push --schema=./packages/database/prisma/schema.prisma",
-    "db:migrate": "bun run ./packages/database/node_modules/prisma/build/index.js migrate dev --schema=./packages/database/prisma/schema.prisma",
-    "db:migrate:prod": "bun run ./packages/database/node_modules/prisma/build/index.js migrate deploy --schema=./packages/database/prisma/schema.prisma",
-    "db:seed": "bun run packages/database/prisma/seed.ts",
-    "db:studio": "bun run ./packages/database/node_modules/prisma/build/index.js studio --schema=./packages/database/prisma/schema.prisma",
+    "test:ai": "bun run ./scripts/test-ai-connection.ts",
+    "postinstall": "bun run db:generate",
+    "prebuild": "bun run db:generate",
+    "db:generate": "bun --env-file=.env run --cwd packages/database db:generate",
+    "prisma:generate": "bun --env-file=.env run --cwd packages/database prisma:generate",
+    "db:push": "bun --env-file=.env run --cwd packages/database db:push",
+    "db:migrate": "bun --env-file=.env run --cwd packages/database db:migrate",
+    "db:migrate:prod": "bun --env-file=.env run --cwd packages/database db:migrate:prod",
+    "db:seed": "bun --env-file=.env run --cwd packages/database db:seed",
+    "db:studio": "bun --env-file=.env run --cwd packages/database db:studio",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop reservy-api",
+    "pm2:restart": "pm2 restart reservy-api",
+    "pm2:logs": "pm2 logs reservy-api",
+    "pm2:status": "pm2 status",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:build": "docker compose -f docker-compose.prod.yml build",
@@ -33,5 +42,10 @@
   },
   "devDependencies": {
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "framer-motion": "^13.2.0",
+    "lucide-react": "^1.43.0",
+    "openai": "^7.15.0"
   }
 }
