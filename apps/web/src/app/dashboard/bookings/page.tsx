@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   BookMarked,
   Search,
@@ -27,6 +28,7 @@ import {
   CalendarDays,
   CheckCheck,
   Ban,
+  TrendingUp,
 } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -142,8 +144,39 @@ export default function BookingsPage() {
     return true;
   });
 
+  // Computed metrics for the 4 quick access cards
+  const todayCount = bookings.filter((b) => {
+    const d = new Date(b.startAt);
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  }).length;
+
+  const tomorrowCount = bookings.filter((b) => {
+    const d = new Date(b.startAt);
+    const tom = new Date();
+    tom.setDate(tom.getDate() + 1);
+    return d.getFullYear() === tom.getFullYear() && d.getMonth() === tom.getMonth() && d.getDate() === tom.getDate();
+  }).length;
+
+  const pendingReceiptsCount = bookings.filter((b) => 
+    b.status === 'PAYMENT_SUBMITTED' || b.payments?.[0]?.status === 'PROOF_SUBMITTED'
+  ).length;
+
+  const todayRevenue = bookings
+    .filter((b) => {
+      const d = new Date(b.startAt);
+      const now = new Date();
+      return (
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate() &&
+        b.status === 'COMPLETED'
+      );
+    })
+    .reduce((sum, b) => sum + (b.priceSnapshot || b.price || 0), 0);
+
   return (
-    <div className="space-y-3 animate-fade-in text-right">
+    <div className="space-y-4 animate-fade-in text-right">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
@@ -158,6 +191,128 @@ export default function BookingsPage() {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Top Luxury Metrics Overview (Unified Container - 2 Columns on Mobile, 4 on Desktop) */}
+      <div className="p-3 sm:p-5 rounded-3xl bg-[#111726]/90 border border-amber-500/20 shadow-luxury-md backdrop-blur-xl space-y-2 sm:space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <h2 className="text-xs sm:text-sm font-black text-white tracking-tight">خلاصه وضعیت و فیلتر سریع</h2>
+          </div>
+          <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">جهت فیلتر لیست نوبت‌ها روی هر بخش کلیک کنید</span>
+        </div>
+
+        {/* 2 Columns on Mobile, 4 Columns on Desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3.5">
+          {/* 1. Today's Bookings */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setDayPriorityFilter(dayPriorityFilter === 'today' ? 'all' : 'today')}
+            className={`p-2.5 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
+              dayPriorityFilter === 'today'
+                ? 'bg-amber-500/15 border border-amber-500 ring-1 ring-amber-500/50'
+                : 'bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40'
+            }`}
+            title="فیلتر نوبت‌های امروز"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                نوبت‌های امروز
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatNumberFa(todayCount)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-amber-400/80 font-medium truncate mt-0.5">
+                {dayPriorityFilter === 'today' ? '✓ در حال نمایش' : 'کلیک جهت فیلتر'}
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <Flame className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+
+          {/* 2. Tomorrow's Bookings */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setDayPriorityFilter(dayPriorityFilter === 'tomorrow' ? 'all' : 'tomorrow')}
+            className={`p-2.5 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
+              dayPriorityFilter === 'tomorrow'
+                ? 'bg-amber-500/15 border border-amber-500 ring-1 ring-amber-500/50'
+                : 'bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40'
+            }`}
+            title="فیلتر نوبت‌های فردا"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                نوبت‌های فردا
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatNumberFa(tomorrowCount)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                {dayPriorityFilter === 'tomorrow' ? '✓ در حال نمایش' : 'کلیک جهت فیلتر'}
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <CalendarDays className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+
+          {/* 3. Pending Receipts */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setDayPriorityFilter(dayPriorityFilter === 'receipts' ? 'all' : 'receipts')}
+            className={`p-2.5 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
+              dayPriorityFilter === 'receipts'
+                ? 'bg-amber-500/15 border border-amber-500 ring-1 ring-amber-500/50'
+                : pendingReceiptsCount > 0
+                ? 'border-amber-500/60 ring-1 ring-amber-500/50 bg-amber-500/5'
+                : 'bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40'
+            }`}
+            title="فیلتر فیش‌های در انتظار بررسی"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                فیش‌های در انتظار
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatNumberFa(pendingReceiptsCount)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-amber-400/80 font-medium truncate mt-0.5">
+                {dayPriorityFilter === 'receipts' ? '✓ در حال نمایش' : 'رسیدهای کارت‌به‌کارت'}
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <CreditCard className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+
+          {/* 4. Daily Income -> Goes to Financial Reports */}
+          <Link
+            href="/dashboard/reports"
+            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            title="مشاهده بخش گزارش‌های مالی و عملکرد"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                درآمد امروز
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatToman(todayRevenue)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-emerald-400/80 font-medium truncate mt-0.5">
+                گزارش‌های مالی ←
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </Link>
         </div>
       </div>
 
