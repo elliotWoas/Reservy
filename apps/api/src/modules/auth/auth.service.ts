@@ -120,11 +120,15 @@ export class AuthService {
     });
 
     if (!user) {
+      // Diagnostic log to identify if user exists in the database
+      console.warn(`[Auth] Login rejected: No user exists in database with email "${input.email}". (Did you run 'bun db:seed' or register first?)`);
       throw new DomainError(DomainErrorCode.INVALID_CREDENTIALS, 'ایمیل یا رمز عبور اشتباه است');
     }
 
     const passwordHash = hashPassword(input.password);
     if (user.passwordHash !== passwordHash) {
+      // Diagnostic log for password hash mismatch
+      console.warn(`[Auth] Login rejected: Password mismatch for user "${input.email}"`);
       throw new DomainError(DomainErrorCode.INVALID_CREDENTIALS, 'ایمیل یا رمز عبور اشتباه است');
     }
 
