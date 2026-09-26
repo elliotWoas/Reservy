@@ -61,26 +61,76 @@ export class ApiClient {
 
     const url = resolveApiUrl(endpoint);
 
-    const res = await fetch(url, {
-      ...options,
+    // Development & debugging logger
+    console.log(`[ApiClient] Request -> ${options.method || 'GET'} ${url}`, {
       headers,
+      body: options.body,
     });
 
-    let data: any = {};
+    let res: Response;
     try {
-      data = await res.json();
-    } catch {
-      data = {};
+      res = await fetch(url, {
+        ...options,
+        headers,
+      });
+    } catch (networkError: any) {
+      console.error(`[ApiClient] Network Connection Error on ${url}:`, networkError);
+      throw {
+        code: 'NETWORK_ERROR',
+        message: 'عدم امکان اتصال به سرور. لطفاً ارتباط اینترنت یا تنظیمات Nginx سرور را بررسی فرمایید.',
+        details: { originalError: networkError.message },
+      };
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    let data: any = {};
+    let rawText = '';
+
+    if (contentType.includes('application/json')) {
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        console.warn(`[ApiClient] Failed to parse JSON response:`, jsonErr);
+        data = {};
+      }
+    } else {
+      try {
+        rawText = await res.text();
+      } catch {
+        rawText = '';
+      }
     }
 
     if (!res.ok) {
+      console.error(`[ApiClient] HTTP Error ${res.status} [${res.statusText}] from ${url}:`, {
+        status: res.status,
+        statusText: res.statusText,
+        contentType,
+        data,
+        rawText: rawText.slice(0, 500),
+      });
+
+      const isHtmlResponse = rawText.includes('<html') || contentType.includes('text/html');
+      const errorMessage =
+        data.error?.message ||
+        data.message ||
+        (isHtmlResponse
+          ? `پاسخ نامعتبر از سرور یا Nginx (کد وضعیت ${res.status} ${res.statusText}). درخواست به بک‌اند نرسیده است.`
+          : `خطای سرور (${res.status}): ${res.statusText}`);
+
       const error: ApiError = data.error || {
-        code: 'UNKNOWN_ERROR',
-        message: 'خطایی در برقراری ارتباط با سرور رخ داد',
+        code: `HTTP_${res.status}`,
+        message: errorMessage,
+        details: {
+          status: res.status,
+          statusText: res.statusText,
+          rawResponse: rawText.slice(0, 300),
+        },
       };
       throw error;
     }
 
+    console.log(`[ApiClient] Response ${res.status} <- ${url}`, data);
     return data.data !== undefined ? data.data : data;
   }
 

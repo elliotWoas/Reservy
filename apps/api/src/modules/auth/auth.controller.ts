@@ -11,15 +11,23 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: unknown) {
+    // Log registration request initiation
+    console.log('[Auth] Incoming registration request');
     const validated = RegisterSchema.parse(body);
+    console.log(`[Auth] Registration payload validated for: ${validated.email}`);
     const result = await this.authService.register(validated);
+    console.log(`[Auth] User registered successfully: ${result.user.email} (${result.user.id})`);
     return { data: result };
   }
 
   @Post('login')
   async login(@Body() body: unknown) {
+    // Log login attempt
+    console.log('[Auth] Incoming login request');
     const validated = LoginSchema.parse(body);
+    console.log(`[Auth] Login credentials validated for email: ${validated.email}`);
     const result = await this.authService.login(validated);
+    console.log(`[Auth] User authenticated successfully: ${result.user.email}`);
     return { data: result };
   }
 

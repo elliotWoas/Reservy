@@ -15,6 +15,9 @@ export class LoggerMiddleware implements NestMiddleware {
     const method = req?.method || 'GET';
     const url = req?.originalUrl || req?.url || '/';
 
+    // Immediate log when request reaches NestJS Express pipeline
+    console.log(`[HTTP INCOMING] ${method.padEnd(6)} ${url} (ip: ${req.ip || req.headers['x-real-ip'] || 'unknown'}, correlationId: ${correlationId})`);
+
     if (typeof res?.on === 'function') {
       res.on('finish', () => {
         const duration = Date.now() - start;
@@ -30,7 +33,7 @@ export class LoggerMiddleware implements NestMiddleware {
             : '\x1b[32m';
         const reset = '\x1b[0m';
 
-        console.log(`[HTTP] ${method.padEnd(6)} ${url} ${statusColor}${status}${reset} (${duration}ms)`);
+        console.log(`[HTTP FINISH]   ${method.padEnd(6)} ${url} ${statusColor}${status}${reset} (${duration}ms)`);
       });
     }
 

@@ -39,12 +39,25 @@ async function bootstrap() {
   // Global Exceptions Filter
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  // Capture low-level HTTP parser / client errors (e.g. malformed headers, invalid upgrade tokens)
+  const httpServer = app.getHttpServer();
+  httpServer.on('clientError', (err: any, socket: any) => {
+    console.error(`\x1b[31m[HTTP CLIENT ERROR]\x1b[0m ${err.message}`, {
+      code: err.code,
+      bytesParsed: err.bytesParsed,
+    });
+    if (!socket.destroyed) {
+      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+    }
+  });
+
   const port = ENV.PORT || 4002;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   const healthPath = apiPrefix ? `/${apiPrefix}/health` : '/health';
-  console.log(`🚀 NestJS Reservy API Server running on port ${port} [${ENV.NODE_ENV}]`);
+  console.log(`🚀 NestJS Reservy API Server running on http://0.0.0.0:${port} [${ENV.NODE_ENV}]`);
   console.log(`📍 Health Check: http://localhost:${port}${healthPath}`);
+  console.log(`🌐 CORS Allowed Origins:`, corsOrigin);
 }
 
 bootstrap();
