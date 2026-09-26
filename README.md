@@ -1,4 +1,4 @@
-# Reservy (رزِروی)
+# Reservy
 
 > **Enterprise Multi-Tenant Online Service Booking SaaS Platform**
 > Clean Architecture • Domain-Oriented Modular Monolith • Card-to-Card Payment Flow • Full Persian/RTL Support • Jalali Calendar
