@@ -36,7 +36,11 @@ export default function LoginPage() {
         router.push('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'ایمیل یا رمز عبور اشتباه است');
+      const displayMsg =
+        err?.message ||
+        err?.error?.message ||
+        (typeof err === 'string' ? err : 'ایمیل یا رمز عبور اشتباه است');
+      setError(displayMsg);
     } finally {
       setIsLoading(false);
     }

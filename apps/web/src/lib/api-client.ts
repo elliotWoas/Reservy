@@ -1,9 +1,16 @@
 import { APP_CONFIG, resolveApiUrl } from './config';
 
-export interface ApiError {
+export class ApiError extends Error {
   code: string;
-  message: string;
   details?: Record<string, unknown>;
+
+  constructor(message: string, code = 'API_ERROR', details?: Record<string, unknown>) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = code;
+    this.details = details;
+    Object.setPrototypeOf(this, ApiError.prototype);
+  }
 }
 
 export class ApiClient {
@@ -75,11 +82,11 @@ export class ApiClient {
       });
     } catch (networkError: any) {
       console.error(`[ApiClient] Network Connection Error on ${url}:`, networkError);
-      throw {
-        code: 'NETWORK_ERROR',
-        message: 'عدم امکان اتصال به سرور. لطفاً ارتباط اینترنت یا تنظیمات Nginx سرور را بررسی فرمایید.',
-        details: { originalError: networkError.message },
-      };
+      throw new ApiError(
+        'عدم امکان برقراری ارتباط با سرور. لطفاً از روشن بودن سرور و اتصال اینترنت اطمینان حاصل فرمایید.',
+        'NETWORK_ERROR',
+        { originalError: networkError?.message }
+      );
     }
 
     const contentType = res.headers.get('content-type') || '';
@@ -111,23 +118,36 @@ export class ApiClient {
       });
 
       const isHtmlResponse = rawText.includes('<html') || contentType.includes('text/html');
-      const errorMessage =
-        data.error?.message ||
-        data.message ||
-        (isHtmlResponse
-          ? `پاسخ نامعتبر از سرور یا Nginx (کد وضعیت ${res.status} ${res.statusText}). درخواست به بک‌اند نرسیده است.`
-          : `خطای سرور (${res.status}): ${res.statusText}`);
 
-      const error: ApiError = data.error || {
-        code: `HTTP_${res.status}`,
-        message: errorMessage,
-        details: {
-          status: res.status,
-          statusText: res.statusText,
-          rawResponse: rawText.slice(0, 300),
-        },
-      };
-      throw error;
+      let resolvedCode = `HTTP_${res.status}`;
+      let resolvedMessage = '';
+      let resolvedDetails: Record<string, unknown> | undefined = undefined;
+
+      if (data?.error) {
+        if (typeof data.error === 'string') {
+          resolvedMessage = data.error;
+        } else if (typeof data.error === 'object') {
+          resolvedCode = data.error.code || resolvedCode;
+          resolvedMessage = data.error.message || '';
+          resolvedDetails = data.error.details;
+        }
+      }
+
+      if (!resolvedMessage) {
+        if (typeof data?.message === 'string') {
+          resolvedMessage = data.message;
+        } else if (Array.isArray(data?.message)) {
+          resolvedMessage = data.message.join('، ');
+        } else if (isHtmlResponse) {
+          resolvedMessage = `پاسخ نامعتبر از سرور یا Nginx (کد وضعیت ${res.status} ${res.statusText}).`;
+        } else if (res.status === 400 || res.status === 401) {
+          resolvedMessage = 'ایمیل یا رمز عبور اشتباه است';
+        } else {
+          resolvedMessage = `خطای سرور (${res.status}): ${res.statusText}`;
+        }
+      }
+
+      throw new ApiError(resolvedMessage, resolvedCode, resolvedDetails);
     }
 
     console.log(`[ApiClient] Response ${res.status} <- ${url}`, data);

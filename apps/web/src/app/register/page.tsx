@@ -42,7 +42,11 @@ export default function RegisterPage() {
 
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'خطا در ثبت‌نام. لطفاً اطلاعات را بررسی نمایید.');
+      const displayMsg =
+        err?.message ||
+        err?.error?.message ||
+        (typeof err === 'string' ? err : 'خطا در ثبت‌نام. لطفاً اطلاعات را بررسی نمایید.');
+      setError(displayMsg);
     } finally {
       setIsLoading(false);
     }
