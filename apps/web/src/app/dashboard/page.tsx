@@ -30,7 +30,7 @@ import {
   CheckCheck,
   Ban,
 } from 'lucide-react';
-import { StatCard, Card, EmptyState } from '@/components/ui/Card';
+import { Card, EmptyState } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -95,6 +95,18 @@ export default function DashboardOverviewPage() {
     }
   };
 
+  // Smooth scroll to a target section on the dashboard with a temporary glow effect
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      element.classList.add('ring-2', 'ring-amber-500/70', 'transition-all');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-amber-500/70');
+      }, 1500);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-[450px] flex items-center justify-center">
@@ -155,40 +167,123 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* ---------------------------------------------------- */}
-      {/* 2. Top Luxury Metrics Overview                      */}
+      {/* 2. Top Luxury Metrics Overview (Unified Container)  */}
       {/* ---------------------------------------------------- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="نوبت‌های امروز"
-          value={formatNumberFa(metrics.bookingsToday || 0)}
-          icon={Flame}
-          subtitle={`${formatNumberFa(metrics.confirmedToday || 0)} نوبت تایید شده`}
-        />
-        <StatCard
-          title="نوبت‌های فردا"
-          value={formatNumberFa(metrics.bookingsTomorrow || 0)}
-          icon={CalendarDays}
-          subtitle="رزروهای برنامه‌ریزی شده فردا"
-        />
-        <StatCard
-          title="فیش‌های در انتظار تایید"
-          value={formatNumberFa(metrics.pendingProofsCount || 0)}
-          icon={CreditCard}
-          subtitle="رسیدهای کارت‌به‌کارت معوقه"
-          className={metrics.pendingProofsCount > 0 ? 'ring-2 ring-amber-500 bg-amber-500/10' : ''}
-        />
-        <StatCard
-          title="درآمد امروز"
-          value={formatToman(metrics.revenueToday || 0)}
-          icon={TrendingUp}
-          subtitle={`درآمد این ماه: ${formatToman(metrics.revenueMonth || 0)}`}
-        />
+      <div className="p-3 sm:p-5 rounded-3xl bg-[#111726]/90 border border-amber-500/20 shadow-luxury-md backdrop-blur-xl space-y-2 sm:space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <h2 className="text-xs sm:text-sm font-black text-white tracking-tight">خلاصه وضعیت و دسترسی سریع</h2>
+          </div>
+          <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">جهت مشاهده یا اقدام روی هر بخش کلیک کنید</span>
+        </div>
+
+        {/* 2 Columns on Mobile, 4 Columns on Desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3.5">
+          {/* 1. Today's Bookings */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => scrollToSection('today-section')}
+            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            title="رفتن به بخش نوبت‌های امروز"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                نوبت‌های امروز
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatNumberFa(metrics.bookingsToday || 0)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-amber-400/80 font-medium truncate mt-0.5">
+                {formatNumberFa(metrics.confirmedToday || 0)} نوبت تایید شده
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <Flame className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+
+          {/* 2. Tomorrow's Bookings */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => scrollToSection('tomorrow-section')}
+            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            title="رفتن به بخش نوبت‌های فردا"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                نوبت‌های فردا
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatNumberFa(metrics.bookingsTomorrow || 0)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                برنامه‌ریزی شده فردا
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <CalendarDays className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+
+          {/* 3. Pending Receipts */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => scrollToSection('receipts-section')}
+            className={`p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
+              metrics.pendingProofsCount > 0
+                ? 'border-amber-500/60 ring-1 ring-amber-500/50 bg-amber-500/5'
+                : 'border-amber-500/15 hover:border-amber-500/40'
+            }`}
+            title="رفتن به بخش فیش‌های در انتظار بررسی"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                فیش‌های در انتظار
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatNumberFa(metrics.pendingProofsCount || 0)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-amber-400/80 font-medium truncate mt-0.5">
+                رسیدهای کارت‌به‌کارت
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <CreditCard className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+
+          {/* 4. Daily Income -> Goes to Financial Reports */}
+          <Link
+            href="/dashboard/reports"
+            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            title="مشاهده بخش گزارش‌های مالی و عملکرد"
+          >
+            <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-300 transition-colors truncate">
+                درآمد امروز
+              </p>
+              <p className="text-base sm:text-2xl font-black text-white tracking-tight">
+                {formatToman(metrics.revenueToday || 0)}
+              </p>
+              <p className="text-[9px] sm:text-[11px] text-emerald-400/80 font-medium truncate mt-0.5">
+                گزارش‌های مالی ←
+              </p>
+            </div>
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-amber-400 rounded-xl sm:rounded-2xl border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-200 shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* ---------------------------------------------------- */}
       {/* 3. Priority 1: TODAY'S APPOINTMENTS (مهم‌ترین اولویت) */}
       {/* ---------------------------------------------------- */}
-      <Card className="space-y-2 p-3 border-amber-500/25 bg-gradient-to-b from-[#141B2D] to-[#0E131F] shadow-luxury-md">
+      <Card id="today-section" className="scroll-mt-20 space-y-2 p-3 sm:p-6 border-amber-500/25 bg-gradient-to-b from-[#141B2D] to-[#0E131F] shadow-luxury-md transition-all">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-500/15 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 flex items-center justify-center shadow-xs font-black">
@@ -361,7 +456,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 4. Priority 2: TOMORROW'S APPOINTMENTS (اولویت فردا) */}
       {/* ---------------------------------------------------- */}
-      <Card className="space-y-4 p-6 border-amber-500/15 bg-[#111726]/90">
+      <Card id="tomorrow-section" className="scroll-mt-20 space-y-4 p-6 border-amber-500/15 bg-[#111726]/90 transition-all">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-slate-800 text-amber-400 flex items-center justify-center shadow-xs border border-slate-700">
@@ -444,7 +539,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 5. Priority 3: SENT RECEIPTS AWAITING CONFIRMATION  */}
       {/* ---------------------------------------------------- */}
-      <Card className="space-y-4 p-6 border-amber-500/20 bg-[#111726]/90 shadow-luxury-md">
+      <Card id="receipts-section" className="scroll-mt-20 space-y-4 p-6 border-amber-500/20 bg-[#111726]/90 shadow-luxury-md transition-all">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
