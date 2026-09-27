@@ -72,7 +72,7 @@ export default function LoginPage() {
         </div>
 
         {/* Demo Fast-Login Buttons */}
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
+        {/* <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
           <span className="block text-[11px] font-bold text-slate-400 text-right">ورود سریع با اکانت‌های دمو (توسعه):</span>
           <div className="flex gap-2">
             <button
@@ -92,7 +92,7 @@ export default function LoginPage() {
               <span>سوپر ادمین (Admin)</span>
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Form */}
         <form onSubmit={handleLogin} className="p-8 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl text-right">
