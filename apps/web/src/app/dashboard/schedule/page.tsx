@@ -248,7 +248,7 @@ export default function WorkingHoursQuickSetupPage() {
                     className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${
                       slotDuration === dur
                         ? 'bg-emerald-600 text-white shadow-sm'
-                        : 'bg-slate-800 hover:bg-slate-200 text-slate-100'
+                        : 'bg-slate-800 hover:bg-emerald-700 text-slate-100'
                     }`}
                   >
                     {dur} دقیقه
