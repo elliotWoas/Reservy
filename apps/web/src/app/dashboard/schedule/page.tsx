@@ -134,7 +134,7 @@ export default function WorkingHoursQuickSetupPage() {
     <div className="space-y-8 animate-fade-in text-right">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-black text-slate-900">تنظیم سریع ساعات کاری و بلوک‌های رزرو (سانس‌بندی)</h1>
+        <h1 className="text-xl font-black text-slate-100">تنظیم سریع ساعات کاری و بلوک‌های رزرو (سانس‌بندی)</h1>
         <p className="text-xs text-slate-500 mt-1">
           ساعت شروع و پایان کار، زمان‌های استراحت و مدت زمان هر نوبت (مثلاً ۴۵ دقیقه) را تعیین کنید تا کل روز به صورت خودکار به بلوک‌های خالی تبدیل شود.
         </p>
@@ -146,11 +146,11 @@ export default function WorkingHoursQuickSetupPage() {
           <Card className="space-y-6">
             {/* Staff Selector */}
             <div>
-              <label className="block text-xs font-bold text-slate-800 mb-2">انتخاب ارائه‌دهنده / آرایشگر:</label>
+              <label className="block text-xs font-bold text-slate-200 mb-2">انتخاب ارائه‌دهنده / آرایشگر:</label>
               <select
                 value={selectedStaffId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className="w-full text-xs font-bold px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900"
+                className="w-full text-xs font-bold px-3.5 py-2.5 rounded-md bg-slate-800 border border-slate-500 text-slate-200 font-bold focus:outline-none focus:ring-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
               >
                 {staffList.map((st) => (
                   <option key={st.id} value={st.id}>
@@ -164,7 +164,7 @@ export default function WorkingHoursQuickSetupPage() {
             <div className="space-y-3 pt-2 border-t border-slate-100">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-xs font-bold text-slate-900">۱. بازه ساعت کاری روزانه</h3>
+                <h3 className="text-xs font-bold text-slate-300">۱. بازه ساعت کاری روزانه</h3>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Input
@@ -186,11 +186,11 @@ export default function WorkingHoursQuickSetupPage() {
             <div className="space-y-3 pt-2 border-t border-slate-100">
               <div className="flex items-center gap-2">
                 <Coffee className="w-4 h-4 text-amber-600" />
-                <h3 className="text-xs font-bold text-slate-900">۲. زمان‌های استراحت / ناهار (غیرقابل رزرو)</h3>
+                <h3 className="text-xs font-bold text-slate-200">۲. زمان‌های استراحت / ناهار (غیرقابل رزرو)</h3>
               </div>
               <div className="space-y-3">
                 <div>
-                  <span className="block text-[11px] font-semibold text-slate-600 mb-1">استراحت اول (ناهار / استراحت ظهر):</span>
+                  <span className="block text-[11px] font-semibold text-slate-300 mb-1">استراحت اول (ناهار / استراحت ظهر):</span>
                   <div className="grid grid-cols-2 gap-3">
                     <Input
                       type="time"
@@ -206,7 +206,7 @@ export default function WorkingHoursQuickSetupPage() {
                 </div>
 
                 <div className="pt-2">
-                  <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                  <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={hasBreak2}
@@ -237,7 +237,7 @@ export default function WorkingHoursQuickSetupPage() {
             <div className="space-y-3 pt-2 border-t border-slate-100">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-xs font-bold text-slate-900">۳. مدت زمان هر سانس / هر مشتری</h3>
+                <h3 className="text-xs font-bold text-slate-200">۳. مدت زمان هر سانس / هر مشتری</h3>
               </div>
               <div className="flex flex-wrap gap-2">
                 {[30, 45, 60, 90].map((dur) => (
@@ -245,10 +245,10 @@ export default function WorkingHoursQuickSetupPage() {
                     key={dur}
                     type="button"
                     onClick={() => setSlotDuration(dur)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${
                       slotDuration === dur
                         ? 'bg-emerald-600 text-white shadow-sm'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                        : 'bg-slate-800 hover:bg-slate-200 text-slate-100'
                     }`}
                   >
                     {dur} دقیقه
@@ -264,7 +264,7 @@ export default function WorkingHoursQuickSetupPage() {
                   type="checkbox"
                   checked={isFridayOff}
                   onChange={(e) => setIsFridayOff(e.target.checked)}
-                  className="rounded border-slate-300 text-emerald-600"
+                  className="rounded border-slate-300 text-emerald-800"
                 />
                 <span>جمعه‌ها تعطیل باشد</span>
               </label>
@@ -274,9 +274,9 @@ export default function WorkingHoursQuickSetupPage() {
             <Button
               isLoading={isSaving}
               onClick={handleApplySchedule}
-              className="w-full py-3.5 text-sm font-bold mt-4 flex items-center justify-center gap-2"
+              className="w-full py-3.5 text-sm font-bold text-[13px] mt-4 flex items-center justify-center gap-2"
             >
-              <Save className="w-4 h-4" />
+              {/* <Save className="w-4 h-4" /> */}
               <span>اعمال و ذخیره برای تمام روزهای هفته (شنبه تا پنج‌شنبه)</span>
             </Button>
           </Card>
@@ -290,7 +290,7 @@ export default function WorkingHoursQuickSetupPage() {
                 <Calendar className="w-4 h-4 text-emerald-600" />
                 <h3 className="text-xs font-bold text-slate-100">پیش‌نمایش سانس‌های روزانه</h3>
               </div>
-              <span className="-mt-3 ml-3 px-3 py-2 rounded-b-2xl bg-emerald-400 text-emerald-900 text-[10px] font-bold uppercase">
+              <span className="-mt-3 ml-3 px-3 py-2 rounded-b-xl bg-emerald-400 text-emerald-900 text-[10px] font-bold ">
                 {previewSlots.length} نوبت در روز
               </span>
             </div>
@@ -303,10 +303,10 @@ export default function WorkingHoursQuickSetupPage() {
               {previewSlots.map((slot, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-xl bg-slate-450 border border-slate-600 text-xs font-semibold text-slate-800 flex items-center justify-between"
+                  className="p-2.5 rounded-md bg-slate-450 border border-slate-600 text-xs font-semibold text-slate-800 flex items-center justify-between"
                 >
                   <span className="text-emerald-300 font-bold">نوبت {idx + 1}</span>
-                  <span className="font-mono text-slate-100">{slot}</span>
+                  <span className="font-mono text-slate-400">{slot}</span>
                 </div>
               ))}
             </div>
