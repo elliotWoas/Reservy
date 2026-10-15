@@ -65,7 +65,7 @@ export function ApiStatusBadge() {
       </button>
 
       {showDetails && (
-        <div className="absolute left-0 mt-2 w-72 p-4 rounded-2xl bg-[#111726] border border-amber-500/30 shadow-2xl text-xs space-y-2.5 z-50 animate-in fade-in">
+        <div className="absolute left-0 mt-2 w-72 p-4 rounded-2xl bg-surface border border-amber-500/30 shadow-2xl text-xs space-y-2.5 z-50 animate-in fade-in">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="font-bold text-white">وضعیت سرویس هوش مصنوعی</span>
             <span

@@ -88,10 +88,10 @@ export function ReceiptImageLightbox({
       {/* Lightbox Container */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-4xl bg-[#111726]/95 backdrop-blur-2xl rounded-3xl border border-amber-500/30 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[92vh] transform transition-all duration-300 ease-out ${animationClass}`}
+        className={`relative w-full max-w-4xl bg-surface/95 backdrop-blur-2xl rounded-3xl border border-amber-500/30 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[92vh] transform transition-all duration-300 ease-out ${animationClass}`}
       >
         {/* Top Luxury Toolbar */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] text-white border-b border-amber-500/15 select-none">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-surface-hover via-surface to-surface-hover text-white border-b border-amber-500/15 select-none">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
               <CreditCard className="w-4 h-4" />
@@ -162,7 +162,7 @@ export function ReceiptImageLightbox({
         </div>
 
         {/* Bottom Receipt Metadata Details */}
-        <div className="px-6 py-3.5 bg-[#0E131F] border-t border-amber-500/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="px-6 py-3.5 bg-inset border-t border-amber-500/15 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-4 text-slate-400 flex-wrap">
             {referenceNumber && (
               <span className="font-mono bg-black/40 px-2 py-0.5 rounded-md border border-amber-500/20 text-amber-300">

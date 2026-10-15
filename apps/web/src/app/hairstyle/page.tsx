@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default function HairstylePage() {
   return (
-    <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex flex-col selection:bg-amber-500 selection:text-black">
+    <div className="min-h-screen bg-app text-slate-100 flex flex-col selection:bg-amber-500 selection:text-black">
       {/* Top Navigation Bar */}
-      <header className="border-b border-amber-500/15 bg-[#0B0F17]/90 backdrop-blur-md sticky top-0 z-30">
+      <header className="border-b border-amber-500/15 bg-app/90 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link

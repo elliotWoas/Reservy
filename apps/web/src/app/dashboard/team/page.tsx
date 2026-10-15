@@ -160,8 +160,8 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-black text-slate-900">تیم، ارائه‌دهندگان و ساعات کاری</h1>
-          <p className="text-xs text-slate-500">مدیریت پرسنل، خدمات اختصاصی و برنامه شیفت‌های هفتگی</p>
+          <h1 className="text-xl font-black text-slate-300">تیم، ارائه‌دهندگان و ساعات کاری</h1>
+          <p className="text-[14px] text-slate-500">مدیریت پرسنل، خدمات اختصاصی و برنامه شیفت‌های هفتگی</p>
         </div>
 
         <Button size="sm" onClick={handleOpenAddStaff} className="flex items-center gap-1.5">
@@ -172,7 +172,7 @@ export default function TeamPage() {
 
       {/* Staff Grid */}
       {loading ? (
-        <div className="p-12 text-center text-xs text-slate-500">در حال بارگذاری لیست تیم...</div>
+        <div className="p-12 text-center text-xs text-slate-100">در حال بارگذاری لیست تیم...</div>
       ) : staffList.length === 0 ? (
         <EmptyState
           title="هیچ ارائه‌دهنده‌ای ثبت نشده است"
@@ -186,25 +186,25 @@ export default function TeamPage() {
             <Card key={st.id} className="p-5 space-y-4">
               <div className="flex items-center gap-3.5">
                 {st.avatarUrl ? (
-                  <img src={st.avatarUrl} alt={st.displayName} className="w-14 h-14 rounded-2xl object-cover" />
+                  <img src={st.avatarUrl} alt={st.displayName} className="w-14 h-14 rounded-xl object-cover" />
                 ) : (
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xl">
+                  <div className="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xl">
                     {st.displayName.charAt(0)}
                   </div>
                 )}
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">{st.displayName}</h3>
-                  <p className="text-xs text-slate-500 line-clamp-1">{st.bio || 'متخصص'}</p>
+                  <h3 className="text-sm font-bold text-slate-200">{st.displayName}</h3>
+                  <p className="text-[12px] text-slate-400 line-clamp-1">{st.bio || 'متخصص'}</p>
                 </div>
               </div>
 
               {/* Services assigned */}
               <div>
-                <span className="block text-[11px] font-semibold text-slate-500 mb-1.5">خدمات ارائه شونده:</span>
+                <span className="block text-[11px] font-semibold text-slate-300 mb-1.5">خدمات ارائه شونده:</span>
                 <div className="flex flex-wrap gap-1.5">
                   {st.staffServices?.length > 0 ? (
                     st.staffServices.map((ss: any) => (
-                      <span key={ss.serviceId} className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-medium">
+                      <span key={ss.serviceId} className="px-2.5 py-1.5 rounded-md bg-slate-800 text-slate-200 text-[10px] font-medium">
                         {ss.service?.name}
                       </span>
                     ))
@@ -215,12 +215,12 @@ export default function TeamPage() {
               </div>
 
               {/* Actions */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-500 flex items-center justify-between">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => handleOpenSchedule(st)}
-                  className="text-[11px] py-1.5"
+                  className="text-[11px] py-1.5  border-slate-500 text-slate-300 flex items-center gap-1.5"
                 >
                   <Clock className="w-3.5 h-3.5 ml-1" />
                   <span>تنظیم ساعات کاری</span>
@@ -229,7 +229,7 @@ export default function TeamPage() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenEditStaff(st)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"
+                    className="p-1.5 rounded-md hover:bg-slate-100 text-slate-100"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
@@ -280,15 +280,15 @@ export default function TeamPage() {
 
           {/* Multi-select Services */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">انتساب خدمات قابل رزرو:</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border border-slate-200 rounded-xl">
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">انتخاب خدمات قابل رزرو:</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border border-slate-400 rounded-xl">
               {servicesList.map((s) => {
                 const isSelected = selectedServiceIds.includes(s.id);
                 return (
                   <label
                     key={s.id}
-                    className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer text-xs transition-colors ${
-                      isSelected ? 'bg-emerald-50 text-emerald-900 font-bold' : 'hover:bg-slate-50 text-slate-700'
+                    className={`flex items-center gap-2 p-2 bg-slate-200 rounded-md cursor-pointer text-xs transition-colors ${
+                      isSelected ? 'bg-emerald-100 text-emerald-900 font-bold' : 'hover:bg-slate-50 text-slate-800'
                     }`}
                   >
                     <input
@@ -301,7 +301,7 @@ export default function TeamPage() {
                           setSelectedServiceIds(selectedServiceIds.filter((id) => id !== s.id));
                         }
                       }}
-                      className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                      className="rounded border-slate-500 text-emerald-600 focus:ring-emerald-500"
                     />
                     <span>{s.name}</span>
                   </label>
@@ -328,7 +328,7 @@ export default function TeamPage() {
             {weekSchedules.map((day, idx) => (
               <div
                 key={day.dayOfWeek}
-                className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                   day.isDayOff ? 'bg-slate-50/50 border-slate-200 opacity-60' : 'bg-white border-slate-200'
                 }`}
               >

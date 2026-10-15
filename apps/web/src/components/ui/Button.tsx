@@ -16,7 +16,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'bg-emerald-600 hover:bg-emerald-700 text-white focus:ring-emerald-500 shadow-sm hover:shadow',
       gold: 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-700 hover:to-amber-700 text-white focus:ring-amber-500 shadow-luxury-sm',
       goldOutline: 'border border-amber-300 bg-amber-50/70 hover:bg-amber-100/70 text-amber-900 focus:ring-amber-500 shadow-2xs',
-      secondary: 'bg-slate-900 hover:bg-slate-950 text-white focus:ring-slate-700 shadow-sm',
+      secondary: 'bg-slate-900 hover:bg-app text-white focus:ring-slate-700 shadow-sm',
       outline: 'border border-slate-200 hover:bg-slate-50 text-slate-800 focus:ring-slate-400',
       danger: 'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-500 shadow-sm',
       ghost: 'hover:bg-slate-100 text-slate-700',

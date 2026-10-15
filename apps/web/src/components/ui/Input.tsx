@@ -15,8 +15,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           ref={ref}
-          className={cn(
-            'w-full px-4 py-2.5 text-sm bg-[#0E131F] border rounded-xl shadow-xs transition-all duration-500',
+          className={cn(  
+            'w-full px-4 py-2.5 text-sm bg-inset bg-slate-800 border rounded-xl shadow-xs transition-all duration-500',
             'border-amber-500/20 text-white placeholder:text-slate-100',
             'focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500',
             'disabled:opacity-50 disabled:bg-slate-900',
