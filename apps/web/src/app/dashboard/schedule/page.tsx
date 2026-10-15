@@ -284,18 +284,18 @@ export default function WorkingHoursQuickSetupPage() {
 
         {/* Live Slot Preview Column */}
         <div className="space-y-4">
-          <Card className="p-5 space-y-4">
+          <Card className="p-3 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-xs font-bold text-slate-900">پیش‌نمایش سانس‌های روزانه</h3>
+                <h3 className="text-xs font-bold text-slate-100">پیش‌نمایش سانس‌های روزانه</h3>
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+              <span className="-mt-3 ml-3 px-3 py-2 rounded-b-2xl bg-emerald-400 text-emerald-900 text-[10px] font-bold uppercase">
                 {previewSlots.length} نوبت در روز
               </span>
             </div>
 
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[12px] text-slate-200">
               مشتریان در صفحه رزرو، سانس‌های خالی زیر را برای انتخاب مشاهده خواهند کرد:
             </p>
 
@@ -303,10 +303,10 @@ export default function WorkingHoursQuickSetupPage() {
               {previewSlots.map((slot, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 flex items-center justify-between"
+                  className="p-2.5 rounded-xl bg-slate-450 border border-slate-600 text-xs font-semibold text-slate-800 flex items-center justify-between"
                 >
-                  <span className="text-emerald-700 font-bold">نوبت {idx + 1}</span>
-                  <span className="font-mono text-slate-900">{slot}</span>
+                  <span className="text-emerald-300 font-bold">نوبت {idx + 1}</span>
+                  <span className="font-mono text-slate-100">{slot}</span>
                 </div>
               ))}
             </div>
