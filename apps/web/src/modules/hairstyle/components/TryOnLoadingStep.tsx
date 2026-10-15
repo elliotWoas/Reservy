@@ -31,7 +31,7 @@ export function TryOnLoadingStep({ hairstyle, error, onRetry, onBack }: TryOnLoa
   }, [error, stages.length]);
 
   return (
-    <div className="w-full max-w-lg mx-auto p-8 rounded-3xl bg-[#111726] border border-amber-500/30 text-center space-y-6 shadow-2xl animate-in fade-in duration-400">
+    <div className="w-full max-w-lg mx-auto p-8 rounded-3xl bg-surface border border-amber-500/30 text-center space-y-6 shadow-2xl animate-in fade-in duration-400">
       {error ? (
         /* Error State */
         <div className="space-y-5">

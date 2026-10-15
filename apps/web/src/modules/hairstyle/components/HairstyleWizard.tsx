@@ -173,7 +173,7 @@ export function HairstyleWizard() {
   const progressIndex = getStepProgressIndex();
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[#0B0F17] text-slate-100 flex flex-col items-center">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-app text-slate-100 flex flex-col items-center">
       {/* Top Wizard Steps Bar */}
       {currentStep !== 'INTRO' && (
         <div className="w-full max-w-2xl mb-8">

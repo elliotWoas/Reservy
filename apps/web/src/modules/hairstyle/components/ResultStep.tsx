@@ -76,7 +76,7 @@ export function ResultStep({
       />
 
       {/* Barber Technical Card */}
-      <div className="p-6 rounded-3xl bg-[#111726] border border-amber-500/30 space-y-4 shadow-xl">
+      <div className="p-6 rounded-3xl bg-surface border border-amber-500/30 space-y-4 shadow-xl">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div className="flex items-center gap-2 text-white font-bold text-sm">
             <Scissors className="w-4 h-4 text-amber-400" />

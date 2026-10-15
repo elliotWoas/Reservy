@@ -50,8 +50,8 @@ export function RecommendationStep({
               key={item.id}
               className={`p-6 rounded-3xl border transition-all duration-300 relative overflow-hidden ${
                 isTopRank
-                  ? 'bg-gradient-to-b from-[#151D30] to-[#0E1424] border-amber-500/40 shadow-2xl shadow-amber-500/10'
-                  : 'bg-[#111726] border-slate-800 hover:border-amber-500/30 shadow-xl'
+                  ? 'bg-gradient-to-b from-surface-alt to-surface-deep border-amber-500/40 shadow-2xl shadow-amber-500/10'
+                  : 'bg-surface border-slate-800 hover:border-amber-500/30 shadow-xl'
               }`}
             >
               {isTopRank && (
