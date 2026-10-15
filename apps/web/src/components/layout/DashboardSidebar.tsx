@@ -52,7 +52,7 @@ export function DashboardSidebar({
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-l border-amber-500/10 bg-[#0E131F]/95 backdrop-blur-xl min-h-screen text-right select-none shadow-[4px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 shrink-0">
+    <aside className="hidden lg:flex flex-col w-64 border-l border-amber-500/10 bg-inset/95 backdrop-blur-xl min-h-screen text-right select-none shadow-[4px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 shrink-0">
       {/* Brand Header */}
       <div className="p-6 border-b border-amber-500/10 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-3">

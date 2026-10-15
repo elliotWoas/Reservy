@@ -53,7 +53,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6 selection:bg-emerald-500 text-white">
+    <div className="min-h-screen flex items-center justify-center bg-app p-6 selection:bg-emerald-500 text-white">
       <div className="w-full max-w-md space-y-8 animate-fade-in">
         {/* Brand */}
         <div className="text-center space-y-2">

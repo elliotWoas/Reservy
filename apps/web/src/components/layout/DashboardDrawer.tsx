@@ -106,7 +106,7 @@ export function DashboardDrawer({
       {/* Sliding Drawer Panel */}
       <aside
         className={cn(
-          'fixed top-0 bottom-0 right-0 z-50 w-72 sm:w-80 bg-[#0E131F]/98 backdrop-blur-2xl border-l border-amber-500/20 shadow-[-12px_0_50px_rgba(0,0,0,0.85)] flex flex-col text-right select-none transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+          'fixed top-0 bottom-0 right-0 z-50 w-72 sm:w-80 bg-inset/98 backdrop-blur-2xl border-l border-amber-500/20 shadow-[-12px_0_50px_rgba(0,0,0,0.85)] flex flex-col text-right select-none transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
         dir="rtl"

@@ -18,7 +18,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E131F]/95 backdrop-blur-xl border-t border-amber-500/15 px-2 py-1.5 flex justify-around select-none shadow-2xl">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-inset/95 backdrop-blur-xl border-t border-amber-500/15 px-2 py-1.5 flex justify-around select-none shadow-2xl">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;

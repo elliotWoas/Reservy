@@ -28,7 +28,7 @@ export function DashboardHeader({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 sm:px-6 bg-[#0E131F]/90 backdrop-blur-xl border-b border-amber-500/10 text-right shadow-lg">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 sm:px-6 bg-inset/90 backdrop-blur-xl border-b border-amber-500/10 text-right shadow-lg">
       {/* Right Side (Start in RTL): Hamburger Menu Button + User Identity */}
       <div className="flex items-center gap-3">
         {onToggleMenu && (
