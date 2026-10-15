@@ -11,57 +11,23 @@ This document records the UI conventions currently implemented in `apps/web` and
 - Preserve Persian-first localization: document language is `fa`, document direction is `rtl`, and layouts should work with right-to-left text. Use logical CSS properties/utilities where possible.
 - Next.js and React versions are `next@^14.2.3` and `react@^18.3.1`.
 
-## Tailwind configuration
+## Tailwind configuration and theme tokens
 
-Tailwind CSS 3 is configured in `apps/web/tailwind.config.js` and scans `src/pages`, `src/components`, and `src/app`. There is also an `apps/web/tailwind.config.ts` with a different brand palette. The global stylesheet uses the dark luxury palette below; keep new UI aligned with that active palette and resolve the duplicate config before relying on generated theme tokens across environments.
+Tailwind CSS 3 is configured in `apps/web/tailwind.config.js`. `apps/web/tailwind.config.ts` exposes the same semantic aliases for TypeScript tooling. **The actual application theme color values live only in `apps/web/src/app/globals.css` under `:root`**; both Tailwind configs map semantic utilities to those CSS variables and support opacity modifiers.
 
-### Active colors
+| Tailwind utility | CSS token | Current value |
+| --- | --- | --- |
+| `bg-app` | `--bg-app` | `#10151F` |
+| `bg-surface` | `--bg-surface` | `#111726` |
+| `bg-surface-hover` | `--bg-surface-hover` | `#172033` |
+| `bg-inset` | `--bg-inset` | `#0E131F` |
+| `bg-raised` | `--bg-raised` | `#161D2E` |
+| `bg-surface-alt` | `--bg-surface-alt` | `#141B2D` |
+| `bg-surface-deep` | `--bg-deep` | `#0E1424` |
+| Amber utilities / gold accent | `--amber-*`, `--accent-gold` | `amber-500` resolves to `#D4AF37` |
+| Gold light | `--accent-gold-light` | `#F3E5AB` |
 
-Global CSS custom properties in `apps/web/src/app/globals.css`:
-
-| Token | Value |
-| --- | --- |
-| App background `--bg-app` | `#10151F` |
-| Card `--bg-card` | `#111726` |
-| Card hover `--bg-card-hover` | `#172033` |
-| Card border `--border-card` | `rgba(212, 175, 55, 0.16)` |
-| Gold accent `--accent-gold` | `#D4AF37` |
-| Gold light `--accent-gold-light` | `#F3E5AB` |
-| Body text | Tailwind `slate-100` (`#f1f5f9`) |
-
-Tailwind theme extensions in the active JavaScript config:
-
-| Family | Shade | Hex |
-| --- | ---: | --- |
-| `brand` | 50 | `#faf7f0` |
-| `brand` | 100 | `#f3edd9` |
-| `brand` | 200 | `#e7d8b1` |
-| `brand` | 300 | `#d9bd82` |
-| `brand` | 400 | `#cba357` |
-| `brand` | 500 | `#b88934` |
-| `brand` | 600 | `#a3712b` |
-| `brand` | 700 | `#835425` |
-| `brand` | 800 | `#6d4323` |
-| `brand` | 900 | `#5c3720` |
-| `brand` | 950 | `#351c0f` |
-| `gold` | 50 | `#fdfbf7` |
-| `gold` | 100 | `#f9f4e8` |
-| `gold` | 200 | `#f2e6cb` |
-| `gold` | 300 | `#e8d2a2` |
-| `gold` | 400 | `#dba558` |
-| `gold` | 500 | `#cfa043` |
-| `gold` | 600 | `#b88432` |
-| `gold` | 700 | `#946329` |
-| `gold` | 800 | `#774f26` |
-| `gold` | 900 | `#634223` |
-| `obsidian` | 50 | `#f8fafc` |
-| `obsidian` | 100 | `#f1f5f9` |
-| `obsidian` | 200 | `#e2e8f0` |
-| `obsidian` | 800 | `#141a29` |
-| `obsidian` | 900 | `#090d16` |
-| `obsidian` | 950 | `#04070d` |
-
-The `tailwind.config.ts` alternative defines `brand` as a green scale (`#f0fdf4` through `#052e16`) and `primary` as a slate scale (`#f8fafc` through `#020617`). Do not treat those as the active visual palette until the duplicate config is reconciled.
+Use these semantic utilities instead of repeating arbitrary theme hex values in components. For a theme change, update the CSS variables in `globals.css`; component classes and Tailwind aliases should not need edits. Status colors and illustration/data colors are not global theme tokens and can remain local where their meaning is specific.
 
 ## Typography
 
@@ -82,4 +48,4 @@ The `tailwind.config.ts` alternative defines `brand` as a green scale (`#f0fdf4`
 
 - Prefer semantic HTML and accessible names, visible keyboard focus, and clear disabled/loading states.
 - Reuse existing primitives in `apps/web/src/components/ui` when they fit; keep new variants compatible with the current Tailwind setup.
-- Avoid adding a second source of truth for theme values. If tokens change, update the active config and global CSS together, then reconcile or remove the conflicting config.
+- Avoid adding a second source of truth for theme values. Add or update a CSS variable in `globals.css`, then expose it as a semantic Tailwind alias in `tailwind.config.js` when components need a utility class.
