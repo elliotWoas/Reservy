@@ -69,7 +69,7 @@ export default function CustomersPage() {
   return (
     <div className="space-y-6 animate-fade-in text-right">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-surface-hover via-surface to-surface-hover p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
@@ -86,21 +86,21 @@ export default function CustomersPage() {
       </div>
 
       {/* Search */}
-      <Card className="p-4 border-amber-500/15 bg-[#111726]/90">
+      <Card className="p-4 border-amber-500/15 bg-surface/90">
         <form onSubmit={handleSearchSubmit} className="relative max-w-md">
           <input
             type="text"
             placeholder="جستجو با نام یا شماره تماس مشتری..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-3 pr-9 py-2.5 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
+            className="w-full pl-3 pr-9 py-2.5 rounded-2xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
         </form>
       </Card>
 
       {/* Customers Table */}
-      <Card className="p-0 overflow-hidden border-amber-500/15 bg-[#111726]/90">
+      <Card className="p-0 overflow-hidden border-amber-500/15 bg-surface/90">
         {loading ? (
           <div className="p-12 text-center text-xs text-slate-400 font-bold">در حال بارگذاری پرونده مشتریان...</div>
         ) : customers.length === 0 ? (
@@ -112,7 +112,7 @@ export default function CustomersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-[#0E131F] border-b border-amber-500/10 text-slate-400 font-bold">
+              <thead className="bg-inset border-b border-amber-500/10 text-slate-400 font-bold">
                 <tr>
                   <th className="p-4">پروفایل و نام مشتری</th>
                   <th className="p-4">شماره تماس</th>
@@ -185,7 +185,7 @@ export default function CustomersPage() {
           title={`یادداشت پرونده: ${selectedCustomer.fullName}`}
         >
           <form onSubmit={handleSaveNotes} className="space-y-4 text-right">
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#0E131F] border border-amber-500/20">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-inset border border-amber-500/20">
               <Avatar name={selectedCustomer.fullName || 'مشتری'} size="md" />
               <div>
                 <span className="font-bold text-white block">{selectedCustomer.fullName}</span>
@@ -202,7 +202,7 @@ export default function CustomersPage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="مثال: حساسیت به رنگ، مدل موی دلخواه، تخفیف اختصاصی..."
-                className="w-full p-3.5 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 leading-relaxed"
+                className="w-full p-3.5 rounded-2xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 leading-relaxed"
               />
             </div>
 

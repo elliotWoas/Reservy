@@ -211,7 +211,7 @@ export default function CalendarPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-black text-slate-900">تقویم کاری و نوبت‌ها</h1>
-          <p className="text-xs text-slate-500">{formatJalaliDate(currentDate)}</p>
+          <p className="text-xs text-slate-100">{formatJalaliDate(currentDate)}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
@@ -219,7 +219,7 @@ export default function CalendarPage() {
           <select
             value={selectedStaffId}
             onChange={(e) => setSelectedStaffId(e.target.value)}
-            className="text-xs font-semibold px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-700 focus:outline-none"
+            className="text-xs font-semibold px-3 py-2 rounded-md bg-slate-800 border border-slate-500 text-slate-200 focus:outline-none"
           >
             <option value="">همه ارائه‌دهندگان</option>
             {staffList.map((st) => (
@@ -230,7 +230,7 @@ export default function CalendarPage() {
           </select>
 
           {/* View Mode Toggle */}
-          <div className="flex bg-slate-100 p-1 rounded-md">
+          <div className="flex bg-slate-200 p-1 rounded-md">
             <button
               onClick={() => setViewMode('day')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'day' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'
@@ -251,16 +251,16 @@ export default function CalendarPage() {
           <div className="flex items-center gap-1">
             <button
               onClick={handlePrev}
-              className="p-2 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
+              className="p-2 rounded-md bg-slate-800 border border-slate-300 hover:bg-slate-50 text-slate-300"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 " />
             </button>
-            <Button size="sm" variant="outline" onClick={handleToday}>
+            <Button className="bg-slate-800 border border-slate-400 hover:bg-slate-150 text-slate-300" size="sm" variant="outline" onClick={handleToday}>
               امروز
             </Button>
             <button
               onClick={handleNext}
-              className="p-2 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
+              className="p-2 rounded-md bg-slate-800 border border-slate-300 hover:bg-slate-50 text-slate-300"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>

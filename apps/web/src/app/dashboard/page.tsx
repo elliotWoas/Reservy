@@ -129,7 +129,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 1. Header with Luxury Gold Accent & Action Buttons   */}
       {/* ---------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-xl border border-amber-500/20 shadow-luxury-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-surface-hover via-surface to-surface-hover p-6 rounded-xl border border-amber-500/20 shadow-luxury-md">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30">
@@ -169,7 +169,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 2. Top Luxury Metrics Overview (Unified Container)  */}
       {/* ---------------------------------------------------- */}
-      <div className="p-3 sm:p-5 rounded-3xl bg-[#111726]/90 border border-amber-500/20 shadow-luxury-md backdrop-blur-xl space-y-2 sm:space-y-3">
+      <div className="p-3 sm:p-5 rounded-3xl bg-surface/90 border border-amber-500/20 shadow-luxury-md backdrop-blur-xl space-y-2 sm:space-y-3">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
@@ -185,7 +185,7 @@ export default function DashboardOverviewPage() {
             role="button"
             tabIndex={0}
             onClick={() => scrollToSection('today-section')}
-            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            className="p-2.5 sm:p-4 rounded-2xl bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
             title="رفتن به بخش نوبت‌های امروز"
           >
             <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
@@ -209,7 +209,7 @@ export default function DashboardOverviewPage() {
             role="button"
             tabIndex={0}
             onClick={() => scrollToSection('tomorrow-section')}
-            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            className="p-2.5 sm:p-4 rounded-2xl bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
             title="رفتن به بخش نوبت‌های فردا"
           >
             <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
@@ -233,7 +233,7 @@ export default function DashboardOverviewPage() {
             role="button"
             tabIndex={0}
             onClick={() => scrollToSection('receipts-section')}
-            className={`p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
+            className={`p-2.5 sm:p-4 rounded-2xl bg-inset hover:bg-raised border transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
               metrics.pendingProofsCount > 0
                 ? 'border-amber-500/60 ring-1 ring-amber-500/50 bg-amber-500/5'
                 : 'border-amber-500/15 hover:border-amber-500/40'
@@ -259,7 +259,7 @@ export default function DashboardOverviewPage() {
           {/* 4. Daily Income -> Goes to Financial Reports */}
           <Link
             href="/dashboard/reports"
-            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            className="p-2.5 sm:p-4 rounded-2xl bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
             title="مشاهده بخش گزارش‌های مالی و عملکرد"
           >
             <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
@@ -283,7 +283,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 3. Priority 1: TODAY'S APPOINTMENTS (مهم‌ترین اولویت) */}
       {/* ---------------------------------------------------- */}
-      <Card id="today-section" className="scroll-mt-20 space-y-2 p-3 sm:p-6 border-amber-500/25 bg-gradient-to-b from-[#141B2D] to-[#0E131F] shadow-luxury-md transition-all">
+      <Card id="today-section" className="scroll-mt-20 space-y-2 p-3 sm:p-6 border-amber-500/25 bg-gradient-to-b from-surface-alt to-inset shadow-luxury-md transition-all">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-500/15 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 flex items-center justify-center shadow-xs font-black">
@@ -324,7 +324,7 @@ export default function DashboardOverviewPage() {
                       ? 'border-emerald-500/30 bg-emerald-950/20'
                       : isCancelled
                       ? 'border-slate-800 bg-slate-900/40 opacity-60'
-                      : 'border-amber-500/20 bg-[#111726] hover:border-amber-500/40 hover:bg-[#161D2E] shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
+                      : 'border-amber-500/20 bg-surface hover:border-amber-500/40 hover:bg-raised shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
                   }`}
                 >
                   {/* Customer & Booking Details */}
@@ -456,7 +456,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 4. Priority 2: TOMORROW'S APPOINTMENTS (اولویت فردا) */}
       {/* ---------------------------------------------------- */}
-      <Card id="tomorrow-section" className="scroll-mt-20 space-y-4 p-6 border-amber-500/15 bg-[#111726]/90 transition-all">
+      <Card id="tomorrow-section" className="scroll-mt-20 space-y-4 p-6 border-amber-500/15 bg-surface/90 transition-all">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-slate-800 text-amber-400 flex items-center justify-center shadow-xs border border-slate-700">
@@ -481,7 +481,7 @@ export default function DashboardOverviewPage() {
               return (
                 <div
                   key={booking.id}
-                  className="p-2.5 rounded-lg bg-[#0E131F] hover:bg-[#141B2D] border border-amber-500/10 hover:border-amber-500/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="p-2.5 rounded-lg bg-inset hover:bg-surface-alt border border-amber-500/10 hover:border-amber-500/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="flex items-start gap-3.5">
                     <Avatar name={booking.customer?.fullName || 'مشتری'} size="md" />
@@ -539,7 +539,7 @@ export default function DashboardOverviewPage() {
       {/* ---------------------------------------------------- */}
       {/* 5. Priority 3: SENT RECEIPTS AWAITING CONFIRMATION  */}
       {/* ---------------------------------------------------- */}
-      <Card id="receipts-section" className="scroll-mt-20 space-y-4 p-6 border-amber-500/20 bg-[#111726]/90 shadow-luxury-md transition-all">
+      <Card id="receipts-section" className="scroll-mt-20 space-y-4 p-6 border-amber-500/20 bg-surface/90 shadow-luxury-md transition-all">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
@@ -570,7 +570,7 @@ export default function DashboardOverviewPage() {
               return (
                 <div
                   key={payment.id}
-                  className="p-4 rounded-lg bg-[#0E131F] border border-amber-500/20 shadow-xs flex items-center justify-between gap-3"
+                  className="p-4 rounded-lg bg-inset border border-amber-500/20 shadow-xs flex items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -622,7 +622,7 @@ export default function DashboardOverviewPage() {
         >
           <div className="space-y-6 text-right">
             {/* Customer Profile Header */}
-            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-[#111726] to-amber-500/10 border border-amber-500/20 flex items-center gap-4">
+            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-surface to-amber-500/10 border border-amber-500/20 flex items-center gap-4">
               <Avatar name={selectedBooking.customer?.fullName || 'مشتری'} size="xl" />
               <div className="space-y-1 flex-1">
                 <div className="flex items-center justify-between">
@@ -654,7 +654,7 @@ export default function DashboardOverviewPage() {
                 const resolvedFileUrl = resolveAssetUrl(fileUrl);
 
                 return (
-                  <div className="p-4 rounded-3xl bg-[#0E131F] border border-amber-500/30 space-y-3">
+                  <div className="p-4 rounded-3xl bg-inset border border-amber-500/30 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
                         <CreditCard className="w-4 h-4 text-amber-400" />
@@ -709,7 +709,7 @@ export default function DashboardOverviewPage() {
               }
 
               return (
-                <div className="p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
+                <div className="p-3.5 rounded-lg bg-inset border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium">
                     <ShieldCheck className="w-4 h-4 text-slate-400" />
                     پرداخت حضوری / در محل
@@ -723,21 +723,21 @@ export default function DashboardOverviewPage() {
 
             {/* Receipt Summary Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-lg bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">کد رهگیری فاکتور</span>
                 <span className="font-mono font-bold text-white text-sm">{selectedBooking.code}</span>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-lg bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">مبلغ کل فاکتور</span>
                 <span className="font-black text-amber-400 text-sm">
                   {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
                 </span>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-lg bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">تاریخ نوبت</span>
                 <span className="font-bold text-white">{formatJalaliDate(selectedBooking.startAt)}</span>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-lg bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">ساعت نوبت</span>
                 <span className="font-bold text-white">{formatTimeFa(selectedBooking.startAt)}</span>
               </div>

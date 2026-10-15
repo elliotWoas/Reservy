@@ -59,7 +59,7 @@ export default function SuperAdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-app text-white">
         <div className="text-xs font-semibold text-slate-400">در حال بارگذاری پنل سوپر ادمین...</div>
       </div>
     );
@@ -69,7 +69,7 @@ export default function SuperAdminPage() {
   const orgs = overview?.recentOrganizations || [];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 sm:p-10 selection:bg-purple-500 text-right">
+    <div className="min-h-screen bg-app text-white p-6 sm:p-10 selection:bg-purple-500 text-right">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Top Bar */}
         <div className="flex items-center justify-between pb-6 border-b border-slate-800">

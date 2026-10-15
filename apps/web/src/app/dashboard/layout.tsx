@@ -74,7 +74,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0B0F17]">
+      <div className="min-h-screen flex items-center justify-center bg-app">
         <div className="flex flex-col items-center gap-3.5">
           <div className="w-10 h-10 border-3 border-amber-500 border-t-transparent rounded-full animate-spin shadow-luxury-sm" />
           <span className="text-xs font-bold text-slate-400">در حال بارگذاری داشبورد...</span>
@@ -84,7 +84,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen flex bg-[#0B0F17] text-slate-100 selection:bg-amber-500 selection:text-black" dir="rtl">
+    <div className="min-h-screen flex bg-app text-slate-100 selection:bg-amber-500 selection:text-black" dir="rtl">
       {/* Right Desktop Sidebar (Collapsible / Pinnable) */}
       <DashboardSidebar
         orgSlug={user?.activeOrganization?.slug}

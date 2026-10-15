@@ -42,12 +42,12 @@ export default function ReportsPage() {
     <div className="space-y-8 animate-fade-in text-right">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-black text-slate-900">گزارش‌های مالی و عملکرد</h1>
-        <p className="text-xs text-slate-500">تحلیل درآمدهای تایید شده، پرفروش‌ترین خدمات و بهترین اعضای تیم</p>
+        <h1 className="text-xl font-black text-slate-300">گزارش‌های مالی و عملکرد</h1>
+        <p className="text-xs text-slate-400">تحلیل درآمدهای تایید شده، پرفروش‌ترین خدمات و بهترین اعضای تیم</p>
       </div>
 
       {/* Revenue Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <StatCard
           title="درآمد امروز"
           value={formatToman(metrics.revenueToday || 0)}
@@ -69,14 +69,14 @@ export default function ReportsPage() {
       </div>
 
       {/* Two Column Performance Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Top Services */}
         <Card className="space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <Scissors className="w-5 h-5 text-emerald-600" />
             <div>
-              <h3 className="text-sm font-bold text-slate-900">پرفروش‌ترین خدمات</h3>
-              <p className="text-[11px] text-slate-500">رتبه‌بندی بر اساس تعداد نوبت‌های انجام شده</p>
+              <h3 className="text-sm font-bold text-slate-300">پرفروش‌ترین خدمات</h3>
+              <p className="text-[11px] text-slate-400">رتبه‌بندی بر اساس تعداد نوبت‌های انجام شده</p>
             </div>
           </div>
 
@@ -84,15 +84,15 @@ export default function ReportsPage() {
             {topServices.map((s: any, idx: number) => (
               <div
                 key={s.id}
-                className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between"
+                className="p-3.5 rounded-xl bg-slate-520 border border-slate-400 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
                     {formatNumberFa(idx + 1)}
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">{s.name}</h4>
-                    <span className="text-[10px] text-slate-500">قیمت واحد: {formatToman(s.price)}</span>
+                    <h4 className="text-xs font-bold text-slate-300">{s.name}</h4>
+                    <span className="text-[10px] text-slate-400">قیمت واحد: {formatToman(s.price)}</span>
                   </div>
                 </div>
                 <div className="text-left space-y-0.5">
@@ -113,8 +113,8 @@ export default function ReportsPage() {
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <Award className="w-5 h-5 text-emerald-600" />
             <div>
-              <h3 className="text-sm font-bold text-slate-900">عملکرد اعضای تیم</h3>
-              <p className="text-[11px] text-slate-500">تعداد نوبت‌های ثبت شده و انجام شده توسط هر فرد</p>
+              <h3 className="text-sm font-bold text-slate-300">عملکرد اعضای تیم</h3>
+              <p className="text-[11px] text-slate-400">تعداد نوبت‌های ثبت شده و انجام شده توسط هر فرد</p>
             </div>
           </div>
 
@@ -122,16 +122,16 @@ export default function ReportsPage() {
             {topStaff.map((st: any, idx: number) => (
               <div
                 key={st.id}
-                className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between"
+                className="p-3.5 rounded-xl bg-slate-520 border border-slate-400 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-slate-200 text-slate-800 flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-lg bg-slate-300 text-slate-800 flex items-center justify-center font-bold text-xs">
                     {formatNumberFa(idx + 1)}
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">{st.displayName}</h4>
+                  <h4 className="text-xs font-bold text-slate-300">{st.displayName}</h4>
                 </div>
                 <div className="text-left">
-                  <span className="text-xs font-black text-slate-800">
+                  <span className="text-xs font-black text-slate-200">
                     {formatNumberFa(st.totalCompletedBookings)} نوبت موفق
                   </span>
                 </div>

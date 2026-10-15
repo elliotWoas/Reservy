@@ -178,7 +178,7 @@ export default function BookingsPage() {
   return (
     <div className="space-y-4 animate-fade-in text-right">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-surface-hover via-surface to-surface-hover p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-3 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
@@ -195,7 +195,7 @@ export default function BookingsPage() {
       </div>
 
       {/* Top Luxury Metrics Overview (Unified Container - 2 Columns on Mobile, 4 on Desktop) */}
-      <div className="p-3 sm:p-5 rounded-3xl bg-[#111726]/90 border border-amber-500/20 shadow-luxury-md backdrop-blur-xl space-y-2 sm:space-y-3">
+      <div className="p-3 sm:p-5 rounded-3xl bg-surface/90 border border-amber-500/20 shadow-luxury-md backdrop-blur-xl space-y-2 sm:space-y-3">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
@@ -214,7 +214,7 @@ export default function BookingsPage() {
             className={`p-2.5 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
               dayPriorityFilter === 'today'
                 ? 'bg-amber-500/15 border border-amber-500 ring-1 ring-amber-500/50'
-                : 'bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40'
+                : 'bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40'
             }`}
             title="فیلتر نوبت‌های امروز"
           >
@@ -242,7 +242,7 @@ export default function BookingsPage() {
             className={`p-2.5 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none ${
               dayPriorityFilter === 'tomorrow'
                 ? 'bg-amber-500/15 border border-amber-500 ring-1 ring-amber-500/50'
-                : 'bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40'
+                : 'bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40'
             }`}
             title="فیلتر نوبت‌های فردا"
           >
@@ -272,7 +272,7 @@ export default function BookingsPage() {
                 ? 'bg-amber-500/15 border border-amber-500 ring-1 ring-amber-500/50'
                 : pendingReceiptsCount > 0
                 ? 'border-amber-500/60 ring-1 ring-amber-500/50 bg-amber-500/5'
-                : 'bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40'
+                : 'bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40'
             }`}
             title="فیلتر فیش‌های در انتظار بررسی"
           >
@@ -295,7 +295,7 @@ export default function BookingsPage() {
           {/* 4. Daily Income -> Goes to Financial Reports */}
           <Link
             href="/dashboard/reports"
-            className="p-2.5 sm:p-4 rounded-2xl bg-[#0E131F] hover:bg-[#161D2E] border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
+            className="p-2.5 sm:p-4 rounded-2xl bg-inset hover:bg-raised border border-amber-500/15 hover:border-amber-500/40 transition-all duration-200 cursor-pointer active:scale-[0.98] group flex items-start justify-between gap-1.5 sm:gap-2 shadow-xs text-right select-none"
             title="مشاهده بخش گزارش‌های مالی و عملکرد"
           >
             <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
@@ -317,7 +317,7 @@ export default function BookingsPage() {
       </div>
 
       {/* Priority Tabs & Filters Toolbar */}
-      <Card className="p-3 space-y-4 border-amber-500/15 bg-[#111726]/90">
+      <Card className="p-3 space-y-4 border-amber-500/15 bg-surface/90">
         {/* Priority Tabs */}
         <div className="flex items-center gap-1 overflow-x-auto pb-1 select-none">
           <button
@@ -326,7 +326,7 @@ export default function BookingsPage() {
             className={`px-2 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'today'
                 ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black'
-                : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
+                : 'bg-inset text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
             }`}
           >
             <Flame className="w-4 h-4" />
@@ -339,7 +339,7 @@ export default function BookingsPage() {
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'tomorrow'
                 ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black'
-                : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
+                : 'bg-inset text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
             }`}
           >
             <CalendarDays className="w-4 h-4" />
@@ -352,7 +352,7 @@ export default function BookingsPage() {
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'receipts'
                 ? 'bg-amber-500 text-slate-950 shadow-luxury-sm font-black'
-                : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
+                : 'bg-inset text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
             }`}
           >
             <CreditCard className="w-4 h-4" />
@@ -365,7 +365,7 @@ export default function BookingsPage() {
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               dayPriorityFilter === 'all'
                 ? 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-sm font-black'
-                : 'bg-[#0E131F] text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
+                : 'bg-inset text-slate-400 hover:bg-white/10 hover:text-white border border-amber-500/10'
             }`}
           >
             <span>تمام نوبت‌ها ({formatNumberFa(bookings.length)})</span>
@@ -380,7 +380,7 @@ export default function BookingsPage() {
               placeholder="جستجو با نام مشتری، شماره تماس یا کد رهگیری نوبت..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-3 pr-9 py-2.5 rounded-xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
+              className="w-full pl-3 pr-9 py-2.5 rounded-xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
             />
             <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
           </form>
@@ -390,7 +390,7 @@ export default function BookingsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="text-xs font-bold px-3.5 py-2.5 rounded-xl bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none w-full sm:w-auto"
+              className="text-xs font-bold px-3.5 py-2.5 rounded-xl bg-inset border border-amber-500/20 text-white focus:outline-none w-full sm:w-auto"
             >
               <option value="">همه وضعیت‌ها</option>
               <option value="PENDING_PAYMENT">در انتظار پرداخت</option>
@@ -436,7 +436,7 @@ export default function BookingsPage() {
                     ? 'border-emerald-500/30 bg-emerald-950/20'
                     : isCancelled
                     ? 'border-slate-800 bg-slate-900/40 opacity-60'
-                    : 'border-amber-500/20 bg-[#111726] hover:border-amber-500/40 hover:bg-[#161D2E] shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
+                    : 'border-amber-500/20 bg-surface hover:border-amber-500/40 hover:bg-raised shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
                 }`}
               >
                 {/* Left Side: Customer & Service Profile */}
@@ -581,7 +581,7 @@ export default function BookingsPage() {
         >
           <div className="space-y-6 text-right">
             {/* Customer Profile Card */}
-            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-[#111726] to-amber-500/10 border border-amber-500/20 flex items-center gap-4">
+            <div className="p-4.5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-surface to-amber-500/10 border border-amber-500/20 flex items-center gap-4">
               <Avatar name={selectedBooking.customer?.fullName || 'مشتری'} size="xl" />
               <div className="space-y-1 flex-1">
                 <div className="flex items-center justify-between">
@@ -614,7 +614,7 @@ export default function BookingsPage() {
                 const resolvedFileUrl = resolveAssetUrl(fileUrl);
 
                 return (
-                  <div className="p-4 rounded-3xl bg-[#0E131F] border border-amber-500/30 space-y-3">
+                  <div className="p-4 rounded-3xl bg-inset border border-amber-500/30 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
                         <CreditCard className="w-4 h-4 text-amber-400" />
@@ -669,7 +669,7 @@ export default function BookingsPage() {
               }
 
               return (
-                <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-inset border border-amber-500/15 text-xs text-slate-300 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium">
                     <ShieldCheck className="w-4 h-4 text-slate-400" />
                     پرداخت در محل / ثبت حضوری
@@ -683,27 +683,27 @@ export default function BookingsPage() {
 
             {/* Receipt Summary Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">کد رهگیری فاکتور</span>
                 <span className="font-mono font-bold text-white text-sm">{selectedBooking.code}</span>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">مبلغ کل فاکتور</span>
                 <span className="font-black text-amber-400 text-sm">
                   {formatToman(selectedBooking.priceSnapshot || selectedBooking.price || 0)}
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">تاریخ نوبت</span>
                 <span className="font-bold text-white">{formatJalaliDate(selectedBooking.startAt)}</span>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1">
+              <div className="p-3.5 rounded-xl bg-inset border border-amber-500/15 space-y-1">
                 <span className="text-slate-400 text-[11px] block">ساعت و مدت زمان</span>
                 <span className="font-bold text-white">
                   {formatTimeFa(selectedBooking.startAt)} ({selectedBooking.durationSnapshot || selectedBooking.service?.durationMinutes || 45} دقیقه)
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/15 space-y-1 col-span-2">
+              <div className="p-3.5 rounded-xl bg-inset border border-amber-500/15 space-y-1 col-span-2">
                 <span className="text-slate-400 text-[11px] block">خدمت و ارائه‌دهنده</span>
                 <span className="font-bold text-white">
                   {selectedBooking.service?.name || selectedBooking.serviceNameSnapshot} — ارائه‌دهنده:{' '}
@@ -714,7 +714,7 @@ export default function BookingsPage() {
 
             {/* Notes if any */}
             {selectedBooking.notes && (
-              <div className="p-3.5 rounded-xl bg-[#0E131F] border border-amber-500/20 text-xs space-y-1">
+              <div className="p-3.5 rounded-xl bg-inset border border-amber-500/20 text-xs space-y-1">
                 <span className="font-bold text-amber-400 block">یادداشت مشتری:</span>
                 <p className="text-slate-300 leading-relaxed">{selectedBooking.notes}</p>
               </div>
@@ -810,7 +810,7 @@ export default function BookingsPage() {
                 placeholder="مثال: درخواست مشتری، عدم حضور، جابجایی زمان..."
                 value={cancellationReason}
                 onChange={(e) => setCancellationReason(e.target.value)}
-                className="w-full p-3.5 rounded-xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-rose-500"
+                className="w-full p-3.5 rounded-xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-rose-500"
               />
             </div>
 
