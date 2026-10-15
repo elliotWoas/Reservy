@@ -275,7 +275,7 @@ export function CaptureStep({
       </div>
 
       {/* Main Viewport Container */}
-      <div className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden bg-slate-950 border-2 border-slate-800 shadow-2xl flex items-center justify-center">
+      <div className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden bg-app border-2 border-slate-800 shadow-2xl flex items-center justify-center">
         {capturedSnapshot ? (
           /* Snapshot Review Mode */
           <div className="relative w-full h-full">

@@ -90,7 +90,7 @@ export default function HomePage() {
         </section>
 
         {/* Feature Grid */}
-        <section className="py-20 bg-slate-950/50 border-t border-slate-800/80 px-6">
+        <section className="py-20 bg-app/50 border-t border-slate-800/80 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center space-y-3 mb-16">
               <h2 className="text-2xl sm:text-3xl font-black text-white">امکانات پلتفرم رزِروی</h2>

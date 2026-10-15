@@ -92,7 +92,7 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6 animate-fade-in text-right">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#172033] via-[#111726] to-[#172033] p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-surface-hover via-surface to-surface-hover p-6 rounded-3xl border border-amber-500/20 shadow-luxury-md">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
@@ -106,7 +106,7 @@ export default function PaymentsPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex bg-[#0E131F] p-1.5 rounded-2xl border border-amber-500/15">
+        <div className="flex bg-inset p-1.5 rounded-2xl border border-amber-500/15">
           <button
             onClick={() => setStatusFilter('PROOF_SUBMITTED')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -143,7 +143,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Payments Table */}
-      <Card className="p-0 overflow-hidden border-amber-500/15 bg-[#111726]/90">
+      <Card className="p-0 overflow-hidden border-amber-500/15 bg-surface/90">
         {loading ? (
           <div className="p-12 text-center text-xs text-slate-400 font-bold">در حال دریافت لیست پرداخت‌ها...</div>
         ) : payments.length === 0 ? (
@@ -155,7 +155,7 @@ export default function PaymentsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-[#0E131F] border-b border-amber-500/10 text-slate-400 font-bold">
+              <thead className="bg-inset border-b border-amber-500/10 text-slate-400 font-bold">
                 <tr>
                   <th className="p-4">مشتری</th>
                   <th className="p-4">کد نوبت</th>
@@ -216,7 +216,7 @@ export default function PaymentsPage() {
         >
           <div className="space-y-6 text-right">
             {/* Info Summary */}
-            <div className="grid grid-cols-2 gap-4 text-xs bg-[#0E131F] p-4 rounded-2xl border border-amber-500/15">
+            <div className="grid grid-cols-2 gap-4 text-xs bg-inset p-4 rounded-2xl border border-amber-500/15">
               <div>
                 <span className="text-slate-400 block">مشتری:</span>
                 <strong className="text-white font-bold text-sm">{selectedPayment.booking?.customer?.fullName}</strong>
@@ -243,7 +243,7 @@ export default function PaymentsPage() {
                   />
                 </div>
               ) : (
-                <div className="p-8 text-center bg-[#0E131F] border border-dashed border-slate-700 rounded-2xl text-xs text-slate-400">
+                <div className="p-8 text-center bg-inset border border-dashed border-slate-700 rounded-2xl text-xs text-slate-400">
                   فایلی پیوست نشده است
                 </div>
               )}
@@ -306,7 +306,7 @@ export default function PaymentsPage() {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="مثال: مبلغ واریزی ناخوانا است، شماره حساب اشتباه است..."
-                className="w-full p-3 rounded-2xl text-xs bg-[#0E131F] border border-amber-500/20 text-white focus:outline-none focus:border-rose-500 leading-relaxed"
+                className="w-full p-3 rounded-2xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-rose-500 leading-relaxed"
               />
             </div>
 

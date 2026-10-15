@@ -26,7 +26,7 @@ export function IntroStep({ onStart, onQuickStart }: IntroStepProps) {
 
       {/* 3 Photos Explanation Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-[#111726] border border-amber-500/20 space-y-3 text-center hover:border-amber-500/50 transition-all group">
+        <div className="p-5 rounded-2xl bg-surface border border-amber-500/20 space-y-3 text-center hover:border-amber-500/50 transition-all group">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center font-black text-lg group-hover:scale-110 transition-transform">
             ۱
           </div>
@@ -36,7 +36,7 @@ export function IntroStep({ onStart, onQuickStart }: IntroStepProps) {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#111726] border border-amber-500/20 space-y-3 text-center hover:border-amber-500/50 transition-all group">
+        <div className="p-5 rounded-2xl bg-surface border border-amber-500/20 space-y-3 text-center hover:border-amber-500/50 transition-all group">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center font-black text-lg group-hover:scale-110 transition-transform">
             ۲
           </div>
@@ -46,7 +46,7 @@ export function IntroStep({ onStart, onQuickStart }: IntroStepProps) {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#111726] border border-amber-500/20 space-y-3 text-center hover:border-amber-500/50 transition-all group">
+        <div className="p-5 rounded-2xl bg-surface border border-amber-500/20 space-y-3 text-center hover:border-amber-500/50 transition-all group">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center font-black text-lg group-hover:scale-110 transition-transform">
             ۳
           </div>

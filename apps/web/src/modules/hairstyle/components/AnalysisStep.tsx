@@ -87,7 +87,7 @@ export function AnalysisStep({ geometry, shapeEstimate, onProceed }: AnalysisSte
       </div>
 
       {/* Face Shape & Proportions Card */}
-      <div className="p-6 rounded-3xl bg-[#111726] border border-amber-500/30 space-y-5 shadow-2xl relative overflow-hidden">
+      <div className="p-6 rounded-3xl bg-surface border border-amber-500/30 space-y-5 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-36 h-36 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
@@ -125,7 +125,7 @@ export function AnalysisStep({ geometry, shapeEstimate, onProceed }: AnalysisSte
       </div>
 
       {/* Hair & Preferences Form */}
-      <form onSubmit={handleSubmit} className="p-6 rounded-3xl bg-[#111726] border border-slate-800 space-y-6">
+      <form onSubmit={handleSubmit} className="p-6 rounded-3xl bg-surface border border-slate-800 space-y-6">
         <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-slate-800 pb-3">
           <Sliders className="w-4 h-4 text-amber-400" />
           <span>تکمیل اطلاعات جنس و ترجیحات موی شما</span>

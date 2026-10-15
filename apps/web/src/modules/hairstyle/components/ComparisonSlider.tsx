@@ -57,7 +57,7 @@ export function ComparisonSlider({
   return (
     <div className="w-full flex flex-col items-center gap-4 select-none">
       {/* View Mode Toggle */}
-      <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-950/60 border border-amber-500/20 text-xs">
+      <div className="flex items-center gap-2 p-1 rounded-xl bg-app/60 border border-amber-500/20 text-xs">
         <button
           type="button"
           onClick={() => setViewMode('slider')}
@@ -91,7 +91,7 @@ export function ComparisonSlider({
           onMouseMove={handleMouseMove}
           onMouseDown={handleMouseDown}
           onTouchMove={handleTouchMove}
-          className="relative w-full max-w-md aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-500/30 cursor-ew-resize touch-none bg-slate-950"
+          className="relative w-full max-w-md aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-500/30 cursor-ew-resize touch-none bg-app"
         >
           {/* Generated Image (Right layer / Base) */}
           <img
@@ -145,14 +145,14 @@ export function ComparisonSlider({
       ) : (
         /* Side-by-Side Mode */
         <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-slate-800 shadow-xl bg-slate-950">
+          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-slate-800 shadow-xl bg-app">
             <img src={originalImage} alt="قبل" className="w-full h-full object-cover" />
             <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-slate-300 text-xs font-bold border border-white/10">
               عکس اولیه شما
             </div>
           </div>
 
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-xl bg-slate-950">
+          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-xl bg-app">
             <img src={generatedImage} alt={hairstyleName} className="w-full h-full object-cover" />
             <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-emerald-500/90 text-slate-950 text-xs font-black shadow-lg flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" />
