@@ -93,7 +93,7 @@ export default function CustomersPage() {
             placeholder="جستجو با نام یا شماره تماس مشتری..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-3 pr-9 py-2.5 rounded-2xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
+            className="w-full pl-3 pr-9 py-2.5 rounded-xl text-xs bg-inset border border-amber-500/20 text-white focus:outline-none focus:border-amber-500 transition-colors"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
         </form>
