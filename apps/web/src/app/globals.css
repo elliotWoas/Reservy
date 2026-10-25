@@ -4,6 +4,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @layer base {
+  :root {
+    --font-sans: 'Vazirmatn', Tahoma, sans-serif; */
+
+    /* Light Palette: Crisp Mint & Soft Sage */
+/* ============================================== */
+
+    /* #F4F7F5 - Soft Mint/Grey-White */
+    /* --bg-app: 244 247 245; */
+    /* #FFFFFF - Pure White */
+    /* --bg-surface: 255 255 255; */
+     /* #ECF2EF - Soft Hover */
+    /* --bg-surface-hover: 236 242 239; */
+    /* #E4EBE7 */
+    /* --bg-inset: 228 235 231; */
+    /* #FFFFFF */
+    /* --bg-raised: 255 255 255; */
+    /* #F0F5F2 */
+    /* --bg-surface-alt: 240 245 242; */
+    /* #DBE3DF */
+    /* --bg-deep: 219 227 223;
+    
+    /* #94B8A3 - Muted Sage */
+    /* --border-card: 148 184 163;        */
+    /* #81AF96 - Slightly deeper for light mode contrast */
+    /* --accent-gold: 129 175 150; */
+    /* #CAE0D4 */
+    /* --accent-gold-light: 202 224 212;  */
+
+    /* Soft Jade / Botanical Sage Scale (Kept identical to Dark Mode) */
+    /* --amber-50: 244 249 246;  --amber-100: 229 240 234; --amber-200: 202 224 212; */
+    
+    /* --amber-300: 167 202 183; --amber-400: 129 175 150; --amber-600: 88 135 110; */
+    /* --amber-700: 70 109 89;   --amber-800: 58 89 73;    --amber-900: 49 74 61;   --amber-950: 25 40 33;  */
+
+    /* --tab-anim-duration: 0.4s;
+  } */
+
+  /* body {
+    font-family: var(--font-sans);
+    direction: rtl;
+    text-align: right;
+    background-color: rgb(var(--bg-app));
+    @apply text-slate-800 antialiased selection:bg-amber-200 selection:text-slate-900;
+    background-image: 
+      radial-gradient(at 0% 0%, rgb(var(--accent-gold) / 0.08) 0px, transparent 45%),
+      radial-gradient(at 100% 0%, rgba(148, 184, 163, 0.12) 0px, transparent 40%),
+      radial-gradient(at 50% 100%, rgb(var(--accent-gold) / 0.05) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, rgba(228, 235, 231, 0.6) 0px, transparent 60%);
+    background-attachment: fixed;
+  }
+} */
+
 @layer base {
   :root {
     --font-sans: 'Vazirmatn', Tahoma, sans-serif;
