@@ -8,23 +8,24 @@
   :root {
     --font-sans: 'Vazirmatn', Tahoma, sans-serif;
 
-    /* Active Luxury Dark Palette: Royal Obsidian & Brushed Gold */
-    --bg-app: 16 21 31; /* #10151F */
-    --bg-surface: 17 23 38; /* #111726 */
-    --bg-surface-hover: 23 32 51; /* #172033 */
-    --bg-inset: 14 19 31; /* #0E131F */
-    --bg-raised: 22 29 46; /* #161D2E */
-    --bg-surface-alt: 20 27 45; /* #141B2D */
-    --bg-deep: 14 20 36; /* #0E1424 */
-    --border-card: 212 175 55; /* #D4AF37 */
-    --accent-gold: 212 175 55; /* #D4AF37 */
-    --accent-gold-light: 243 229 171; /* #F3E5AB */
+    /* Palette 3: Deep Cypress & Soft Sage */
+    --bg-app: 13 20 18;           /* #0D1412 - Deep Cypress */
+    --bg-surface: 18 28 25;       /* #121C19 */
+    --bg-surface-hover: 25 39 35; /* #192723 */
+    --bg-inset: 10 15 14;         /* #0A0F0E */
+    --bg-raised: 22 34 30;        /* #16221E */
+    --bg-surface-alt: 20 31 28;   /* #141F1C */
+    --bg-deep: 8 13 11;           /* #080D0B */
+    
+    --border-card: 148 184 163;       /* #94B8A3 - Muted Sage */
+    --accent-gold: 148 184 163;       /* #94B8A3 */
+    --accent-gold-light: 209 229 217; /* #D1E5D9 */
 
-    --amber-50: 255 251 235; --amber-100: 254 243 199; --amber-200: 253 230 138;
-    --amber-300: 252 211 77; --amber-400: 251 191 36; --amber-600: 217 119 6;
-    --amber-700: 180 83 9; --amber-800: 146 64 14; --amber-900: 120 53 15; --amber-950: 69 26 3;
+    /* Soft Jade / Botanical Sage Scale */
+    --amber-50: 244 249 246;  --amber-100: 229 240 234; --amber-200: 202 224 212;
+    --amber-300: 167 202 183; --amber-400: 129 175 150; --amber-600: 88 135 110;
+    --amber-700: 70 109 89;   --amber-800: 58 89 73;    --amber-900: 49 74 61;   --amber-950: 25 40 33;
 
-    /* Tab Transition Speed (Adjust duration here) */
     --tab-anim-duration: 1.88s;
   }
 
@@ -33,12 +34,12 @@
     direction: rtl;
     text-align: right;
     background-color: rgb(var(--bg-app));
-    @apply text-slate-100 antialiased selection:bg-amber-500 selection:text-black;
+    @apply text-slate-100 antialiased selection:bg-amber-400 selection:text-black;
     background-image: 
-      radial-gradient(at 0% 0%, rgb(var(--accent-gold) / 0.08) 0px, transparent 45%),
-      radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 40%),
+      radial-gradient(at 0% 0%, rgb(var(--accent-gold) / 0.09) 0px, transparent 45%),
+      radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.04) 0px, transparent 40%),
       radial-gradient(at 50% 100%, rgb(var(--accent-gold) / 0.06) 0px, transparent 50%),
-      radial-gradient(at 80% 50%, rgba(30, 41, 59, 0.35) 0px, transparent 60%);
+      radial-gradient(at 80% 50%, rgba(20, 40, 34, 0.4) 0px, transparent 60%);
     background-attachment: fixed;
   }
 }
