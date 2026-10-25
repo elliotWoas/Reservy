@@ -71,7 +71,7 @@ export default function ServicesPage() {
     setPrice(s.price);
     setBufferBefore(s.bufferBeforeMinutes || 0);
     setBufferAfter(s.bufferAfterMinutes || 0);
-    setIsModalOpen(true);
+    setIsModalOpen(false);
   };
 
   const handleSaveService = async (e: React.FormEvent) => {
@@ -101,7 +101,8 @@ export default function ServicesPage() {
       }
 
       setIsModalOpen(false);
-      fetchData();
+      setEditingServiceId(null);
+      await fetchData();
     } catch (err: any) {
       alert(err.message || 'خطا در ذخیره خدمت');
     } finally {
@@ -140,7 +141,7 @@ export default function ServicesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-black text-slate-900">مدیریت خدمات و قیمت‌گذاری</h1>
+          <h1 className="text-xl font-black text-slate-100">مدیریت خدمات و قیمت‌گذاری</h1>
           <p className="text-xs text-slate-500">تعریف خدمات قابل رزرو، مدت زمان و قیمت‌ها</p>
         </div>
 
@@ -156,9 +157,9 @@ export default function ServicesPage() {
       </div>
 
       {/* Services List */}
-      <Card className="p-0 overflow-hidden">
+      <div className="space-y-3">
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-500">در حال بارگذاری لیست خدمات...</div>
+          <Card className="p-12 text-center text-xs text-slate-400">در حال بارگذاری لیست خدمات...</Card>
         ) : services.length === 0 ? (
           <EmptyState
             title="هیچ خدمتی ثبت نشده است"
@@ -166,67 +167,126 @@ export default function ServicesPage() {
             icon={Scissors}
             action={<Button size="sm" onClick={handleOpenAdd}>تعریف اولین خدمت</Button>}
           />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-500 font-bold">
-                <tr>
-                  <th className="p-4">عنوان خدمت</th>
-                  <th className="p-4">دسته‌بندی</th>
-                  <th className="p-4">مدت زمان</th>
-                  <th className="p-4">قیمت</th>
-                  <th className="p-4">بافر استراحت</th>
-                  <th className="p-4 text-left">عملیات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {services.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-4">
-                      <span className="font-bold text-slate-900 block">{s.name}</span>
-                      {s.description && <span className="text-[11px] text-slate-500 line-clamp-1">{s.description}</span>}
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2 py-0.5 rounded-md  text-slate-400 text-[11px]">
-                        {s.category?.name || 'بدون دسته‌بندی'}
+        ) : services.map((s) => (
+          <div key={s.id} className="space-y-2">
+            <Card className="p-4 sm:p-5 border-white/10 bg-surface/90">
+              <div className="flex flex-row-reverse items-start gap-3">
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteService(s.id)}
+                    aria-label={`حذف ${s.name}`}
+                    className="w-10 h-10 rounded-xl border border-rose-400/15 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition-colors flex items-center justify-center"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => editingServiceId === s.id ? setEditingServiceId(null) : handleOpenEdit(s)}
+                    aria-label={`ویرایش ${s.name}`}
+                    aria-expanded={editingServiceId === s.id}
+                    className={`w-10 h-10 rounded-xl border transition-colors flex items-center justify-center ${
+                      editingServiceId === s.id
+                        ? 'border-amber-400/40 bg-amber-500/15 text-amber-300'
+                        : 'border-emerald-400/15 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+                    }`}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="min-w-0 flex-1 text-right">
+                  <h2 className="text-sm font-extrabold text-slate-100">{s.name}</h2>
+                  <p className="mt-1 text-xs font-bold text-emerald-300">{formatToman(s.price)} ریال</p>
+                  {s.description && <p className="mt-2 text-[11px] leading-6 text-slate-400 line-clamp-2">{s.description}</p>}
+                  <div className="mt-2 flex flex-wrap justify-end gap-x-3 gap-y-1 text-[10px] text-slate-500">
+                    <span>{s.durationMinutes} دقیقه</span>
+                    <span>{s.category?.name || 'بدون دسته‌بندی'}</span>
+                    {(s.bufferBeforeMinutes || s.bufferAfterMinutes) > 0 && (
+                      <span>بافر {s.bufferBeforeMinutes || 0} قبل / {s.bufferAfterMinutes || 0} بعد</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {editingServiceId === s.id && (
+              <Card className="p-4 sm:p-5 border-white/10 bg-surface/95 animate-fade-in">
+                <form onSubmit={handleSaveService} className="space-y-4">
+                  <div className="space-y-1 border-b border-white/10 pb-3">
+                    <h3 className="text-sm font-black text-slate-100">ویرایش خدمت: {s.name}</h3>
+                    <p className="text-[11px] leading-5 text-slate-400">قیمت و زمان جدید فقط برای رزروهای جدید اعمال می‌شود.</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor={`service-name-${s.id}`} className="block text-xs font-bold text-slate-300">نام خدمت</label>
+                    <input id={`service-name-${s.id}`} required value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-inset px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-amber-400/50 focus:ring-2 focus:ring-amber-500/10" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="font-bold text-slate-300">مدت خدمت</label>
+                      <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-inset px-3 py-2 text-slate-200">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        {Math.floor(durationMinutes / 60) > 0 ? `${Math.floor(durationMinutes / 60)} ساعت و ` : ''}{durationMinutes % 60 ? `${durationMinutes % 60} دقیقه` : '۰ دقیقه'}
                       </span>
-                    </td>
-                    <td className="p-4 font-semibold text-slate-700">{s.durationMinutes} دقیقه</td>
-                    <td className="p-4 font-black text-emerald-700">{formatToman(s.price)}</td>
-                    <td className="p-4 text-slate-500">
-                      {s.bufferBeforeMinutes || s.bufferAfterMinutes
-                        ? `${s.bufferBeforeMinutes || 0} قبل / ${s.bufferAfterMinutes || 0} بعد`
-                        : 'بدون بافر'}
-                    </td>
-                    <td className="p-4 text-left">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => handleOpenEdit(s)}
-                          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-slate-900"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteService(s.id)}
-                          className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                    <p className="text-[10px] text-slate-500">ساعت</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[0, 1, 2, 3].map((hours) => (
+                        <button key={hours} type="button" onClick={() => setDurationMinutes(Math.max(5, hours * 60 + durationMinutes % 60))} className={`rounded-xl border py-2 text-xs transition ${Math.floor(durationMinutes / 60) === hours ? 'border-amber-400/50 bg-amber-500/10 text-amber-300' : 'border-white/10 bg-inset text-slate-400 hover:border-white/20'}`}>{hours}</button>
+                      ))}
+                    </div>
+                    <p className="pt-1 text-[10px] text-slate-500">دقیقه</p>
+                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+                      {[0, 5, 10, 15, 20, 25, 30, 45].map((minutes) => (
+                        <button key={minutes} type="button" onClick={() => setDurationMinutes(Math.max(5, Math.floor(durationMinutes / 60) * 60 + minutes))} className={`rounded-xl border py-2 text-xs transition ${durationMinutes % 60 === minutes ? 'border-amber-400/50 bg-amber-500/10 text-amber-300' : 'border-white/10 bg-inset text-slate-400 hover:border-white/20'}`}>{minutes}</button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor={`service-price-${s.id}`} className="block text-xs font-bold text-slate-300">قیمت</label>
+                    <div className="flex items-center rounded-xl border border-white/10 bg-inset px-4 focus-within:border-amber-400/50">
+                      <input id={`service-price-${s.id}`} type="number" min={0} step={1000} required value={price} onChange={(e) => setPrice(Number(e.target.value))} className="w-full bg-transparent py-3 text-xs text-slate-100 outline-none" />
+                      <span className="text-[10px] text-slate-500">ریال</span>
+                    </div>
+                    <p className="text-[10px] font-bold text-emerald-300">یک بار مصرف و شفاف؛ بدون هزینه پنهان</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor={`service-description-${s.id}`} className="block text-xs font-bold text-slate-300">توضیحات خدمت (اختیاری)</label>
+                    <textarea id={`service-description-${s.id}`} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full resize-y rounded-xl border border-white/10 bg-inset px-4 py-3 text-xs leading-6 text-slate-100 outline-none transition focus:border-amber-400/50 focus:ring-2 focus:ring-amber-500/10" />
+                  </div>
+
+                  <details className="rounded-xl border border-white/10 bg-inset px-4 py-3">
+                    <summary className="cursor-pointer text-xs font-bold text-slate-300">تنظیمات تکمیلی</summary>
+                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <select aria-label="دسته‌بندی خدمت" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="rounded-xl border border-white/10 bg-surface px-3 py-2.5 text-xs text-slate-200">
+                        <option value="">بدون دسته‌بندی</option>
+                        {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                      <label className="space-y-1 text-[10px] text-slate-400">بافر قبل (دقیقه)<input type="number" min={0} value={bufferBefore} onChange={(e) => setBufferBefore(Number(e.target.value))} className="w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-xs text-slate-100" /></label>
+                      <label className="space-y-1 text-[10px] text-slate-400">بافر بعد (دقیقه)<input type="number" min={0} value={bufferAfter} onChange={(e) => setBufferAfter(Number(e.target.value))} className="w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-xs text-slate-100" /></label>
+                    </div>
+                  </details>
+
+                  <p className="text-[10px] leading-5 text-slate-500">قیمت یا زمان خدمت ممکن است تغییر کند؛ لطفاً برای هماهنگی با مشتری پیش از رزرو بررسی کنید.</p>
+                  <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <Button type="button" variant="outline" onClick={() => setEditingServiceId(null)} className="sm:min-w-24">انصراف</Button>
+                    <Button type="submit" isLoading={isSaving} className="sm:min-w-40">ذخیره تغییرات</Button>
+                  </div>
+                </form>
+              </Card>
+            )}
           </div>
-        )}
-      </Card>
+        ))}
+      </div>
 
       {/* Service Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingServiceId ? 'ویرایش خدمت' : 'افزودن خدمت جدید'}
+        title="افزودن خدمت جدید"
         maxWidth="md"
       >
         <form onSubmit={handleSaveService} className="space-y-4">
@@ -239,11 +299,11 @@ export default function ServicesPage() {
           />
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">دسته‌بندی:</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">دسته‌بندی:</label>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-800"
+              className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-inset border border-white/10 text-slate-100"
             >
               <option value="">بدون دسته‌بندی</option>
               {categories.map((c) => (
